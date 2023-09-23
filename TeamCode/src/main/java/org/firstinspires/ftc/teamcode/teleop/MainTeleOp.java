@@ -28,7 +28,6 @@ public class MainTeleOp extends LinearOpMode {
     }
 
     private void drive() {
-        driveSpeed = 1;
         driveSpeed *= 1 - 0.5 * gp1.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER);
         driveSpeed = Math.max(0, driveSpeed);
         Vector2d driveVector = new Vector2d(gp1.getLeftX(), -gp1.getLeftY()),
