@@ -1,9 +1,12 @@
 package org.firstinspires.ftc.teamcode.teleop.subsystems;
 
+import com.arcrobotics.ftclib.hardware.motors.Motor;
 import com.arcrobotics.ftclib.hardware.motors.MotorEx;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
 public class Bot {
+    //TODO: write sus-system FUNCTIONALITY (function names have been called in bot functions to aid in what is needed)
+    //TODO: revise order of instructions that is written for every bot-state
 
     public enum BotState {
         INTAKE, // surgical tubing picking up pixels
@@ -11,7 +14,7 @@ public class Bot {
         STORAGE_2, // STORAGE contains two pixels and is FULL
         OUTTAKE_PICKUP, // CLAW is turned inward and is ready to pick up pixel
         OUTTAKE, // CLAW has pixel and is ready to place
-        HANGING
+        HANGING // ROBOT is attempting to or has climb and hang on the BAR
     }
 
     public static Bot instance;
@@ -22,16 +25,14 @@ public class Bot {
     //storage counters to find Status
     private int pixelsInStorage = 0;
 
-    //initalize objects of sus-systems (once they have functionality)
-    //TODO: write sus-system FUNCTIONALITY (function names have been called in bot functions to aid in what is needed)
-    //TODO: revise order of instructions that is written for every bot-state
+    // initalize objects of sus-systems (once they have functionality)
 
 //    public Climber climber;
-//    public Intake intake;
+    public Intake toodles;
 //    public Launcher launcher;
 //    public Slides slides;
 //    public V4B phobar;
-//    public Claw claw;
+    public Claw claw;
 
 
 
@@ -59,11 +60,11 @@ public class Bot {
         br = new MotorEx(opMode.hardwareMap, "motorBR");
 
 //        climber = new Climber(opMode);
-//        intake = new Intake(opMode);
+        toodles = new Intake(opMode);
 //        launcher = new Launcher(opMode);
 //        slides = new Slides(opMode);
 //        phobar = new V4B(opMode);
-//        claw = new Claw(opMode);
+        claw = new Claw(opMode);
     }
 
 
@@ -77,7 +78,7 @@ public class Bot {
             return;
         }
         botState = BotState.INTAKE;
-//        intake.run();
+        toodles.runIntake(0.5);
     }
 
     public void intoStorage(){
@@ -92,17 +93,17 @@ public class Bot {
 
     public void outtake_pickup(int numPixels) {
         botState = BotState.OUTTAKE_PICKUP;
-//        claw.open();
+        claw.open();
         switch (numPixels) {
             case 1:
 //                slides.run(certain length for one pixels);
 //                V4B.rotateTo(certain degrees);
-//                claw.close();
+                claw.close();
                 pixelsInStorage--;
             case 2:
 //                slides.run(certain length for two pixels);
 //                V4B.rotateTo(certain degrees);
-//                claw.close();
+                claw.close();
                 pixelsInStorage-=2;
         }
 //        V4B.runToFront();
@@ -120,12 +121,12 @@ public class Bot {
         switch (option) {
             case 1:
 //                slides.runToBottom();
-//                claw.open();
+                claw.open();
             case 2:
 //                slides.run(backdrop height);
-//                claw.open();
+                claw.open();
             case 3:
-//                claw.open();
+                claw.open();
         }
     }
 
@@ -133,7 +134,7 @@ public class Bot {
         botState = BotState.HANGING;
 //        V4B.runToFront();
 //        slides.runToBottom();
-//        claw.close();
+        claw.close();
 //        climber.runSlidesUp();
 //        climber.hookClose();
 //        climber.runSlidesDown();
@@ -147,7 +148,7 @@ public class Bot {
     }
 
 //    public void droneLaunch() {
-////        dunno what the frinkiewrikle how to code for drone launching :sob:
+////        dunno what the frinkiewrikle how to code for drone launching
 //    }
 
     public void fixMotors() {

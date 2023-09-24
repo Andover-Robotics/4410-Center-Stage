@@ -22,6 +22,7 @@ public class MainTeleOp extends LinearOpMode {
 
         waitForStart();
 
+        bot.fixMotors();
         while(opModeIsActive() && !isStopRequested()) {
             drive();
         }
