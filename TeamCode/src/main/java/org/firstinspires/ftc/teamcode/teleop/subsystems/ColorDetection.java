@@ -1,0 +1,119 @@
+package org.firstinspires.ftc.teamcode.teleop.subsystems;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+
+import org.opencv.core.Mat;
+import org.opencv.core.Core;
+import org.opencv.core.MatOfPoint;
+import org.opencv.core.Rect;
+import org.opencv.imgproc.Imgproc;
+import org.openftc.easyopencv.OpenCvPipeline;
+import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.opencv.core.Scalar;
+
+/*
+TODO: NEED TO TUNE HSV VALUES
+ */
+
+public class ColorDetection extends OpenCvPipeline{
+
+    Telemetry telemetry;
+    Mat HSV = new Mat();
+    MatOfPoint biggest;
+
+    public static int minwidth = 60;
+    public static int width = 0;
+    public static int camwidth = 1280;
+    public static int camheight = 720;
+
+    public static double midpointrect;
+
+    public enum SpikeMark{
+        LEFT,
+        MIDDLE,
+        RIGHT,
+        NOTDETECTED
+    }
+    public static SpikeMark spikeMark = SpikeMark.NOTDETECTED;
+
+    // Alliance: 0 - NONE, 1 - RED, 2 - BLUE
+    int alliance = 0;
+
+    // Red HSV Values
+    public static double redLH = 19, redLS = 145, redLV = 100, redHH = 28, redHS = 255, redHV = 255;
+    public static Scalar redLowHSV= new Scalar(redLH,redLS,redLV);
+    public static Scalar redHighHSV = new Scalar(redHH,redHS,redHV);
+
+    // Blue HSV Values
+    public static double blueLH = 19, blueLS = 145, blueLV = 100, blueHH = 28, blueHS = 255, blueHV = 255;
+    public static Scalar blueLowHSV= new Scalar(blueLH,blueLS,blueLV);
+    public static Scalar blueHighHSV = new Scalar(blueHH,blueHS,blueHV);
+
+
+    public ColorDetection(Telemetry telemetry, int alliance){ // CONSTRUCTOR :D
+        this.telemetry = telemetry;
+        this.alliance = alliance;
+    }
+
+    @Override
+    public Mat processFrame(Mat input) {
+        Imgproc.cvtColor(input, HSV, Imgproc.COLOR_RGB2HSV); //converting RGB colors to HSV
+
+        Rect rightrect = new Rect(750, 1, 529, 719);
+        Rect leftrect = new Rect(1, 1, 479, 719); // rectangle sizes
+
+        Imgproc.rectangle(input, leftrect, new Scalar(255, 0, 0), 5); //displays rectangles with red color
+        Imgproc.rectangle(input, rightrect, new Scalar(255, 0, 0), 5);
+
+        // filters HSV mat into image with black being the lowest yellow HSV and white being the highest yellow HSV
+        if (alliance == 1) {
+            Core.inRange(HSV, redLowHSV, redHighHSV, HSV);
+        } else {
+            Core.inRange(HSV, blueLowHSV, blueHighHSV, HSV);
+        }
+
+        List<MatOfPoint> contours = new ArrayList<>();
+        Imgproc.findContours(HSV, contours, new Mat(), 0,1); // finds contours in HSV mat
+
+        if (!contours.isEmpty()) { // checks if no contours are found
+            contours.sort(Collections.reverseOrder(Comparator.comparingDouble(m -> Imgproc.boundingRect(m).width))); //orders contours in array from big to small(by width)
+            // ____biggest are variables for the biggest on each side
+            biggest = contours.get(0); //contour with the largest width(first in the array)
+            // use biggest.width to get the width
+
+            Rect rect = Imgproc.boundingRect(biggest); // turns biggest contour into a rectangle
+
+            if (rect.width > minwidth) { // rectangle is bigger than 10 pixels
+                Imgproc.rectangle(input, rect.tl(), rect.br(), new Scalar(0, 255, 0), 6); // puts border around contours with a green shade
+
+                midpointrect = rect.tl().x + rect.width/2.0; // gets midpoint x of the rectangle
+
+                width = rect.width;
+
+                if (midpointrect > leftrect.tl().x && midpointrect < leftrect.br().x) { // checks if within boundaries of left side rectangle
+                    spikeMark = SpikeMark.LEFT;
+                } else if (midpointrect > rightrect.tl().x && midpointrect < rightrect.br().x) { // checks if within boundaries of right side rectangle
+                    spikeMark = SpikeMark.RIGHT;
+                } else if (midpointrect < rightrect.tl().x && midpointrect > leftrect.br().x){
+                    spikeMark = SpikeMark.MIDDLE; // checks if in middle; means that it is scorable
+                }
+//
+//                telemetry.addLine("Midpoint of Bounding Box :"+ midpointrect);
+            } else {
+                spikeMark = SpikeMark.NOTDETECTED;
+            }
+        } else {
+            spikeMark = SpikeMark.NOTDETECTED;
+        }
+//        telemetry.addData("contours: ", contours.size());
+//         telemetry.addData("Junction status: ",junctionVal);   is in test opmode
+
+        // Releasing all our mats for the next iteration
+        HSV.release();
+
+        return input; // return end frame with rectangles drawn
+    }
+}

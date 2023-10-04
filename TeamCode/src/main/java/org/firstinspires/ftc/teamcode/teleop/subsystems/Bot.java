@@ -1,36 +1,43 @@
 package org.firstinspires.ftc.teamcode.teleop.subsystems;
 
+import android.graphics.Color;
+
 import com.arcrobotics.ftclib.hardware.motors.Motor;
 import com.arcrobotics.ftclib.hardware.motors.MotorEx;
+
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
 public class Bot {
-    //TODO: revise order of instructions that is written for every bot-state and finite state farm
-    // TODO: write climbing and drone sus-system
+
+    //TODO: write sus-system FUNCTIONALITY (function names have been called in bot functions to aid in what is needed)
+    //TODO: revise order of instructions that is written for every bot-state
 
     public enum BotState {
-        INTAKE_STORAGE, // surgical tubing picking up pixels
-        READY_POS, // sldies closed V4B closed, claw closed
-        OUTTAKE_PICKUP, // CLAW is turned inward and is ready to pick up pixel
-        OUTTAKE, // CLAW has pixel and is ready to place
-        HANGING // ROBOT is attempting to or has climb and hang on the BAR
+        INTAKE, // Intaking pixels
+        STORAGE_1, // Storage contains 1 pixel
+        STORAGE_2, // Storage contains 2 pixels, full
+        OUTTAKE, // Claw is ready to pick up pixel
+        SCORING, // Claw has pixel and is ready to place on backboard
+        CLIMBING // Robot is climbing/hanging on bar
     }
 
     public static Bot instance;
 
-    public BotState botState = BotState.INTAKE_STORAGE;
+    public BotState botState = BotState.INTAKE;
     private final MotorEx fl, fr, bl, br;
+
+    private final double kTurn = 1.7;
 
     //storage counters to find Status
     private int pixelsInStorage = 0;
 
     // initalize objects of sus-systems (once they have functionality)
 
-    public Climber climber;
-    public Intake toodles;
+//    public Climber climber;
+    public Intake intake;
 //    public Launcher launcher;
-    public Slides slides;
-    public V4B phobar;
+//    public Slides slides;
+//    public V4B fourBar;
     public Claw claw;
 
 
@@ -59,10 +66,10 @@ public class Bot {
         br = new MotorEx(opMode.hardwareMap, "motorBR");
 
 //        climber = new Climber(opMode);
-        toodles = new Intake(opMode);
+        intake = new Intake(opMode);
 //        launcher = new Launcher(opMode);
-        slides = new Slides(opMode);
-        phobar = new V4B(opMode);
+//        slides = new Slides(opMode);
+//        fourBar = new V4B(opMode);
         claw = new Claw(opMode);
     }
 
@@ -70,83 +77,77 @@ public class Bot {
     public boolean checkIfFull(){return (pixelsInStorage==2);}
     public int getPixelsInStorage(){return pixelsInStorage;}
 
-//    public void intake() {
-//        //check if full
-//        // run tubing until it hits storage
-//        if (checkIfFull()) {
-//            return;
-//        }
-//        botState = BotState.INTAKE_STORAGE;
-////        toodles.runIntake(0.5);
-//    }
+    public void intake() {
+        //check if full
+        // run tubing until it hits storage
+        if (checkIfFull()) {
+            return;
+        }
+        botState = BotState.INTAKE;
+        intake.runIntake(0.5);
+    }
 
     public void intoStorage(){
         pixelsInStorage++;
+        switch (pixelsInStorage) {
+            case 1:
+                botState = BotState.STORAGE_1;
+            case 2:
+                botState = BotState.STORAGE_2;
+        }
     }
 
-    public void ready_pos() {
-        botState = BotState.READY_POS;
-        phobar.ready_pos();
-        claw.open();
-        slides.runToBottom();
-    }
-
-    public void outtake_pickup(int numPixels) {
-        botState = BotState.OUTTAKE_PICKUP;
+    public void scorePosition(int numPixels) {
+        botState = BotState.SCORING;
         claw.open();
         switch (numPixels) {
             case 1:
-                phobar.storage();
-                slides.runTo((int) slides.ONE_PIXEL_LENGTH);
+//                slides.run(certain length for one pixels);
+//                V4B.rotateTo(certain degrees);
                 claw.close();
                 pixelsInStorage--;
             case 2:
-                phobar.storage();
-                slides.runTo((int) slides.TWO_PIXEL_LENGTH);
+//                slides.run(certain length for two pixels);
+//                V4B.rotateTo(certain degrees);
                 claw.close();
                 pixelsInStorage-=2;
         }
 //        V4B.runToFront();
     }
 
-    public void outtake_backboard(int pos) { // low, med, high -> 1,2,3
+    public void outtake(int option) {
+        // option could be the idfferent places we could drop our pixels
+        // ex. 1 is on the ground, 2 is on the backdrop, 3 is discard
+        // TODO: brainstorm options
         botState = BotState.OUTTAKE;
 
         //make sure bar and claw is facing outward
-        phobar.outtake();
-        switch (pos) {
+//        V4B.runToFront();
+
+        switch (option) {
             case 1:
-                slides.runToTop();
-                break;
+//                slides.runToBottom();
+                claw.open();
             case 2:
-                slides.runToMiddle();
-                break;
+//                slides.run(backdrop height);
+                claw.open();
             case 3:
-                slides.runToLow();
-                break;
+                claw.open();
         }
-
-    }
-
-    public void outtake_ground() {
-        botState = BotState.OUTTAKE;
-
-        //make sure bar and claw is facing outward
-        phobar.outtake();
-        slides.runToBottom();
-
     }
 
     public void climbOn() {
-        botState = BotState.HANGING;
-        ready_pos();
+        botState = BotState.CLIMBING;
+//        V4B.runToFront();
+//        slides.runToBottom();
+        claw.close();
 //        climber.runSlidesUp();
 //        climber.hookClose();
 //        climber.runSlidesDown();
     }
 
     public void climbOff() {
-        botState = BotState.INTAKE_STORAGE;
+        botState = BotState.INTAKE;
 //        climber.runSlidesUp();
 //        climber.hookOpen();
 //        climber.runSlidesDown();
@@ -155,6 +156,18 @@ public class Bot {
 //    public void droneLaunch() {
 ////        dunno what the frinkiewrikle how to code for drone launching
 //    }
+
+    public void alignJunction() {
+        if (ColorDetection.spikeMark == ColorDetection.SpikeMark.LEFT) {
+            drive(0,0, -1* kTurn * Math.abs((ColorDetection.camwidth/2.0)-ColorDetection.midpointrect));
+        }
+        if (ColorDetection.spikeMark == ColorDetection.SpikeMark.RIGHT) {
+            drive(0,0, kTurn * Math.abs((ColorDetection.camwidth/2.0)-ColorDetection.midpointrect));
+        }
+        if (ColorDetection.spikeMark == ColorDetection.SpikeMark.MIDDLE) {
+            drive(0,0,0);
+        }
+    }
 
     public void fixMotors() {
         fl.setInverted(false);
