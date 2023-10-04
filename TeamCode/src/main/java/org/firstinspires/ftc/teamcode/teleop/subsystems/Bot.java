@@ -1,44 +1,41 @@
 package org.firstinspires.ftc.teamcode.teleop.subsystems;
 
-import android.graphics.Color;
-
 import com.arcrobotics.ftclib.hardware.motors.Motor;
 import com.arcrobotics.ftclib.hardware.motors.MotorEx;
-
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+import android.graphics.Color;
+
 
 public class Bot {
-
-    //TODO: write sus-system FUNCTIONALITY (function names have been called in bot functions to aid in what is needed)
-    //TODO: revise order of instructions that is written for every bot-state
+    //TODO: revise order of instructions that is written for every bot-state and finite state farm
+    // TODO: write climbing and drone sus-system
 
     public enum BotState {
-        INTAKE, // Intaking pixels
-        STORAGE_1, // Storage contains 1 pixel
-        STORAGE_2, // Storage contains 2 pixels, full
-        OUTTAKE, // Claw is ready to pick up pixel
-        SCORING, // Claw has pixel and is ready to place on backboard
-        CLIMBING // Robot is climbing/hanging on bar
+        INTAKE_STORAGE, // surgical tubing picking up pixels
+        READY_POS, // sldies closed V4B closed, claw closed
+        OUTTAKE_PICKUP, // CLAW is turned inward and is ready to pick up pixel
+        OUTTAKE, // CLAW has pixel and is ready to place
+        HANGING // ROBOT is attempting to or has climb and hang on the BAR
     }
 
     public static Bot instance;
 
-    public BotState botState = BotState.INTAKE;
+    public BotState botState = BotState.INTAKE_STORAGE;
     private final MotorEx fl, fr, bl, br;
-
-    private final double kTurn = 1.7;
 
     //storage counters to find Status
     private int pixelsInStorage = 0;
 
     // initalize objects of sus-systems (once they have functionality)
 
-//    public Climber climber;
-    public Intake intake;
-//    public Launcher launcher;
-//    public Slides slides;
-//    public V4B fourBar;
+    public Climber climber;
+    public Intake toodles;
+    //    public Launcher launcher;
+    public Slides slides;
+    public V4B phobar;
     public Claw claw;
+
+    private final double kTurn = 1.7;
 
 
 
@@ -66,10 +63,10 @@ public class Bot {
         br = new MotorEx(opMode.hardwareMap, "motorBR");
 
 //        climber = new Climber(opMode);
-        intake = new Intake(opMode);
+        toodles = new Intake(opMode);
 //        launcher = new Launcher(opMode);
-//        slides = new Slides(opMode);
-//        fourBar = new V4B(opMode);
+        slides = new Slides(opMode);
+        phobar = new V4B(opMode);
         claw = new Claw(opMode);
     }
 
@@ -77,77 +74,83 @@ public class Bot {
     public boolean checkIfFull(){return (pixelsInStorage==2);}
     public int getPixelsInStorage(){return pixelsInStorage;}
 
-    public void intake() {
-        //check if full
-        // run tubing until it hits storage
-        if (checkIfFull()) {
-            return;
-        }
-        botState = BotState.INTAKE;
-        intake.runIntake(0.5);
-    }
+//    public void intake() {
+//        //check if full
+//        // run tubing until it hits storage
+//        if (checkIfFull()) {
+//            return;
+//        }
+//        botState = BotState.INTAKE_STORAGE;
+////        toodles.runIntake(0.5);
+//    }
 
     public void intoStorage(){
         pixelsInStorage++;
-        switch (pixelsInStorage) {
-            case 1:
-                botState = BotState.STORAGE_1;
-            case 2:
-                botState = BotState.STORAGE_2;
-        }
     }
 
-    public void scorePosition(int numPixels) {
-        botState = BotState.SCORING;
+    public void ready_pos() {
+        botState = BotState.READY_POS;
+        phobar.ready_pos();
+        claw.open();
+        slides.runToBottom();
+    }
+
+    public void outtake_pickup(int numPixels) {
+        botState = BotState.OUTTAKE_PICKUP;
         claw.open();
         switch (numPixels) {
             case 1:
-//                slides.run(certain length for one pixels);
-//                V4B.rotateTo(certain degrees);
+                phobar.storage();
+                slides.runTo((int) Slides.ONE_PIXEL_LENGTH);
                 claw.close();
                 pixelsInStorage--;
             case 2:
-//                slides.run(certain length for two pixels);
-//                V4B.rotateTo(certain degrees);
+                phobar.storage();
+                slides.runTo((int) Slides.TWO_PIXEL_LENGTH);
                 claw.close();
                 pixelsInStorage-=2;
         }
 //        V4B.runToFront();
     }
 
-    public void outtake(int option) {
-        // option could be the idfferent places we could drop our pixels
-        // ex. 1 is on the ground, 2 is on the backdrop, 3 is discard
-        // TODO: brainstorm options
+    public void outtake_backboard(int pos) { // low, med, high -> 1,2,3
         botState = BotState.OUTTAKE;
 
         //make sure bar and claw is facing outward
-//        V4B.runToFront();
-
-        switch (option) {
+        phobar.outtake();
+        switch (pos) {
             case 1:
-//                slides.runToBottom();
-                claw.open();
+                slides.runToTop();
+                break;
             case 2:
-//                slides.run(backdrop height);
-                claw.open();
+                slides.runToMiddle();
+                break;
             case 3:
-                claw.open();
+                slides.runToLow();
+                break;
         }
+
+    }
+
+    public void outtake_ground() {
+        botState = BotState.OUTTAKE;
+
+        //make sure bar and claw is facing outward
+        phobar.outtake();
+        slides.runToBottom();
+
     }
 
     public void climbOn() {
-        botState = BotState.CLIMBING;
-//        V4B.runToFront();
-//        slides.runToBottom();
-        claw.close();
+        botState = BotState.HANGING;
+        ready_pos();
 //        climber.runSlidesUp();
 //        climber.hookClose();
 //        climber.runSlidesDown();
     }
 
     public void climbOff() {
-        botState = BotState.INTAKE;
+        botState = BotState.INTAKE_STORAGE;
 //        climber.runSlidesUp();
 //        climber.hookOpen();
 //        climber.runSlidesDown();
