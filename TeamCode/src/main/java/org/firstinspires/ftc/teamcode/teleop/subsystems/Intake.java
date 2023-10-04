@@ -8,6 +8,7 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 @Config
 public class Intake {
     private final MotorEx toodles;
+    private double power = 0.5;
 
     public Intake(OpMode opMode){
         toodles = new MotorEx(opMode.hardwareMap, "intake");
@@ -16,13 +17,17 @@ public class Intake {
         toodles.setInverted(false);
     }
 
-    public void runIntake(double power){
+    public void runIntake(){
         toodles.setInverted(false);
         toodles.set(Math.abs(power));
     }
 
-    public void runReverseIntake(double power){
+    public void runReverseIntake(){
         toodles.setInverted(true);
         toodles.set(Math.abs(power));
+    }
+
+    public void stopIntake() {
+        toodles.set(0);
     }
 }
