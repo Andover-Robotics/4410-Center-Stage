@@ -18,21 +18,18 @@ public class Slides {
     private PIDFController controller;
 
     enum Position {
+        // HIGH, MID, LOW - Position on lines on backboard
         HIGH,
         MID,
         LOW,
-        GROUND
+        STORAGE // STORAGE - Moves to where the pixels are placed
     }
 
-    private Position position = Position.GROUND;
+    private Position position = Position.STORAGE;
     public static double p = 0.015, i = 0, d = 0, f = 0, staticF = 0.25;
     private final double tolerance = 20, powerUp = 0.1, powerDown = 0.05, manualDivide = 1, powerMin = 0.1;
     private double manualPower = 0;
-
-    public static int MAXHEIGHT = -2000, top = -1700, topTeleOp = -1750, mid = -980, low = -300, ground = 0, inc = 100, dec = 300;
-    public static double ONE_PIXEL_LENGTH = 0.6, TWO_PIXEL_LENGTH = 0.6;
-
-
+    public static int MAXHEIGHT = -2000, top = -1700, maxteleop = -1750, mid = -980, low = -300, storage = 0, inc = 100, dec = 300;
     private final OpMode opMode;
     private double target = 0;
     private boolean goingDown = false;
@@ -84,9 +81,9 @@ public class Slides {
         position = Position.LOW;
     }
 
-    public void runToBottom() {
-        runTo(ground);
-        position = Position.GROUND;
+    public void runToStorage() {
+        runTo(storage);
+        position = Position.STORAGE;
     }
 
     public void runManual(double manual) {

@@ -2,7 +2,9 @@ package org.firstinspires.ftc.teamcode.teleop.subsystems;
 
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+import com.acmerobotics.dashboard.config.Config;
 
+@Config
 public class V4B {
     private final Servo fourbar;
     private final Servo clawRotation;
@@ -19,34 +21,35 @@ public class V4B {
         clawRotation.setDirection(Servo.Direction.FORWARD);
     }
 
-    public void ready_pos() {
-        fourbar.setPosition(fourOuttake);
-        clawRotation.setPosition(clawOuttake);
-    }
-
     public void outtake(){
         fourbar.setPosition(fourOuttake);
         clawRotation.setPosition(clawOuttake);
     }
 
-    public void ground(){
+    public void ground() {
         fourbar.setPosition(fourStorage);
         clawRotation.setPosition(clawStorage);
     }
 
-    public void storage(){
+    // 4B  is stored - either driving, or ready to take from storage
+    public void storage() {
         fourbar.setDirection(Servo.Direction.REVERSE);
         clawRotation.setDirection(Servo.Direction.REVERSE);
         fourbar.setPosition(fourGround);
         clawRotation.setPosition(clawGround);
     }
 
-    public void runManualOuttake(double fourpos, double clawpos){
+    // Pick up pixel from storage
+    public void pickup() {
+
+    }
+
+    public void runManualOuttake(double fourpos, double clawpos) {
         fourbar.setPosition(fourpos);
         clawRotation.setPosition(clawpos);
     }
 
-    public void runManualStorage(double fourpos, double clawpos){
+    public void runManualStorage(double fourpos, double clawpos) {
         fourbar.setDirection(Servo.Direction.REVERSE);
         clawRotation.setDirection(Servo.Direction.REVERSE);
         fourbar.setPosition(fourpos);
