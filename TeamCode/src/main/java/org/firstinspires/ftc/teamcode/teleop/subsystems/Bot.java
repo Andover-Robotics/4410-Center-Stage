@@ -3,47 +3,32 @@ package org.firstinspires.ftc.teamcode.teleop.subsystems;
 import com.arcrobotics.ftclib.hardware.motors.Motor;
 import com.arcrobotics.ftclib.hardware.motors.MotorEx;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
-import android.graphics.Color;
-
 
 public class Bot {
-    //TODO: revise order of instructions that is written for every bot-state and finite state farm
-    // TODO: write climbing and drone sus-system
+    // TODO
 
     public enum BotState {
-        INTAKE_STORAGE, // surgical tubing picking up pixels
-        READY_POS, // sldies closed V4B closed, claw closed
-        OUTTAKE_PICKUP, // CLAW is turned inward and is ready to pick up pixel
-        OUTTAKE, // CLAW has pixel and is ready to place
-        HANGING // ROBOT is attempting to or has climb and hang on the BAR
+        INITIALIZED, // Init position: slides and 4B are down
+        PICKUP, // Pickup position: claw picks up pixel from storage
+        READY, // Ready position: slides and 4B are at the backboard (ready to score)
     }
 
     public static Bot instance;
-
-    public BotState botState = BotState.INTAKE_STORAGE;
+    public BotState botState = BotState.INITIALIZED; // Default bot state
     private final MotorEx fl, fr, bl, br;
 
-    //storage counters to find Status
-    private int pixelsInStorage = 0;
-
-    // initalize objects of sus-systems (once they have functionality)
-
-    public Climber climber;
-    public Intake toodles;
-    //    public Launcher launcher;
+    // Define subsystem objects
+    public Intake intake;
     public Slides slides;
-    public V4B phobar;
+    public V4B fourbar;
     public Claw claw;
-
-    private final double kTurn = 1.7;
-
-
 
     public OpMode opMode;
 
+    // getInstance()
     public static Bot getInstance() {
         if (instance == null) {
-            throw new IllegalStateException("tried to getInstance of Bot when uninitialized");
+            throw new IllegalStateException("tried to getInstance of Bot when uninitialized!");
         }
         return instance;
     }
@@ -54,6 +39,8 @@ public class Bot {
         instance.opMode = opMode;
         return instance;
     }
+
+    // constructor
     private Bot(OpMode opMode) {
         this.opMode = opMode;
 
@@ -62,63 +49,29 @@ public class Bot {
         bl = new MotorEx(opMode.hardwareMap, "motorBL");
         br = new MotorEx(opMode.hardwareMap, "motorBR");
 
-//        climber = new Climber(opMode);
-        toodles = new Intake(opMode);
-//        launcher = new Launcher(opMode);
+        intake = new Intake(opMode);
         slides = new Slides(opMode);
-        phobar = new V4B(opMode);
+        fourbar = new V4B(opMode);
         claw = new Claw(opMode);
     }
 
-
-    public boolean checkIfFull(){return (pixelsInStorage==2);}
-    public int getPixelsInStorage(){return pixelsInStorage;}
-
-//    public void intake() {
-//        //check if full
-//        // run tubing until it hits storage
-//        if (checkIfFull()) {
-//            return;
-//        }
-//        botState = BotState.INTAKE_STORAGE;
-////        toodles.runIntake(0.5);
-//    }
-
-    public void intoStorage(){
-        pixelsInStorage++;
+    // BOT STATES
+    public void initialized() {
+        botState = BotState.INITIALIZED;
+        fourbar.storage();
+        slides.runToStorage();
     }
-
-    public void ready_pos() {
-        botState = BotState.READY_POS;
-        phobar.ready_pos();
+    public void pickup() {
+        botState = BotState.PICKUP;
         claw.open();
-        slides.runToBottom();
+        fourbar.pickup();
+        slides.runToStorage();
+        claw.close();
     }
-
-    public void outtake_pickup(int numPixels) {
-        botState = BotState.OUTTAKE_PICKUP;
-        claw.open();
-        switch (numPixels) {
-            case 1:
-                phobar.storage();
-                slides.runTo((int) Slides.ONE_PIXEL_LENGTH);
-                claw.close();
-                pixelsInStorage--;
-            case 2:
-                phobar.storage();
-                slides.runTo((int) Slides.TWO_PIXEL_LENGTH);
-                claw.close();
-                pixelsInStorage-=2;
-        }
-//        V4B.runToFront();
-    }
-
-    public void outtake_backboard(int pos) { // low, med, high -> 1,2,3
-        botState = BotState.OUTTAKE;
-
-        //make sure bar and claw is facing outward
-        phobar.outtake();
-        switch (pos) {
+    public void ready(int slidesPos) {
+        botState = BotState.READY;
+        fourbar.outtake();
+        switch (slidesPos) {
             case 1:
                 slides.runToTop();
                 break;
@@ -129,43 +82,25 @@ public class Bot {
                 slides.runToLow();
                 break;
         }
-
+    }
+    public void outtake() {
+        claw.open();
+        initialized();
     }
 
-    public void outtake_ground() {
-        botState = BotState.OUTTAKE;
-
-        //make sure bar and claw is facing outward
-        phobar.outtake();
-        slides.runToBottom();
-
+    public void intake(boolean isReverse) {
+        if (!isReverse) {
+            intake.runIntake();
+        } else intake.runReverseIntake();
     }
-
-    public void climbOn() {
-        botState = BotState.HANGING;
-        ready_pos();
-//        climber.runSlidesUp();
-//        climber.hookClose();
-//        climber.runSlidesDown();
-    }
-
-    public void climbOff() {
-        botState = BotState.INTAKE_STORAGE;
-//        climber.runSlidesUp();
-//        climber.hookOpen();
-//        climber.runSlidesDown();
-    }
-
-//    public void droneLaunch() {
-////        dunno what the frinkiewrikle how to code for drone launching
-//    }
 
     public void alignJunction() {
+        double turn = 1.7;
         if (ColorDetection.spikeMark == ColorDetection.SpikeMark.LEFT) {
-            drive(0,0, -1* kTurn * Math.abs((ColorDetection.camwidth/2.0)-ColorDetection.midpointrect));
+            drive(0,0, -1* turn * Math.abs((ColorDetection.camwidth/2.0)-ColorDetection.midpointrect));
         }
         if (ColorDetection.spikeMark == ColorDetection.SpikeMark.RIGHT) {
-            drive(0,0, kTurn * Math.abs((ColorDetection.camwidth/2.0)-ColorDetection.midpointrect));
+            drive(0,0, turn * Math.abs((ColorDetection.camwidth/2.0)-ColorDetection.midpointrect));
         }
         if (ColorDetection.spikeMark == ColorDetection.SpikeMark.MIDDLE) {
             drive(0,0,0);
