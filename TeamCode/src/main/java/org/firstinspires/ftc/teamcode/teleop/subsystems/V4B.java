@@ -4,6 +4,8 @@ import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.acmerobotics.dashboard.config.Config;
 
+// TODO: Set servo values for four bar
+
 @Config
 public class V4B {
     private final Servo fourbar;
@@ -37,11 +39,6 @@ public class V4B {
         clawRotation.setDirection(Servo.Direction.REVERSE);
         fourbar.setPosition(fourGround);
         clawRotation.setPosition(clawGround);
-    }
-
-    // Pick up pixel from storage
-    public void pickup() {
-
     }
 
     public void runManualOuttake(double fourpos, double clawpos) {

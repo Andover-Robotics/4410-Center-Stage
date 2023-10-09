@@ -5,17 +5,16 @@ import com.arcrobotics.ftclib.hardware.motors.MotorEx;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
 public class Bot {
-    // TODO
 
     public enum BotState {
-        INITIALIZED, // Init position: slides and 4B are down
-        PICKUP, // Pickup position: claw picks up pixel from storage
-        READY, // Ready position: slides and 4B are at the backboard (ready to score)
+        INITIALIZED, // Initialized position: slides and 4B are down
+        SCORE // Scoring position:
     }
 
     public static Bot instance;
-    public BotState botState = BotState.INITIALIZED; // Default bot state
+    public BotState state = BotState.INITIALIZED; // Default bot state
     private final MotorEx fl, fr, bl, br;
+    public OpMode opMode;
 
     // Define subsystem objects
     public Intake intake;
@@ -23,9 +22,7 @@ public class Bot {
     public V4B fourbar;
     public Claw claw;
 
-    public OpMode opMode;
-
-    // getInstance()
+    // get bot instance
     public static Bot getInstance() {
         if (instance == null) {
             throw new IllegalStateException("tried to getInstance of Bot when uninitialized!");
@@ -40,7 +37,6 @@ public class Bot {
         return instance;
     }
 
-    // constructor
     private Bot(OpMode opMode) {
         this.opMode = opMode;
 
@@ -57,32 +53,21 @@ public class Bot {
 
     // BOT STATES
     public void initialized() {
-        botState = BotState.INITIALIZED;
+        state = BotState.INITIALIZED;
         fourbar.storage();
         slides.runToStorage();
-    }
-    public void pickup() {
-        botState = BotState.PICKUP;
         claw.open();
-        fourbar.pickup();
+    }
+
+    public void pickup() {
+        state = BotState.SCORE;
+        claw.open();
+        fourbar.storage();
         slides.runToStorage();
         claw.close();
-    }
-    public void ready(int slidesPos) {
-        botState = BotState.READY;
         fourbar.outtake();
-        switch (slidesPos) {
-            case 1:
-                slides.runToTop();
-                break;
-            case 2:
-                slides.runToMiddle();
-                break;
-            case 3:
-                slides.runToLow();
-                break;
-        }
     }
+
     public void outtake() {
         claw.open();
         initialized();
