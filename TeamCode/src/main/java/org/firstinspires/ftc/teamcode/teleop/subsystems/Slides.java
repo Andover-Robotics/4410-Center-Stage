@@ -19,7 +19,7 @@ public class Slides {
     public final MotorEx motorRight;
     private PIDFController controller;
 
-    enum Position {
+    public enum Position {
         // HIGH, MID, LOW - Position on lines on backboard
         HIGH,
         MID,
@@ -27,7 +27,7 @@ public class Slides {
         STORAGE // STORAGE - Moves to where the pixels are placed
     }
 
-    private Position position = Position.STORAGE;
+    public Position position = Position.STORAGE;
     public static double p = 0.015, i = 0, d = 0, f = 0, staticF = 0.25;
     private final double tolerance = 20, powerUp = 0.1, powerDown = 0.05, manualDivide = 1, powerMin = 0.1;
     private double manualPower = 0;

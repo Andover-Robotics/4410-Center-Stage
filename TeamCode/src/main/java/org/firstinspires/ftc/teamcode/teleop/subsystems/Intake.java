@@ -8,7 +8,7 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 @Config
 public class Intake {
     private final MotorEx toodles;
-    private double power = 0.5;
+    private double power = 0.7;
 
     public Intake(OpMode opMode){
         toodles = new MotorEx(opMode.hardwareMap, "intake");

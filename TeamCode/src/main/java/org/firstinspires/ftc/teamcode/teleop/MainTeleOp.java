@@ -10,7 +10,7 @@ import com.arcrobotics.ftclib.geometry.Vector2d;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import org.firstinspires.ftc.teamcode.teleop.subsystems.Bot;
-
+import org.firstinspires.ftc.teamcode.teleop.subsystems.Slides;
 
 
 @Config
@@ -69,6 +69,23 @@ public class MainTeleOp extends LinearOpMode {
                 }
 
                 // SLIDES
+                if (gp2.wasJustPressed(GamepadKeys.Button.DPAD_UP)) {
+                    bot.slides.runToTop();
+                } else if (gp2.wasJustPressed(GamepadKeys.Button.DPAD_RIGHT)) {
+                    bot.slides.runToMiddle();
+                } else if (gp2.wasJustPressed(GamepadKeys.Button.DPAD_DOWN)) {
+                    bot.slides.runToLow();
+                }
+
+                // OUTTAKE
+                if (gp2.wasJustPressed(GamepadKeys.Button.B)) { // open claw then return to initialized position
+                    bot.outtake();
+                    bot.initialized();
+                }
+            }
+
+            // SLIDES
+            if (bot.slides.position == Slides.Position.LOW || bot.slides.position == Slides.Position.MID || bot.slides.position == Slides.Position.HIGH) {
                 // Preset positions
                 if (gp2.wasJustPressed(GamepadKeys.Button.DPAD_UP)) {
                     bot.slides.runToTop();
@@ -83,12 +100,6 @@ public class MainTeleOp extends LinearOpMode {
                 }
                 if (gp2.wasJustPressed(GamepadKeys.Button.LEFT_BUMPER)) {
                     bot.slides.runTo(bot.slides.getPosition() - manualSlideAmt);
-                }
-
-                // OUTTAKE
-                if (gp2.wasJustPressed(GamepadKeys.Button.B)) { // open claw then return to initialized position
-                    bot.outtake();
-                    bot.initialized();
                 }
             }
 
