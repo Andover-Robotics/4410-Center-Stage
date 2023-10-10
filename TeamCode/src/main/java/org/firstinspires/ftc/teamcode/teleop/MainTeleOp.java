@@ -49,58 +49,45 @@ public class MainTeleOp extends LinearOpMode {
 
             // FINITE STATES
             if (bot.state == Bot.BotState.INITIALIZED) { // INITIALIZED
-                // INTAKE
-                if (gp2.wasJustPressed(GamepadKeys.Button.LEFT_BUMPER)) { // intake
+                // INTAKE (driver 1)
+                if (gp1.wasJustPressed(GamepadKeys.Button.LEFT_BUMPER)) { // intake
                     bot.intake(false);
                 }
-                if (gp2.wasJustPressed(GamepadKeys.Button.RIGHT_BUMPER)) { // reverse intake
+                if (gp1.wasJustPressed(GamepadKeys.Button.RIGHT_BUMPER)) { // reverse intake
                     bot.intake(true);
                 }
 
-                // TRANSFER
+                // TRANSFER (driver 2 from here on)
                 if (gp2.wasJustPressed(GamepadKeys.Button.A)) { // pick up
                     bot.pickup();
                 }
             } else if (bot.state == Bot.BotState.SCORE) { // SCORING POSITION
                 if (gp2.wasJustPressed(GamepadKeys.Button.Y)) { // discard pixel
-                    bot.fourbar.ground();
-                    bot.slides.runTo(0); // TODO: Find slides ground position
-                    bot.claw.open();
-                }
-
-                // SLIDES
-                if (gp2.wasJustPressed(GamepadKeys.Button.DPAD_UP)) {
-                    bot.slides.runToTop();
-                } else if (gp2.wasJustPressed(GamepadKeys.Button.DPAD_RIGHT)) {
-                    bot.slides.runToMiddle();
-                } else if (gp2.wasJustPressed(GamepadKeys.Button.DPAD_DOWN)) {
-                    bot.slides.runToLow();
+                    bot.discardPixel(); // all the magic is in the bot class :0
                 }
 
                 // OUTTAKE
                 if (gp2.wasJustPressed(GamepadKeys.Button.B)) { // open claw then return to initialized position
                     bot.outtake();
-                    bot.initialized();
+                    bot.initialized(); // return to init position
                 }
             }
 
             // SLIDES
-            if (bot.slides.position == Slides.Position.LOW || bot.slides.position == Slides.Position.MID || bot.slides.position == Slides.Position.HIGH) {
-                // Preset positions
-                if (gp2.wasJustPressed(GamepadKeys.Button.DPAD_UP)) {
-                    bot.slides.runToTop();
-                } else if (gp2.wasJustPressed(GamepadKeys.Button.DPAD_RIGHT)) {
-                    bot.slides.runToMiddle();
-                } else if (gp2.wasJustPressed(GamepadKeys.Button.DPAD_DOWN)) {
-                    bot.slides.runToLow();
-                }
-                // Manual positioning
-                if (gp2.wasJustPressed(GamepadKeys.Button.RIGHT_BUMPER)) {
-                    bot.slides.runTo(bot.slides.getPosition() + manualSlideAmt);
-                }
-                if (gp2.wasJustPressed(GamepadKeys.Button.LEFT_BUMPER)) {
-                    bot.slides.runTo(bot.slides.getPosition() - manualSlideAmt);
-                }
+            // Preset positions
+            if (gp2.wasJustPressed(GamepadKeys.Button.DPAD_UP)) {
+                bot.slides.runToTop();
+            } else if (gp2.wasJustPressed(GamepadKeys.Button.DPAD_RIGHT)) {
+                bot.slides.runToMiddle();
+            } else if (gp2.wasJustPressed(GamepadKeys.Button.DPAD_DOWN)) {
+                bot.slides.runToLow();
+            }
+            // Manual positioning
+            if (gp2.wasJustPressed(GamepadKeys.Button.RIGHT_BUMPER)) {
+                bot.slides.runTo(bot.slides.getPosition() + manualSlideAmt);
+            }
+            if (gp2.wasJustPressed(GamepadKeys.Button.LEFT_BUMPER)) {
+                bot.slides.runTo(bot.slides.getPosition() - manualSlideAmt);
             }
 
             // OTHER

@@ -79,10 +79,21 @@ public class Bot {
         } else intake.runReverseIntake();
     }
 
+    public void discardPixel() {
+        fourbar.ground();
+        slides.runTo(0); // TODO: Find slides discard position
+        claw.open();
+        initialized(); // return to init position
+    }
+
+    // TODO: Figure out how much to turn and drive forward
     public void alignJunction() {
         double turn = 1.7;
         if (ColorDetection.spikeMark == ColorDetection.SpikeMark.LEFT) {
             drive(0,0, -1* turn * Math.abs((ColorDetection.camwidth/2.0)-ColorDetection.midpointrect));
+            // drive forward
+            pickup();
+            discardPixel();
         }
         if (ColorDetection.spikeMark == ColorDetection.SpikeMark.RIGHT) {
             drive(0,0, turn * Math.abs((ColorDetection.camwidth/2.0)-ColorDetection.midpointrect));

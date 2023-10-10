@@ -96,7 +96,7 @@ public class Slides {
         }
     }
 
-    public void periodic() {
+    public void periodic() { // thanks alex tong :)
         motorRight.setInverted(false);
         motorLeft.setInverted(true);
         controller.setPIDF(p, i, d, f);
