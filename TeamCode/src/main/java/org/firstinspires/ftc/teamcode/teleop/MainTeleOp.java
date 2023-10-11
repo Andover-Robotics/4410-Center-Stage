@@ -10,8 +10,6 @@ import com.arcrobotics.ftclib.geometry.Vector2d;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import org.firstinspires.ftc.teamcode.teleop.subsystems.Bot;
-import org.firstinspires.ftc.teamcode.teleop.subsystems.Slides;
-
 
 @Config
 @TeleOp(name = "MainTeleOp", group = "Main")
