@@ -65,7 +65,7 @@ public class Bot {
         fourbar.storage();
         slides.runToStorage();
         claw.close();
-        fourbar.outtake();
+        fourbar.storage();
     }
 
     public void outtake() {
