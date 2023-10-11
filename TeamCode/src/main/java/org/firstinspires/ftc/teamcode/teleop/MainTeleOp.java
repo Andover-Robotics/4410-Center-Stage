@@ -63,7 +63,7 @@ public class MainTeleOp extends LinearOpMode {
                 }
             } else if (bot.state == Bot.BotState.SCORE) { // SCORING POSITION
                 if (gp2.wasJustPressed(GamepadKeys.Button.Y)) { // discard pixel
-                    bot.discardPixel(); // all the magic is in the bot class :0
+                    bot.discardPixel();
                 }
 
                 // OUTTAKE
