@@ -55,16 +55,16 @@ public class Bot {
     public void initialized() {
         state = BotState.INITIALIZED;
         fourbar.storage();
-        slides.runToStorage();
+        slides.runToLow();
         claw.open();
     }
 
-    public void pickup() {
+    public void pickup(int storeVal) {
         state = BotState.SCORE;
         claw.open();
         fourbar.storage();
-        slides.runToStorage();
-        claw.close();
+        slides.runToLow();
+        claw.close(storeVal);
         fourbar.storage();
     }
 
@@ -91,9 +91,6 @@ public class Bot {
         double turn = 1.7;
         if (ColorDetection.spikeMark == ColorDetection.SpikeMark.LEFT) {
             drive(0,0, -1* turn * Math.abs((ColorDetection.camwidth/2.0)-ColorDetection.midpointrect));
-            // drive forward
-            pickup();
-            discardPixel();
         }
         if (ColorDetection.spikeMark == ColorDetection.SpikeMark.RIGHT) {
             drive(0,0, turn * Math.abs((ColorDetection.camwidth/2.0)-ColorDetection.midpointrect));

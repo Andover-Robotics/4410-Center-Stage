@@ -18,6 +18,7 @@ public class MainTeleOp extends LinearOpMode {
     private Bot bot;
 
     private double driveSpeed = 1;
+    private int clawPos = 1;
     private GamepadEx gp1, gp2;
     public static double kp = 0.025, ki = 0, kd = 0;
     private PIDController headAlign = new PIDController(kp, ki, kd);
@@ -38,6 +39,24 @@ public class MainTeleOp extends LinearOpMode {
         bot.state = Bot.BotState.INITIALIZED;
         bot.initialized();
 
+        /*
+        COMPLETE LIST OF DRIVER CONTROLS (so far):
+        Driver 1 (gp1):
+        joysticks - driving
+        right trigger - slow down
+        left bumper - run intake
+        right bumper - run reverse intake
+        Driver 2 (gp2):
+        A - pick up pixel
+        Y - discard pixel
+        B - outtake (open claw)
+        X - toggle between claw positions
+        dpad up - slides to top
+        dpad right - slides to middle
+        dpad down - slides to bottom
+        right bumper - manual position slides up
+        left bumper - manual position slides down
+         */
 
         while (opModeIsActive() && !isStopRequested()) {
 
@@ -57,7 +76,7 @@ public class MainTeleOp extends LinearOpMode {
 
                 // TRANSFER (driver 2 from here on)
                 if (gp2.wasJustPressed(GamepadKeys.Button.A)) { // pick up
-                    bot.pickup();
+                    bot.pickup(clawPos);
                 }
             } else if (bot.state == Bot.BotState.SCORE) { // SCORING POSITION
                 if (gp2.wasJustPressed(GamepadKeys.Button.Y)) { // discard pixel
@@ -72,7 +91,7 @@ public class MainTeleOp extends LinearOpMode {
             }
 
             // SLIDES
-            // Preset positions
+            // preset positions
             if (gp2.wasJustPressed(GamepadKeys.Button.DPAD_UP)) {
                 bot.slides.runToTop();
             } else if (gp2.wasJustPressed(GamepadKeys.Button.DPAD_RIGHT)) {
@@ -80,12 +99,20 @@ public class MainTeleOp extends LinearOpMode {
             } else if (gp2.wasJustPressed(GamepadKeys.Button.DPAD_DOWN)) {
                 bot.slides.runToLow();
             }
-            // Manual positioning
+            // manual positioning
             if (gp2.wasJustPressed(GamepadKeys.Button.RIGHT_BUMPER)) {
                 bot.slides.runTo(bot.slides.getPosition() + manualSlideAmt);
             }
             if (gp2.wasJustPressed(GamepadKeys.Button.LEFT_BUMPER)) {
                 bot.slides.runTo(bot.slides.getPosition() - manualSlideAmt);
+            }
+
+            // CLAW POSITIONS
+            if (gp2.wasJustPressed(GamepadKeys.Button.X)) {
+                switch (clawPos) {
+                    case 1: clawPos = 2; break; // top pixel
+                    case 2: clawPos = 1; break; // bottom pixel
+                }
             }
 
             // OTHER

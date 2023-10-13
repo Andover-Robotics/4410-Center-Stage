@@ -7,7 +7,10 @@ import com.qualcomm.robotcore.hardware.Servo;
 @Config
 public class Claw {
     private final Servo claw;
-    public static double open = 0.3, close = 0.12; //TODO: NEED TO TUNE VALUES
+
+    // TODO: Tune open and close values
+    public static double open = 0.3;
+    public static double close1 = 0.12, close2 = 0.12;
     public boolean isOpen = false;
 
     public Claw(OpMode opMode){
@@ -20,16 +23,15 @@ public class Claw {
         isOpen = true;
     }
 
-    public void close(){
-        claw.setPosition(close);
-        isOpen = false;
-    }
-
-    public void toggle() {
-        if (isOpen) {
-            claw.setPosition(close);
-        } else {
-            claw.setPosition(open);
+    public void close(int storeVal){
+        switch (storeVal) {
+            case 1:
+                claw.setPosition(close1);
+                break;
+            case 2:
+                claw.setPosition(close2);
+                break;
         }
+        isOpen = false;
     }
 }

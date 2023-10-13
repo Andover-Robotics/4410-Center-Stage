@@ -43,9 +43,6 @@ import static org.firstinspires.ftc.teamcode.auto.DriveConstants.kA;
 import static org.firstinspires.ftc.teamcode.auto.DriveConstants.kStatic;
 import static org.firstinspires.ftc.teamcode.auto.DriveConstants.kV;
 
-import org.firstinspires.ftc.teamcode.auto.trajectorysequence.TrajectorySequence;
-import org.firstinspires.ftc.teamcode.auto.trajectorysequence.TrajectorySequenceBuilder;
-import org.firstinspires.ftc.teamcode.auto.trajectorysequence.TrajectorySequenceRunner;
 import org.firstinspires.ftc.teamcode.auto.util.LynxModuleUtil;
 
 /*

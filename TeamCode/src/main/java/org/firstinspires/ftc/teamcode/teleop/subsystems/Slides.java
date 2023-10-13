@@ -83,11 +83,6 @@ public class Slides {
         position = Position.LOW;
     }
 
-    public void runToStorage() {
-        runTo(storage);
-        position = Position.STORAGE;
-    }
-
     public void runManual(double manual) {
         if (manual > powerMin || manual < -powerMin) {
             manualPower = manual;
