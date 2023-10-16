@@ -10,6 +10,7 @@ public class Claw {
 
     // TODO: Tune open and close values
     public static double open = 0.3;
+    // close1 = take 1st (top) pixel from storage, close2 = take 2nd (bottom) pixel
     public static double close1 = 0.12, close2 = 0.12;
     public boolean isOpen = false;
 

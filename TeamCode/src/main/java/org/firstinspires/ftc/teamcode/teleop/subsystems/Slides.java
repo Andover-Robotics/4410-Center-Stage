@@ -20,10 +20,10 @@ public class Slides {
     private PIDFController controller;
 
     public enum Position {
-        // HIGH, MID, LOW - Position on lines on backboard
+        // HIGH, MID, BOTTOM - Position on lines on backboard
         HIGH,
         MID,
-        LOW,
+        BOTTOM,
         STORAGE // STORAGE - Moves to where the pixels are placed
     }
 
@@ -31,7 +31,7 @@ public class Slides {
     public static double p = 0.015, i = 0, d = 0, f = 0, staticF = 0.25;
     private final double tolerance = 20, powerUp = 0.1, powerDown = 0.05, manualDivide = 1, powerMin = 0.1;
     private double manualPower = 0;
-    public static int MAXHEIGHT = -2000, top = -1700, maxteleop = -1750, mid = -980, low = -300, storage = 0, inc = 100, dec = 300;
+    public static int MAXHEIGHT = -2000, top = -1700, maxteleop = -1750, mid = -980, bottom = -300, storage = 0, inc = 100, dec = 300;
     private final OpMode opMode;
     private double target = 0;
     private boolean goingDown = false;
@@ -53,7 +53,7 @@ public class Slides {
         this.opMode = opMode;
     }
 
-    public void runTo(int t) {
+    public void runTo(double t) {
         motorLeft.setRunMode(Motor.RunMode.RawPower);
         motorLeft.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
         motorRight.setRunMode(Motor.RunMode.RawPower);
@@ -78,9 +78,9 @@ public class Slides {
         position = Position.MID;
     }
 
-    public void runToLow() {
-        runTo(low);
-        position = Position.LOW;
+    public void runToBottom() {
+        runTo(bottom);
+        position = Position.BOTTOM;
     }
 
     public void runManual(double manual) {
@@ -91,7 +91,7 @@ public class Slides {
         }
     }
 
-    public void periodic() { // thanks alex tong :)
+    public void periodic() {
         motorRight.setInverted(false);
         motorLeft.setInverted(true);
         controller.setPIDF(p, i, d, f);
@@ -116,12 +116,6 @@ public class Slides {
                 double power = staticF * controller.calculate(motorLeft.getCurrentPosition());
                 motorLeft.set(power);
                 motorRight.set(power);
-//                if(motorLeft.getCurrentPosition() < -20) {
-//
-//                }else{
-//                    motorLeft.set(0);
-//                    motorRight.set(0);
-//                }
             }
         }
     }

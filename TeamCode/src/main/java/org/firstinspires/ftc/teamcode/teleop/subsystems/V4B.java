@@ -33,12 +33,16 @@ public class V4B {
         clawRotation.setPosition(clawStorage);
     }
 
-    // 4B  is stored - either driving, or ready to take from storage
     public void storage() {
         fourbar.setDirection(Servo.Direction.REVERSE);
         clawRotation.setDirection(Servo.Direction.REVERSE);
         fourbar.setPosition(fourGround);
         clawRotation.setPosition(clawGround);
+    }
+
+    public void ready() {
+        fourbar.setPosition(fourReady);
+        clawRotation.setPosition(clawReady);
     }
 
     public void runManualOuttake(double fourpos, double clawpos) {

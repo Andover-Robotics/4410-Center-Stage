@@ -2,7 +2,10 @@ package org.firstinspires.ftc.teamcode.teleop.subsystems;
 
 import com.arcrobotics.ftclib.hardware.motors.Motor;
 import com.arcrobotics.ftclib.hardware.motors.MotorEx;
+import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 
 public class Bot {
 
@@ -15,6 +18,8 @@ public class Bot {
     public BotState state = BotState.INITIALIZED; // Default bot state
     private final MotorEx fl, fr, bl, br;
     public OpMode opMode;
+    public BNO055IMU imu0;
+    private double imuOffset = 0;
 
     // Define subsystem objects
     public Intake intake;
@@ -53,19 +58,19 @@ public class Bot {
 
     // BOT STATES
     public void initialized() {
-        state = BotState.INITIALIZED;
-        fourbar.storage();
-        slides.runToLow();
+        fourbar.ready();
+        slides.runToBottom();
         claw.open();
+        state = BotState.INITIALIZED;
     }
 
     public void pickup(int storeVal) {
-        state = BotState.SCORE;
         claw.open();
         fourbar.storage();
-        slides.runToLow();
-        claw.close(storeVal);
-        fourbar.storage();
+        slides.runToBottom();
+        claw.close(storeVal); // changes val based on amount of pixels
+        fourbar.ready();
+        state = BotState.SCORE; // bot is now ready to score
     }
 
     public void outtake() {
@@ -137,6 +142,37 @@ public class Bot {
         fr.set(speeds[1]);
         bl.set(speeds[2]);
         br.set(speeds[3]);
+    }
+
+    // IMU
+    public void setImuOffset(double offset) {
+        imuOffset += offset;
+    }
+
+    public void initializeImus() {
+        imu0 = opMode.hardwareMap.get(BNO055IMU.class, "imu");
+
+        final BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
+
+        parameters.mode = BNO055IMU.SensorMode.IMU;
+        parameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
+        parameters.accelUnit = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
+        parameters.loggingEnabled = false;
+
+        imu0.initialize(parameters);
+        resetIMU();
+    }
+
+    public void resetIMU() {
+        imuOffset += getIMU();
+    }
+
+    public double getIMU() {
+        double angle = (imu0.getAngularOrientation().toAngleUnit(AngleUnit.DEGREES).firstAngle - imuOffset) % 360;
+        if (angle > 180) {
+            angle = angle - 360;
+        }
+        return angle;
     }
 
 }
