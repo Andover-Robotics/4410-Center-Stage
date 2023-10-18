@@ -8,53 +8,61 @@ import com.acmerobotics.dashboard.config.Config;
 
 @Config
 public class V4B {
-    private final Servo fourbar;
-    private final Servo clawRotation;
+    private final Servo armLeft, armRight, wrist;
 
     //values need to be changed
-    public static double fourOuttake = 0.6, fourStorage=0.6, fourGround = 0.6, fourReady = 0.6;
-    public static double clawOuttake = 0.6, clawStorage=0.6, clawGround = 0.6, clawReady = 0.6;
+    public static double armOuttake = 0.6, armStorage=0.6, armGround = 0.6, armTopPixel = 0.6, armBottomPixel = 0.6;
+    public static double wristOuttake = 0.6, wristStorage=0.6;
 
 
     public V4B(OpMode opMode) {
-        fourbar = opMode.hardwareMap.servo.get("fourbar");
-        fourbar.setDirection(Servo.Direction.FORWARD);
-        clawRotation = opMode.hardwareMap.servo.get("clawRotation");
-        clawRotation.setDirection(Servo.Direction.FORWARD);
+        armLeft = opMode.hardwareMap.servo.get("armLeft");
+        armLeft.setDirection(Servo.Direction.FORWARD);
+        armRight = opMode.hardwareMap.servo.get("armRight");
+        armRight.setDirection(Servo.Direction.FORWARD);
+
+        wrist = opMode.hardwareMap.servo.get("wrist");
+        wrist.setDirection(Servo.Direction.FORWARD);
+    }
+
+    private void setArm(double position) {
+        armLeft.setPosition(position);
+        armRight.setPosition(1 - position);
+    }
+
+    private void setWrist(double position) {
+        armLeft.setPosition(position);
+        armRight.setPosition(1 - position);
     }
 
     public void outtake(){
-        fourbar.setPosition(fourOuttake);
-        clawRotation.setPosition(clawOuttake);
+        setArm(armOuttake);
+        setWrist(wristOuttake);
     }
 
     public void ground() {
-        fourbar.setPosition(fourStorage);
-        clawRotation.setPosition(clawStorage);
+        setArm(armGround);
+        setWrist(wristStorage);
     }
 
     public void storage() {
-        fourbar.setDirection(Servo.Direction.REVERSE);
-        clawRotation.setDirection(Servo.Direction.REVERSE);
-        fourbar.setPosition(fourGround);
-        clawRotation.setPosition(clawGround);
+        setArm(armStorage);
+        setWrist(wristStorage);
     }
 
-    public void ready() {
-        fourbar.setPosition(fourReady);
-        clawRotation.setPosition(clawReady);
+    public void topPixel() {
+        setArm(armTopPixel);
+        setWrist(wristStorage);
+    }
+
+    public void bottomPixel() {
+        setArm(armBottomPixel);
+        setWrist(wristStorage);
     }
 
     public void runManualOuttake(double fourpos, double clawpos) {
-        fourbar.setPosition(fourpos);
-        clawRotation.setPosition(clawpos);
-    }
-
-    public void runManualStorage(double fourpos, double clawpos) {
-        fourbar.setDirection(Servo.Direction.REVERSE);
-        clawRotation.setDirection(Servo.Direction.REVERSE);
-        fourbar.setPosition(fourpos);
-        clawRotation.setPosition(clawpos);
+        setArm(fourpos);
+        setWrist(clawpos);
     }
 
 }

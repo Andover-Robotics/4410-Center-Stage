@@ -10,12 +10,16 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 public class Bot {
 
     public enum BotState {
-        INITIALIZED, // Initialized position: slides and 4B are down
-        SCORE // Scoring position:
+        STORAGE, // Initialized position: slides and 4B are down
+        TOPPIXEL, // picking up the bottom pixel maybe dont use
+        BOTTOMPIXEL, //Pcking up the top pixel maybe dont use
+        OUTTAKEOUT, // Outtaking with arm out at angle
+        OUTTAKEDOWN, //Outtaking on ground
+
     }
 
     public static Bot instance;
-    public BotState state = BotState.INITIALIZED; // Default bot state
+    public BotState state = BotState.STORAGE; // Default bot state
     private final MotorEx fl, fr, bl, br;
     public OpMode opMode;
     public BNO055IMU imu0;
@@ -57,39 +61,64 @@ public class Bot {
     }
 
     // BOT STATES
-    public void initialized() {
-        fourbar.ready();
-        slides.runToBottom();
-        claw.open();
-        state = BotState.INITIALIZED;
-    }
-
-    public void pickup(int storeVal) {
-        claw.open();
+    public void storage() {//was initialized
         fourbar.storage();
         slides.runToBottom();
-        claw.close(storeVal); // changes val based on amount of pixels
-        fourbar.ready();
-        state = BotState.SCORE; // bot is now ready to score
-    }
-
-    public void outtake() {
         claw.open();
-        initialized();
+        state = BotState.STORAGE;
     }
 
+//    public void pickup(boolean isTop) {
+//        claw.open();
+//        if(isTop){
+//            fourbar.topPixel();
+//        } else{
+//            fourbar.bottomPixel();
+//        }
+//        slides.runToBottom();
+//        claw.close(); // changes val based on amount of pixels
+//        fourbar.storage();
+//        state = BotState.STORAGE; // bot is now ready to score I WANT TO INTEGRATE THIS WITH THE CLAW SO THE CLAW CLOSING AND PICKING UP SWITCHES IT huh when is the bot in this state
+//        //also i just realized it shouldnt be a boolean because there could also be no pixels yeah it's best if it was an int so we can do 0,1,2, etc. it goes Storage(above pixel) -> pickup -> outtake
+//    }
+
+    public void pickupTop() {
+        claw.open();
+        slides.runToBottom();
+        fourbar.topPixel();
+        claw.close();
+        fourbar.storage();
+        state = BotState.STORAGE;
+    }
+    public void pickupBottom() {
+        claw.open();
+        slides.runToBottom();
+        fourbar.bottomPixel();
+        claw.close();
+        fourbar.storage();
+        state = BotState.STORAGE;
+    }
+    public void outtakeOut() { //go to outtake position
+        fourbar.outtake();
+        state = BotState.OUTTAKEOUT;
+    }
+
+    public void outtakeDown() { //go to outtake position
+        fourbar.ground();
+        slides.runToBottom();
+        state = BotState.OUTTAKEDOWN;
+    }
+    public void drop(){ //drop pixel
+        claw.open();
+        storage();
+        state = BotState.STORAGE;
+    }
     public void intake(boolean isReverse) {
         if (!isReverse) {
             intake.runIntake();
         } else intake.runReverseIntake();
     }
 
-    public void discardPixel() {
-        fourbar.ground();
-        slides.runTo(0); // TODO: Find slides discard position
-        claw.open();
-        initialized(); // return to init position
-    }
 
     // TODO: Figure out how much to turn and drive forward
     public void alignJunction() {

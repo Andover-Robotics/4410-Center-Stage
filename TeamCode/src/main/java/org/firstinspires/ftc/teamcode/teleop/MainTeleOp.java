@@ -22,6 +22,7 @@ public class MainTeleOp extends LinearOpMode {
     public static double kp = 0.025, ki = 0, kd = 0;
     private PIDController headingAligner = new PIDController(kp, ki, kd);
     private final int manualSlideAmt = 1;
+    double leftX = gp2.getLeftX(), rightX = gp2.getRightX(), leftY = gp2.getLeftY(), rightY = gp2.getRightY();
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -35,8 +36,8 @@ public class MainTeleOp extends LinearOpMode {
         gp2 = new GamepadEx(gamepad2);
 
         // Initialize bot
-        bot.state = Bot.BotState.INITIALIZED;
-        bot.initialized();
+        bot.state = Bot.BotState.STORAGE;
+        bot.storage();
 
         /*
         COMPLETE LIST OF DRIVER CONTROLS (so far):
@@ -65,7 +66,7 @@ public class MainTeleOp extends LinearOpMode {
             gp2.readButtons();
 
             // FINITE STATES
-            if (bot.state == Bot.BotState.INITIALIZED) { // INITIALIZED
+            if (bot.state == Bot.BotState.STORAGE) { // INITIALIZED
                 // INTAKE (driver 1)
                 if (gp1.wasJustPressed(GamepadKeys.Button.LEFT_BUMPER)) { // intake
                     bot.intake(false);
@@ -76,20 +77,32 @@ public class MainTeleOp extends LinearOpMode {
 
                 // TRANSFER (driver 2 from here on)
                 if (gp2.wasJustPressed(GamepadKeys.Button.A)) { // top pixel
-                    bot.pickup(1);
+                    bot.pickupTop();
                 }
                 if (gp2.wasJustPressed(GamepadKeys.Button.B)) { // bottom pixel
-                    bot.pickup(2);
+                    bot.pickupBottom();
                 }
-            } else if (bot.state == Bot.BotState.SCORE) { // SCORING POSITION
-                if (gp2.wasJustPressed(GamepadKeys.Button.Y)) { // discard pixel
-                    bot.discardPixel();
+                if (gp2.wasJustPressed(GamepadKeys.Button.Y)) { //go to outtake out position
+                    bot.outtakeOut();
                 }
+                if (gp2.wasJustPressed(GamepadKeys.Button.X)) {
+                    bot.outtakeDown();
+                }
+            } else if (bot.state == Bot.BotState.OUTTAKEDOWN) { // SCORING POSITION ground
+                if (gp2.wasJustPressed(GamepadKeys.Button.X)) { // drop pixel & return to storage
+                    bot.drop();
+                }
+            } else if (bot.state == Bot.BotState.OUTTAKEOUT) { //scoring position out
+                if (gp2.wasJustPressed(GamepadKeys.Button.Y)) { //drop and return to storage
+                    bot.drop();
+                }
+            }
+            //DRIVING FSM kept separate from other fsm part because didnt want to put gp1drive in every other state in case something changes or smt unexpected happens
 
-                // OUTTAKE
-                if (gp2.wasJustPressed(GamepadKeys.Button.B)) { // open claw then return to initialized position
-                    bot.outtake();
-                }
+            if (bot.state == Bot.BotState.OUTTAKEOUT) {
+                gp2strafe();
+            } else {
+                gp1drive();
             }
 
             // SLIDES
@@ -100,10 +113,13 @@ public class MainTeleOp extends LinearOpMode {
                 bot.slides.runToMiddle();
             } else if (gp2.wasJustPressed(GamepadKeys.Button.DPAD_DOWN)) {
                 bot.slides.runToBottom();
+            } else if (gp2.wasJustPressed(GamepadKeys.Button.DPAD_LEFT)) {
+                bot.slides.runToLow();
             }
-            // manual positioning with joystick
+            // manual slides positioning with joystick
+
             if (gp2.getLeftY() > 0.1) {
-                bot.slides.runTo(gp2.getLeftY());
+                bot.slides.runManual(leftY*0.5);
             }
 
             // OTHER
@@ -112,21 +128,52 @@ public class MainTeleOp extends LinearOpMode {
                 bot.resetIMU();
                 autoAlignForward = !autoAlignForward;
             }
-
             telemetry.update();
             bot.slides.periodic();
-            drive();
+            //gp1drive(); put in fsm of outtake out -> gp2strafe
         }
     }
 
-    private void drive() {
+    private void gp1drive() {
         driveSpeed = 1;
         driveSpeed *= 1 - 0.5 * gp1.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER);
         driveSpeed = Math.max(0, driveSpeed);
         bot.fixMotors();
+
         Vector2d driveVector = new Vector2d(gp1.getLeftX(), -gp1.getLeftY()),
                 turnVector = new Vector2d(
                         gp1.getRightX(), 0);
+
+        bot.drive(driveVector.getX() * driveSpeed,
+                driveVector.getY() * driveSpeed,
+                turnVector.getX() * driveSpeed / 1.7
+        );
+        if (autoAlignForward) {
+            double power = headingAligner.calculate(bot.getIMU());
+            bot.drive(driveVector.getX() * driveSpeed,
+                    driveVector.getY() * driveSpeed,
+                    -power
+            );
+        } else {
+            bot.drive(driveVector.getX() * driveSpeed,
+                    driveVector.getY() * driveSpeed,
+                    turnVector.getX() * driveSpeed / 1.7
+            );
+        }
+    }
+    private void gp2strafe() {
+        driveSpeed = 0.1;
+        driveSpeed = Math.max(0, driveSpeed);
+        bot.fixMotors();
+
+        Vector2d driveVector = new Vector2d(gp2.getLeftX(), -gp2.getLeftY()),
+                turnVector = new Vector2d(
+                        gp1.getRightX(), 0);
+
+        bot.drive(driveVector.getX() * driveSpeed,
+                driveVector.getY() * driveSpeed,
+                turnVector.getX() * driveSpeed / 1.7
+        );
         if (autoAlignForward) {
             double power = headingAligner.calculate(bot.getIMU());
             bot.drive(driveVector.getX() * driveSpeed,
