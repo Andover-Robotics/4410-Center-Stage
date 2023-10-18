@@ -11,8 +11,6 @@ public class Bot {
 
     public enum BotState {
         STORAGE, // Initialized position: slides and 4B are down
-        TOPPIXEL, // picking up the bottom pixel maybe dont use
-        BOTTOMPIXEL, //Pcking up the top pixel maybe dont use
         OUTTAKEOUT, // Outtaking with arm out at angle
         OUTTAKEDOWN, //Outtaking on ground
 
@@ -82,18 +80,17 @@ public class Bot {
 //        //also i just realized it shouldnt be a boolean because there could also be no pixels yeah it's best if it was an int so we can do 0,1,2, etc. it goes Storage(above pixel) -> pickup -> outtake
 //    }
 
-    public void pickupTop() {
+    public void pickup(int place) {
         claw.open();
         slides.runToBottom();
-        fourbar.topPixel();
-        claw.close();
-        fourbar.storage();
-        state = BotState.STORAGE;
-    }
-    public void pickupBottom() {
-        claw.open();
-        slides.runToBottom();
-        fourbar.bottomPixel();
+        if (place == 1) {
+            fourbar.topPixel();
+        } else if (place == 2) {
+            fourbar.bottomPixel();
+        } else {
+            fourbar.storage();
+        }
+
         claw.close();
         fourbar.storage();
         state = BotState.STORAGE;
@@ -121,7 +118,7 @@ public class Bot {
 
 
     // TODO: Figure out how much to turn and drive forward
-    public void alignJunction() {
+    public void alignSpike() {
         double turn = 1.7;
         if (ColorDetection.spikeMark == ColorDetection.SpikeMark.LEFT) {
             drive(0,0, -1* turn * Math.abs((ColorDetection.camwidth/2.0)-ColorDetection.midpointrect));
