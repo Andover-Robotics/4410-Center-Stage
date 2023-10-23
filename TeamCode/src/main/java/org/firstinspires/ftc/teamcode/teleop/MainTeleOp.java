@@ -75,31 +75,31 @@ public class MainTeleOp extends LinearOpMode {
                     bot.intake(true);
                 }
 
-                // TRANSFER (driver 2 from here on)
+                // TRANSFER
                 if (gp2.wasJustPressed(GamepadKeys.Button.A)) { // top pixel
-                    bot.pickupTop();
+                    bot.pickup(1);
                 }
                 if (gp2.wasJustPressed(GamepadKeys.Button.B)) { // bottom pixel
-                    bot.pickupBottom();
+                    bot.pickup(2);
                 }
-                if (gp2.wasJustPressed(GamepadKeys.Button.Y)) { //go to outtake out position
+                if (gp2.wasJustPressed(GamepadKeys.Button.Y)) { // go to outtake out position
                     bot.outtakeOut();
                 }
-                if (gp2.wasJustPressed(GamepadKeys.Button.X)) {
+                if (gp2.wasJustPressed(GamepadKeys.Button.X)) { // go to outtake ground position
                     bot.outtakeDown();
                 }
-            } else if (bot.state == Bot.BotState.OUTTAKEDOWN) { // SCORING POSITION ground
-                if (gp2.wasJustPressed(GamepadKeys.Button.X)) { // drop pixel & return to storage
+            } else if (bot.state == Bot.BotState.OUTTAKE_OUT) { // SCORING BACKBOARD
+                if (gp2.wasJustPressed(GamepadKeys.Button.Y)) { // drop and return to storage
                     bot.drop();
                 }
-            } else if (bot.state == Bot.BotState.OUTTAKEOUT) { //scoring position out
-                if (gp2.wasJustPressed(GamepadKeys.Button.Y)) { //drop and return to storage
+            } else if (bot.state == Bot.BotState.OUTTAKE_DOWN) { // SCORING GROUND
+                if (gp2.wasJustPressed(GamepadKeys.Button.X)) { // drop and return to storage
                     bot.drop();
                 }
             }
             //DRIVING FSM kept separate from other fsm part because didnt want to put gp1drive in every other state in case something changes or smt unexpected happens
 
-            if (bot.state == Bot.BotState.OUTTAKEOUT) {
+            if (bot.state == Bot.BotState.OUTTAKE_OUT) {
                 gp2strafe();
             } else {
                 gp1drive();
@@ -117,7 +117,6 @@ public class MainTeleOp extends LinearOpMode {
                 bot.slides.runToLow();
             }
             // manual slides positioning with joystick
-
             if (gp2.getLeftY() > 0.1) {
                 bot.slides.runManual(leftY*0.5);
             }
@@ -134,7 +133,7 @@ public class MainTeleOp extends LinearOpMode {
         }
     }
 
-    private void gp1drive() {
+    private void gp1drive() { // all directions
         driveSpeed = 1;
         driveSpeed *= 1 - 0.5 * gp1.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER);
         driveSpeed = Math.max(0, driveSpeed);
@@ -161,7 +160,7 @@ public class MainTeleOp extends LinearOpMode {
             );
         }
     }
-    private void gp2strafe() {
+    private void gp2strafe() { // strafing left right
         driveSpeed = 0.1;
         driveSpeed = Math.max(0, driveSpeed);
         bot.fixMotors();

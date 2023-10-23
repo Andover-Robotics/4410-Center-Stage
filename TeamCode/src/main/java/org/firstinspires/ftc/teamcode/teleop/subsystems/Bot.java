@@ -11,9 +11,8 @@ public class Bot {
 
     public enum BotState {
         STORAGE, // Initialized position: slides and 4B are down
-        OUTTAKEOUT, // Outtaking with arm out at angle
-        OUTTAKEDOWN, //Outtaking on ground
-
+        OUTTAKE_OUT, // Outtaking with arm out at angle
+        OUTTAKE_DOWN, //Outtaking on ground
     }
 
     public static Bot instance;
@@ -83,29 +82,26 @@ public class Bot {
     public void pickup(int place) {
         claw.open();
         slides.runToBottom();
-        if (place == 1) {
-            fourbar.topPixel();
-        } else if (place == 2) {
-            fourbar.bottomPixel();
-        } else {
-            fourbar.storage();
+        switch(place) {
+            case 1: fourbar.topPixel();
+            case 2: fourbar.bottomPixel();
+            default: fourbar.storage();
         }
-
         claw.close();
         fourbar.storage();
         state = BotState.STORAGE;
     }
-    public void outtakeOut() { //go to outtake position
+    public void outtakeOut() { // go to outtake backboard position
         fourbar.outtake();
-        state = BotState.OUTTAKEOUT;
+        state = BotState.OUTTAKE_OUT;
     }
 
-    public void outtakeDown() { //go to outtake position
+    public void outtakeDown() { // go to outtake down/ground position
         fourbar.ground();
         slides.runToBottom();
-        state = BotState.OUTTAKEDOWN;
+        state = BotState.OUTTAKE_DOWN;
     }
-    public void drop(){ //drop pixel
+    public void drop(){ // drop pixel and return to storage
         claw.open();
         storage();
         state = BotState.STORAGE;

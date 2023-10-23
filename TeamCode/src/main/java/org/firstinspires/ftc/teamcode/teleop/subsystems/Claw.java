@@ -23,17 +23,6 @@ public class Claw {
         isOpen = true;
     }
 
-//    public void close(int storeVal){ dont need two diff close positions for the claw, but need for the v4b
-    // we need to make some type of thing that switches a boolean(isTop) if it picks up the top pixel, so it knows if it needs to go to the bottom pixel next time
-//        switch (storeVal) {
-//            case 1:
-//                claw.setPosition(close1);
-//                break;
-//            case 2:
-//                claw.setPosition(close2);
-//                break;
-//        }
-//        isOpen = false;
     public void close(){
         claw.setPosition(close);
         isOpen = false;
