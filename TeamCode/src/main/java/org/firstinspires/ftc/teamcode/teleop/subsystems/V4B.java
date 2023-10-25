@@ -20,7 +20,6 @@ public class V4B {
         armLeft.setDirection(Servo.Direction.FORWARD);
         armRight = opMode.hardwareMap.servo.get("armRight");
         armRight.setDirection(Servo.Direction.FORWARD);
-
         wrist = opMode.hardwareMap.servo.get("wrist");
         wrist.setDirection(Servo.Direction.FORWARD);
     }

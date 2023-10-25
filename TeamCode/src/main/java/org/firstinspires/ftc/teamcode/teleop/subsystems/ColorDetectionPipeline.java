@@ -53,7 +53,7 @@ public class ColorDetectionPipeline extends OpenCvPipeline{
     public static Scalar blueHighHSV = new Scalar(blueHH,blueHS,blueHV);
 
 
-    public ColorDetectionPipeline(Telemetry telemetry){ // CONSTRUCTOR :D
+    public ColorDetectionPipeline(Telemetry telemetry, int alliance){ // CONSTRUCTOR :D
         this.telemetry = telemetry;
         this.alliance = alliance;
     }
