@@ -116,13 +116,13 @@ public class Bot {
     // TODO: Figure out how much to turn and drive forward
     public void alignSpike() {
         double turn = 1.7;
-        if (ColorDetection.spikeMark == ColorDetection.SpikeMark.LEFT) {
-            drive(0,0, -1* turn * Math.abs((ColorDetection.camwidth/2.0)-ColorDetection.midpointrect));
+        if (ColorDetectionPipeline.spikeMark == ColorDetectionPipeline.SpikeMark.LEFT) {
+            drive(0,0, -1* turn * Math.abs((ColorDetectionPipeline.camwidth/2.0)-ColorDetectionPipeline.midpointrect));
         }
-        if (ColorDetection.spikeMark == ColorDetection.SpikeMark.RIGHT) {
-            drive(0,0, turn * Math.abs((ColorDetection.camwidth/2.0)-ColorDetection.midpointrect));
+        if (ColorDetectionPipeline.spikeMark == ColorDetectionPipeline.SpikeMark.RIGHT) {
+            drive(0,0, turn * Math.abs((ColorDetectionPipeline.camwidth/2.0)-ColorDetectionPipeline.midpointrect));
         }
-        if (ColorDetection.spikeMark == ColorDetection.SpikeMark.MIDDLE) {
+        if (ColorDetectionPipeline.spikeMark == ColorDetectionPipeline.SpikeMark.MIDDLE) {
             drive(0,0,0);
         }
     }

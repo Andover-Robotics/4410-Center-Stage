@@ -15,7 +15,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.teamcode.teleop.subsystems.Bot;
-import org.firstinspires.ftc.teamcode.teleop.subsystems.ColorDetection;
+import org.firstinspires.ftc.teamcode.teleop.subsystems.ColorDetectionPipeline;
 import org.openftc.apriltag.AprilTagDetection;
 import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraException;
@@ -26,7 +26,6 @@ import java.util.ArrayList;
 import java.util.Map;
 
 import java.util.Timer;
-import java.util.TimerTask;
 
 @Config
 @Autonomous(name = "MainAutonomous")
@@ -68,7 +67,7 @@ public class MainAutonomous extends LinearOpMode {
     int ID_TWO = 2;
     int ID_THREE = 3;
     AprilTagDetection tagOfInterest = null;
-    ColorDetection colorDetection;
+    ColorDetectionPipeline colorDetection;
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -87,11 +86,11 @@ public class MainAutonomous extends LinearOpMode {
         AprilTagDetectionPipeline aprilTagDetectionPipeline = new AprilTagDetectionPipeline(tagsize, fx, fy, cx, cy);
 
         if (color == Color.RED) {
-            colorDetection = new ColorDetection(telemetry, 1);
+            colorDetection = new ColorDetectionPipeline(telemetry, 1);
         } else if (color == Color.BLUE) {
-            colorDetection = new ColorDetection(telemetry, 2);
+            colorDetection = new ColorDetectionPipeline(telemetry, 2);
         } else {
-            colorDetection = new ColorDetection(telemetry, 0);
+            colorDetection = new ColorDetectionPipeline(telemetry, 0);
         }
 
 

@@ -18,7 +18,7 @@ import org.opencv.core.Scalar;
 TODO: NEED TO TUNE HSV VALUES
  */
 
-public class ColorDetection extends OpenCvPipeline{
+public class ColorDetectionPipeline extends OpenCvPipeline{
 
     Telemetry telemetry;
     Mat HSV = new Mat();
@@ -53,7 +53,7 @@ public class ColorDetection extends OpenCvPipeline{
     public static Scalar blueHighHSV = new Scalar(blueHH,blueHS,blueHV);
 
 
-    public ColorDetection(Telemetry telemetry, int alliance){ // CONSTRUCTOR :D
+    public ColorDetectionPipeline(Telemetry telemetry){ // CONSTRUCTOR :D
         this.telemetry = telemetry;
         this.alliance = alliance;
     }
@@ -62,13 +62,13 @@ public class ColorDetection extends OpenCvPipeline{
     public Mat processFrame(Mat input) {
         Imgproc.cvtColor(input, HSV, Imgproc.COLOR_RGB2HSV); //converting RGB colors to HSV
 
-        Rect rightrect = new Rect(750, 1, 529, 719);
-        Rect leftrect = new Rect(1, 1, 479, 719); // rectangle sizes
+        Rect rightrect = new Rect(858, 1, 425, 719);
+        Rect leftrect = new Rect(1, 1, 425, 719); // rectangle sizes
 
-        Imgproc.rectangle(input, leftrect, new Scalar(255, 0, 0), 5); //displays rectangles with red color
-        Imgproc.rectangle(input, rightrect, new Scalar(255, 0, 0), 5);
+        Imgproc.rectangle(input, leftrect, new Scalar(0, 255, 0), 5); //displays rectangles with red color
+        Imgproc.rectangle(input, rightrect, new Scalar(0, 255, 0), 5);
 
-        // filters HSV mat into image with black being the lowest yellow HSV and white being the highest yellow HSV
+        // filters HSV mat into image with black being the lowest red/blue HSV and white being the highest red/blue HSV
         if (alliance == 1) {
             Core.inRange(HSV, redLowHSV, redHighHSV, HSV);
         } else {
@@ -98,18 +98,18 @@ public class ColorDetection extends OpenCvPipeline{
                 } else if (midpointrect > rightrect.tl().x && midpointrect < rightrect.br().x) { // checks if within boundaries of right side rectangle
                     spikeMark = SpikeMark.RIGHT;
                 } else if (midpointrect < rightrect.tl().x && midpointrect > leftrect.br().x){
-                    spikeMark = SpikeMark.MIDDLE; // checks if in middle; means that it is scorable
+                    spikeMark = SpikeMark.MIDDLE;
                 }
 //
 //                telemetry.addLine("Midpoint of Bounding Box :"+ midpointrect);
             } else {
-                spikeMark = SpikeMark.NOTDETECTED;
+                spikeMark = SpikeMark.MIDDLE;
             }
         } else {
-            spikeMark = SpikeMark.NOTDETECTED;
+            spikeMark = SpikeMark.MIDDLE;
         }
 //        telemetry.addData("contours: ", contours.size());
-//         telemetry.addData("Junction status: ",junctionVal);   is in test opmode
+        // telemetry.addData("Spikemark status: ",spikeMark);
 
         // Releasing all our mats for the next iteration
         HSV.release();
