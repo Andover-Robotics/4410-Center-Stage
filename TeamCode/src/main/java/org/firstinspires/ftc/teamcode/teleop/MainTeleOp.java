@@ -12,7 +12,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import org.firstinspires.ftc.teamcode.teleop.subsystems.Bot;
 
 @Config
-@TeleOp(name = "MainTeleOp", group = "Main")
+@TeleOp(name = "MainTeleOp", group = "Competition")
 public class MainTeleOp extends LinearOpMode {
 
     private Bot bot;
