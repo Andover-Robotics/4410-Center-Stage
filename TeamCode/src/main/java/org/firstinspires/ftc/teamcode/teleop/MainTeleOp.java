@@ -12,7 +12,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import org.firstinspires.ftc.teamcode.teleop.subsystems.Bot;
 
 @Config
-@TeleOp(name = "MainTeleOp", group = "Competition")
+@TeleOp(name = "MainTeleOp")
 public class MainTeleOp extends LinearOpMode {
 
     private Bot bot;
@@ -22,7 +22,8 @@ public class MainTeleOp extends LinearOpMode {
     public static double kp = 0.025, ki = 0, kd = 0;
     private PIDController headingAligner = new PIDController(kp, ki, kd);
     private final int manualSlideAmt = 1;
-    double leftX = gp2.getLeftX(), rightX = gp2.getRightX(), leftY = gp2.getLeftY(), rightY = gp2.getRightY();
+    double leftX, rightX, leftY, rightY;
+
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -34,6 +35,10 @@ public class MainTeleOp extends LinearOpMode {
 
         gp1 = new GamepadEx(gamepad1);
         gp2 = new GamepadEx(gamepad2);
+        leftX = gp2.getLeftX();
+        rightX = gp2.getRightX();
+        leftY = gp2.getLeftY();
+        rightY = gp2.getRightY();
 
         // Initialize bot
         bot.state = Bot.BotState.STORAGE;
