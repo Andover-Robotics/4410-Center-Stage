@@ -4,11 +4,11 @@ import com.arcrobotics.ftclib.hardware.motors.Motor;
 import com.arcrobotics.ftclib.hardware.motors.MotorEx;
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+import com.qualcomm.robotcore.hardware.CRServo;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 
 public class Bot {
-
     public enum BotState {
         STORAGE, // Initialized position: slides and 4B are down
         OUTTAKE_OUT, // Outtaking with arm out at angle
@@ -24,6 +24,8 @@ public class Bot {
 
     // Define subsystem objects
     public Intake intake;
+    public final CRServo counterRoller;
+    public static final double COUNTERROLLER_SPEED = 0.6; // input is in motor power control; see how it is converted in intake function
     public Slides slides;
     public V4B fourbar;
     public Claw claw;
@@ -52,12 +54,27 @@ public class Bot {
         br = new MotorEx(opMode.hardwareMap, "motorBR");
 
         intake = new Intake(opMode);
+        counterRoller = opMode.hardwareMap.crservo.get("counterRoller");
         slides = new Slides(opMode);
         fourbar = new V4B(opMode);
         claw = new Claw(opMode);
     }
 
     // BOT STATES
+    public void intake(boolean isReverse) {
+        // setPower needs a double between 0 and 1 where 0.5 is no motion, 0 is 100% power in one direction and 1 is 100% power in the opposite
+        // the expression below turns motor power control (-1 to 1) to this type of control by reducing the domain to (-0.5 to 0.5) with 0 being no motion
+        // and then adding 0.5 to acheive the (0 to 1) and the 0.5 origin
+        // multiplying by -1 allows it to spin in the opposite way
+        if (!isReverse) {
+            intake.runIntake();
+            counterRoller.setPower(COUNTERROLLER_SPEED/2.0+0.5);
+        } else{
+            intake.runReverseIntake();
+            counterRoller.setPower(COUNTERROLLER_SPEED/-2.0+0.5);
+        }
+    }
+
     public void storage() {//was initialized
         fourbar.storage();
         slides.runToBottom();
@@ -105,11 +122,6 @@ public class Bot {
         claw.open();
         storage();
         state = BotState.STORAGE;
-    }
-    public void intake(boolean isReverse) {
-        if (!isReverse) {
-            intake.runIntake();
-        } else intake.runReverseIntake();
     }
 
 
