@@ -127,6 +127,7 @@ public class MainTeleOp extends LinearOpMode {
                 bot.resetIMU();
                 autoAlignForward = !autoAlignForward;
             }
+            telemetry.addData("Bot State", bot.state.toString());
             telemetry.update();
             bot.slides.periodic();
             //gp1drive(); put in fsm of outtake out -> gp2strafe

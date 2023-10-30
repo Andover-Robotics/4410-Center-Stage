@@ -11,8 +11,12 @@ public class V4B {
     private final Servo armLeft, armRight, wrist;
 
     //values need to be changed
-    public static double armOuttake = 0.6, armStorage=0.6, armGround = 0.6, armTopPixel = 0.6, armBottomPixel = 0.6;
-    public static double wristOuttake = 0.6, wristStorage=0.6;
+//    0.88 - top
+//0.9 - bottom
+//0.35 - outtake
+//0.79 - ground
+    public static double armOuttake = 0.35, armStorage=0.82, armGround = 0.79, armTopPixel = 0.88, armBottomPixel = 0.9;
+    public static double wristOuttake = 0.5, wristStorage=0.2;
 
 
     public V4B(OpMode opMode) {
