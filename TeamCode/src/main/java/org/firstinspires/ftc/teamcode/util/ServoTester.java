@@ -8,10 +8,10 @@ import java.util.Map;
 
 @TeleOp(name = "Servo Tester", group = "Toolbox")
 public class ServoTester extends OpMode {
-    private static double POS_DELTA = 0.02;
+    private static final double POS_DELTA = 0.02;
 
     private Servo servo;
-    private InputColumnResponder input = new InputColumnResponderImpl();
+    private final InputColumnResponder input = new InputColumnResponderImpl();
     private Selector servoSelector;
 
     @Override

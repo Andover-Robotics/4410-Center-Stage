@@ -26,12 +26,11 @@ public class V4B {
 
     private void setArm(double position) {
         armLeft.setPosition(position);
-        armRight.setPosition(1 - position);
+        armRight.setPosition(0.95 - position);
     }
 
     private void setWrist(double position) {
-        armLeft.setPosition(position);
-        armRight.setPosition(1 - position);
+        wrist.setPosition(position);
     }
 
     public void outtake(){

@@ -58,7 +58,7 @@ public class MainTeleOp extends LinearOpMode {
         right bumper - manual position slides up
         left bumper - manual position slides down
         */
-
+        waitForStart();
         while (opModeIsActive() && !isStopRequested()) {
 
             headingAligner.setPID(kp, ki, kd);
