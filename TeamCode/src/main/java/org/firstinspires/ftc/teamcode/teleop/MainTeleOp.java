@@ -63,7 +63,7 @@ public class MainTeleOp extends LinearOpMode {
         right bumper - manual position slides up
         left bumper - manual position slides down
         */
-
+        waitForStart();
         while (opModeIsActive() && !isStopRequested()) {
 
             headingAligner.setPID(kp, ki, kd);
@@ -104,11 +104,7 @@ public class MainTeleOp extends LinearOpMode {
             }
             //DRIVING FSM kept separate from other fsm part because didnt want to put gp1drive in every other state in case something changes or smt unexpected happens
 
-            if (bot.state == Bot.BotState.OUTTAKE_OUT) {
-                gp2strafe();
-            } else {
-                gp1drive();
-            }
+
 
             // SLIDES
             // preset positions
@@ -126,12 +122,19 @@ public class MainTeleOp extends LinearOpMode {
                 bot.slides.runManual(leftY*0.5);
             }
 
+            if (bot.state == Bot.BotState.OUTTAKE_OUT) {
+                gp2strafe();
+            } else {
+                gp1drive();
+            }
+
             // OTHER
             // auto align
             if (gp1.wasJustPressed(GamepadKeys.Button.BACK)) {
                 bot.resetIMU();
                 autoAlignForward = !autoAlignForward;
             }
+            telemetry.addData("Bot State: ",bot.state);
             telemetry.update();
             bot.slides.periodic();
             //gp1drive(); put in fsm of outtake out -> gp2strafe
@@ -152,25 +155,25 @@ public class MainTeleOp extends LinearOpMode {
                 driveVector.getY() * driveSpeed,
                 turnVector.getX() * driveSpeed / 1.7
         );
-        if (autoAlignForward) {
-            double power = headingAligner.calculate(bot.getIMU());
-            bot.drive(driveVector.getX() * driveSpeed,
-                    driveVector.getY() * driveSpeed,
-                    -power
-            );
-        } else {
-            bot.drive(driveVector.getX() * driveSpeed,
-                    driveVector.getY() * driveSpeed,
-                    turnVector.getX() * driveSpeed / 1.7
-            );
-        }
+//        if (autoAlignForward) {
+//            double power = headingAligner.calculate(bot.getIMU());
+//            bot.drive(driveVector.getX() * driveSpeed,
+//                    driveVector.getY() * driveSpeed,
+//                    -power
+//            );
+//        } else {
+//            bot.drive(driveVector.getX() * driveSpeed,
+//                    driveVector.getY() * driveSpeed,
+//                    turnVector.getX() * driveSpeed / 1.7
+//            );
+//        }
     }
     private void gp2strafe() { // strafing left right
         driveSpeed = 0.1;
         driveSpeed = Math.max(0, driveSpeed);
         bot.fixMotors();
 
-        Vector2d driveVector = new Vector2d(gp2.getLeftX(), -gp2.getLeftY()),
+        Vector2d driveVector = new Vector2d(gp2.getLeftX(), -gp2.getRightY()),
                 turnVector = new Vector2d(
                         gp1.getRightX(), 0);
 
@@ -178,18 +181,18 @@ public class MainTeleOp extends LinearOpMode {
                 driveVector.getY() * driveSpeed,
                 turnVector.getX() * driveSpeed / 1.7
         );
-        if (autoAlignForward) {
-            double power = headingAligner.calculate(bot.getIMU());
-            bot.drive(driveVector.getX() * driveSpeed,
-                    driveVector.getY() * driveSpeed,
-                    -power
-            );
-        } else {
-            bot.drive(driveVector.getX() * driveSpeed,
-                    driveVector.getY() * driveSpeed,
-                    turnVector.getX() * driveSpeed / 1.7
-            );
-        }
+//        if (autoAlignForward) {
+//            double power = headingAligner.calculate(bot.getIMU());
+//            bot.drive(driveVector.getX() * driveSpeed,
+//                    driveVector.getY() * driveSpeed,
+//                    -power
+//            );
+//        } else {
+//            bot.drive(driveVector.getX() * driveSpeed,
+//                    driveVector.getY() * driveSpeed,
+//                    turnVector.getX() * driveSpeed / 1.7
+//            );
+//        }
     }
 
 }

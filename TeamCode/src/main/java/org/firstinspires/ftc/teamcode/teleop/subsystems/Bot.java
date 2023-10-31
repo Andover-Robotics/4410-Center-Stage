@@ -46,10 +46,10 @@ public class Bot {
     private Bot(OpMode opMode) {
         this.opMode = opMode;
 
-        fl = new MotorEx(opMode.hardwareMap, "motorFL");
-        fr = new MotorEx(opMode.hardwareMap, "motorFR");
-        bl = new MotorEx(opMode.hardwareMap, "motorBL");
-        br = new MotorEx(opMode.hardwareMap, "motorBR");
+        fl = new MotorEx(opMode.hardwareMap, "motorFL", Motor.GoBILDA.RPM_435);
+        fr = new MotorEx(opMode.hardwareMap, "motorFR", Motor.GoBILDA.RPM_435);
+        bl = new MotorEx(opMode.hardwareMap, "motorBL", Motor.GoBILDA.RPM_435);
+        br = new MotorEx(opMode.hardwareMap, "motorBR", Motor.GoBILDA.RPM_435);
 
         intake = new Intake(opMode);
         slides = new Slides(opMode);
