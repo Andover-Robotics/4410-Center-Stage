@@ -10,6 +10,9 @@ import com.arcrobotics.ftclib.geometry.Vector2d;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import org.firstinspires.ftc.teamcode.teleop.subsystems.Bot;
+import org.firstinspires.ftc.teamcode.teleop.subsystems.Slides;
+
+import java.lang.*;
 
 @Config
 @TeleOp(name = "MainTeleOp")
@@ -23,7 +26,7 @@ public class MainTeleOp extends LinearOpMode {
     private PIDController headingAligner = new PIDController(kp, ki, kd);
     private final int manualSlideAmt = 1;
     double leftX, rightX, leftY, rightY;
-
+    Thread thread;
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -43,6 +46,28 @@ public class MainTeleOp extends LinearOpMode {
         // Initialize bot
         bot.state = Bot.BotState.STORAGE;
         bot.storage();
+
+        // Init Configurations
+        while (!opModeIsActive()) {
+            gp1.readButtons();
+            // test intake
+            if (gp1.isDown(GamepadKeys.Button.LEFT_BUMPER)) { // intake
+                bot.intake(false);
+            } else if (gp1.isDown(GamepadKeys.Button.RIGHT_BUMPER)) { // reverse intake
+                bot.intake(true);
+            } else {
+                bot.intake.stopIntake();
+            }
+            // set power
+            if (gp1.wasJustPressed(GamepadKeys.Button.Y)) {
+                bot.intake.power+=0.02;
+            }
+            if (gp1.wasJustPressed(GamepadKeys.Button.A)) {
+                bot.intake.power-=0.02;
+            }
+            telemetry.addData("Intake power: ", bot.intake.power);
+            telemetry.update();
+        }
 
         /*
         COMPLETE LIST OF DRIVER CONTROLS (so far):
@@ -73,19 +98,38 @@ public class MainTeleOp extends LinearOpMode {
             // FINITE STATES
             if (bot.state == Bot.BotState.STORAGE) { // INITIALIZED
                 // INTAKE (driver 1)
-                if (gp1.wasJustPressed(GamepadKeys.Button.LEFT_BUMPER)) { // intake
+                if (gp1.isDown(GamepadKeys.Button.LEFT_BUMPER)) { // intake
                     bot.intake(false);
-                }
-                if (gp1.wasJustPressed(GamepadKeys.Button.RIGHT_BUMPER)) { // reverse intake
+                } else if (gp1.isDown(GamepadKeys.Button.RIGHT_BUMPER)) { // reverse intake
                     bot.intake(true);
+                } else {
+                    bot.intake.stopIntake();
                 }
 
                 // TRANSFER
                 if (gp2.wasJustPressed(GamepadKeys.Button.A)) { // top pixel
-                    bot.pickup(1);
+                    thread = new Thread(() -> {
+                        bot.claw.open();
+                        sleep(500);
+                        bot.slides.runToBottom();
+                        bot.fourbar.topPixel();
+                        sleep(500);
+                        bot.claw.close();
+                        bot.storage();
+                    });
+                    thread.start();
                 }
                 if (gp2.wasJustPressed(GamepadKeys.Button.B)) { // bottom pixel
-                    bot.pickup(2);
+                    thread = new Thread(() -> {
+                        bot.claw.open();
+                        sleep(500);
+                        bot.slides.runToBottom();
+                        bot.fourbar.bottomPixel();
+                        sleep(500);
+                        bot.claw.close();
+                        bot.storage();
+                    });
+                    thread.start();
                 }
                 if (gp2.wasJustPressed(GamepadKeys.Button.Y)) { // go to outtake out position
                     bot.outtakeOut();
@@ -104,9 +148,9 @@ public class MainTeleOp extends LinearOpMode {
             }
             //DRIVING FSM kept separate from other fsm part because didnt want to put gp1drive in every other state in case something changes or smt unexpected happens
 
-
-
             // SLIDES
+            // manual slides positioning with joystick
+            bot.slides.runManual(gp2.getLeftY()*-0.5);
             // preset positions
             if (gp2.wasJustPressed(GamepadKeys.Button.DPAD_UP)) {
                 bot.slides.runToTop();
@@ -116,10 +160,6 @@ public class MainTeleOp extends LinearOpMode {
                 bot.slides.runToBottom();
             } else if (gp2.wasJustPressed(GamepadKeys.Button.DPAD_LEFT)) {
                 bot.slides.runToLow();
-            }
-            // manual slides positioning with joystick
-            if (gp2.getLeftY() > 0.1) {
-                bot.slides.runManual(leftY*0.5);
             }
 
             if (bot.state == Bot.BotState.OUTTAKE_OUT) {
@@ -134,9 +174,13 @@ public class MainTeleOp extends LinearOpMode {
                 bot.resetIMU();
                 autoAlignForward = !autoAlignForward;
             }
-            telemetry.addData("Bot State: ",bot.state);
+            telemetry.addData("Bot State:",bot.state);
+            telemetry.addData("Intake Power:", bot.intake.power);
+            telemetry.addData("Slides Position:", bot.slides.getPosition() + " (" + bot.slides.position + ")");
+
             telemetry.update();
             bot.slides.periodic();
+
             //gp1drive(); put in fsm of outtake out -> gp2strafe
         }
     }

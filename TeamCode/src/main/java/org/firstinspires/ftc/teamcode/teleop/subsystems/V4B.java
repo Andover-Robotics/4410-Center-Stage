@@ -14,8 +14,8 @@ public class V4B {
 //0.35 - outtake
 //0.79 - ground
     //values need to be changed
-    public static double armOuttake = 0.35, armStorage=0.82, armGround = 0.79, armTopPixel = 0.88, armBottomPixel = 0.9;
-    public static double wristOuttake = 0.5, wristStorage=0.5;
+    public static double armOuttake = 0.35, armStorage=0.76, armGround = 0.08, armTopPixel = 0.92, armBottomPixel = 0.96;
+    public static double wristOuttake = 0.62, wristStorage=0.28, wristGround = 0.34, wristTopPixel = 0.28, wristBottomPixel = 0.32, wristTransfer = 0.18;
 
 
     public V4B(OpMode opMode) {
@@ -23,7 +23,7 @@ public class V4B {
         armLeft.setDirection(Servo.Direction.FORWARD);
         armRight = opMode.hardwareMap.servo.get("armRight");
         armRight.setDirection(Servo.Direction.FORWARD);
-        wrist = opMode.hardwareMap.servo.get("claw");
+        wrist = opMode.hardwareMap.servo.get("wrist");
         wrist.setDirection(Servo.Direction.FORWARD);
     }
 
@@ -36,29 +36,30 @@ public class V4B {
         wrist.setPosition(position);
     }
 
-    public void outtake(){
+    public void outtake() {
+        setWrist(wristTransfer);
         setArm(armOuttake);
         setWrist(wristOuttake);
     }
 
     public void ground() {
+        setWrist(wristGround);
         setArm(armGround);
-        setWrist(wristStorage);
     }
 
     public void storage() {
-        setArm(armStorage);
         setWrist(wristStorage);
+        setArm(armStorage);
     }
 
     public void topPixel() {
+        setWrist(wristTopPixel);
         setArm(armTopPixel);
-        setWrist(wristStorage);
     }
 
     public void bottomPixel() {
+        setWrist(wristBottomPixel);
         setArm(armBottomPixel);
-        setWrist(wristStorage);
     }
 
     public void runManualOuttake(double fourpos, double clawpos) {

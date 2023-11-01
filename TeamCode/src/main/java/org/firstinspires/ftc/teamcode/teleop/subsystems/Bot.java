@@ -27,6 +27,7 @@ public class Bot {
     public Slides slides;
     public V4B fourbar;
     public Claw claw;
+    Thread thread;
 
     // get bot instance
     public static Bot getInstance() {
@@ -61,36 +62,10 @@ public class Bot {
     public void storage() {//was initialized
         fourbar.storage();
         slides.runToBottom();
-        claw.open();
-        state = BotState.STORAGE;
-    }
-
-//    public void pickup(boolean isTop) {
-//        claw.open();
-//        if(isTop){
-//            fourbar.topPixel();
-//        } else{
-//            fourbar.bottomPixel();
-//        }
-//        slides.runToBottom();
-//        claw.close(); // changes val based on amount of pixels
-//        fourbar.storage();
-//        state = BotState.STORAGE; // bot is now ready to score I WANT TO INTEGRATE THIS WITH THE CLAW SO THE CLAW CLOSING AND PICKING UP SWITCHES IT huh when is the bot in this state
-//        //also i just realized it shouldnt be a boolean because there could also be no pixels yeah it's best if it was an int so we can do 0,1,2, etc. it goes Storage(above pixel) -> pickup -> outtake
-//    }
-
-    public void pickup(int place) {
-        claw.open();
-        slides.runToBottom();
-        switch(place) {
-            case 1: fourbar.topPixel();
-            case 2: fourbar.bottomPixel();
-            default: fourbar.storage();
-        }
         claw.close();
-        fourbar.storage();
         state = BotState.STORAGE;
     }
+
     public void outtakeOut() { // go to outtake backboard position
         fourbar.outtake();
         state = BotState.OUTTAKE_OUT;

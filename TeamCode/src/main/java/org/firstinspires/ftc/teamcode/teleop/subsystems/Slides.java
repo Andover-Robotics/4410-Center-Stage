@@ -31,7 +31,7 @@ public class Slides {
     public static double p = 0.015, i = 0, d = 0, f = 0, staticF = 0.25;
     private final double tolerance = 20, powerUp = 0.1, powerDown = 0.05, manualDivide = 1, powerMin = 0.1;
     private double manualPower = 0;
-    public static int MAXHEIGHT = -1400, top = -1200, maxteleop = -1200, mid = -800, low = -400, bottom = -0, inc = 100, dec = 300;
+    public static int MAXHEIGHT = -1550, high = -1550, maxteleop = -1200, mid = -800, low = -400, bottom = -0, inc = 100, dec = 300;
     private final OpMode opMode;
     private double target = 0;
     private boolean goingDown = false;
@@ -69,7 +69,7 @@ public class Slides {
     }
 
     public void runToTop() {
-        runTo(top);
+        runTo(high);
         position = Position.HIGH;
     }
 
@@ -89,8 +89,18 @@ public class Slides {
     }
 
     public void runManual(double manual) {
-        if (manual > powerMin || manual < -powerMin) {
+        if (manual > powerMin || manual < -powerMin || motorLeft.getCurrentPosition() > -300 || motorLeft.getCurrentPosition() < MAXHEIGHT) {
             manualPower = manual;
+            // Changing Position enum manually!
+            if (motorLeft.getCurrentPosition() == bottom) {
+                position = Position.BOTTOM;
+            } else if ((motorLeft.getCurrentPosition() > bottom) && (motorLeft.getCurrentPosition() <= low)) {
+                position = Position.LOW;
+            } else if ((motorLeft.getCurrentPosition() > low) && (motorLeft.getCurrentPosition() <= mid)) {
+                position = Position.MID;
+            } else if ((motorLeft.getCurrentPosition() > mid) && (motorLeft.getCurrentPosition() <= high)) {
+                position = Position.HIGH;
+            }
         } else {
             manualPower = 0;
         }
