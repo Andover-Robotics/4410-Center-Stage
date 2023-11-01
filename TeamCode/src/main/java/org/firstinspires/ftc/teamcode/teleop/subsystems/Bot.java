@@ -22,7 +22,7 @@ public class Bot {
     public BNO055IMU imu0;
     private double imuOffset = 0;
 
-    // Define subsystem objects
+    // Define subsystem objects`
     public Intake intake;
     public final CRServo counterRoller;
     public static final double COUNTERROLLER_SPEED = 0.6; // input is in motor power control; see how it is converted in intake function
@@ -44,6 +44,7 @@ public class Bot {
         instance.opMode = opMode;
         return instance;
     }
+
 
     private Bot(OpMode opMode) {
         this.opMode = opMode;
@@ -99,11 +100,12 @@ public class Bot {
     public void pickup(int place) {
         claw.open();
         slides.runToBottom();
-        switch(place) {
-            case 1: fourbar.topPixel();
-            case 2: fourbar.bottomPixel();
-            default: fourbar.storage();
-        }
+//        switch(place) {
+//            case 1: fourbar.topPixel();
+//            case 2: fourbar.bottomPixel();
+//            default: fourbar.storage();
+//        }
+        fourbar.topPixel();
         claw.close();
         fourbar.storage();
         state = BotState.STORAGE;
@@ -120,6 +122,7 @@ public class Bot {
     }
     public void drop(){ // drop pixel and return to storage
         claw.open();
+
         storage();
         state = BotState.STORAGE;
     }

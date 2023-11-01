@@ -15,7 +15,7 @@ public class V4B {
 //0.9 - bottom
 //0.35 - outtake
 //0.79 - ground
-    public static double armOuttake = 0.35, armStorage=0.82, armGround = 0.79, armTopPixel = 0.88, armBottomPixel = 0.9;
+    public static double armOuttake = 0.35, armStorage=0.82, armGround = 0.3, armTopPixel = 0.88, armBottomPixel = 0.9;
     public static double wristOuttake = 0.5, wristStorage=0.2;
 
 

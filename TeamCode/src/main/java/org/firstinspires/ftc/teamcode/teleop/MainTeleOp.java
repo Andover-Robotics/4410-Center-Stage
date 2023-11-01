@@ -97,7 +97,6 @@ public class MainTeleOp extends LinearOpMode {
                     bot.drop();
                 }
             }
-            //DRIVING FSM kept separate from other fsm part because didnt want to put gp1drive in every other state in case something changes or smt unexpected happens
 
             if (bot.state == Bot.BotState.OUTTAKE_OUT) {
                 gp2strafe();
@@ -128,6 +127,7 @@ public class MainTeleOp extends LinearOpMode {
                 autoAlignForward = !autoAlignForward;
             }
             telemetry.addData("Bot State", bot.state.toString());
+            telemetry.addData("Claw", bot.claw.isOpen);
             telemetry.update();
             bot.slides.periodic();
             //gp1drive(); put in fsm of outtake out -> gp2strafe
@@ -162,7 +162,7 @@ public class MainTeleOp extends LinearOpMode {
         }
     }
     private void gp2strafe() { // strafing left right
-        driveSpeed = 0.1;
+        driveSpeed = 0.3; // speed for strafe
         driveSpeed = Math.max(0, driveSpeed);
         bot.fixMotors();
 
