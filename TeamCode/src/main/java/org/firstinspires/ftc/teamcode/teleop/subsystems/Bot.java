@@ -76,11 +76,7 @@ public class Bot {
         slides.runToBottom();
         state = BotState.OUTTAKE_DOWN;
     }
-    public void drop(){ // drop pixel and return to storage
-        claw.open();
-        storage();
-        state = BotState.STORAGE;
-    }
+
     public void intake(boolean isReverse) {
         if (!isReverse) {
             intake.runIntake();

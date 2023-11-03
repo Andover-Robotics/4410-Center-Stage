@@ -9,14 +9,9 @@ import com.acmerobotics.dashboard.config.Config;
 @Config
 public class V4B {
     private final Servo armLeft, armRight, wrist;
-//0.88 - top
-//0.9 - bottom
-//0.35 - outtake
-//0.79 - ground
-    //values need to be changed
-    public static double armOuttake = 0.35, armStorage=0.76, armGround = 0.08, armTopPixel = 0.92, armBottomPixel = 0.96;
-    public static double wristOuttake = 0.62, wristStorage=0.28, wristGround = 0.34, wristTopPixel = 0.28, wristBottomPixel = 0.32, wristTransfer = 0.18;
 
+    public static double armOuttake = 0.33, armStorage = 0.76, armGround = 0.08, armTopPixel = 0.89, armBottomPixel = 0.92;
+    public static double wristOuttake = 0.6, wristStorage=0.375, wristGround = 0.42, wristTopPixel = 0.35, wristBottomPixel = 0.36, wristTransfer = 0.26;
 
     public V4B(OpMode opMode) {
         armLeft = opMode.hardwareMap.servo.get("armLeft");
