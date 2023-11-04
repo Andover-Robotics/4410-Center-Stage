@@ -218,7 +218,7 @@ public class MainTeleOp extends LinearOpMode {
         }
     }
     private void gp2strafe() { // strafing left/right, no turning or forward/backward
-        driveSpeed = 0.2; // strafing speed for driver 2 to adjust when scoring
+        driveSpeed = 0.25; // strafing speed for driver 2 to adjust when scoring
         driveSpeed = Math.max(0, driveSpeed);
         bot.fixMotors();
 
