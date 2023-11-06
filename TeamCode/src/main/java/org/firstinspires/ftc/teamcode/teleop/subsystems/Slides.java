@@ -17,6 +17,7 @@ public class Slides {
 
     public final MotorEx motorLeft;
     public final MotorEx motorRight;
+    public final MotorEx motorCenter;
     private PIDFController controller;
 
     public enum Position {
@@ -41,15 +42,23 @@ public class Slides {
     public Slides(OpMode opMode) {
         motorLeft = new MotorEx(opMode.hardwareMap, "slidesLeft", Motor.GoBILDA.RPM_435);
         motorRight = new MotorEx(opMode.hardwareMap, "slidesRight", Motor.GoBILDA.RPM_435);
+        motorCenter = new MotorEx(opMode.hardwareMap, "slidesCenter", Motor.GoBILDA.RPM_435);
+
         motorRight.setInverted(true);
         motorLeft.setInverted(false);
+        motorCenter.setInverted(true);
+
         controller = new PIDFController(p, i, d, f);
         controller.setTolerance(tolerance);
         controller.setSetPoint(0);
+
         motorLeft.setRunMode(Motor.RunMode.RawPower);
         motorLeft.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
         motorRight.setRunMode(Motor.RunMode.RawPower);
         motorRight.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
+        motorCenter.setRunMode(Motor.RunMode.RawPower);
+        motorCenter.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
+
         this.opMode = opMode;
     }
 
@@ -58,6 +67,9 @@ public class Slides {
         motorLeft.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
         motorRight.setRunMode(Motor.RunMode.RawPower);
         motorRight.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
+        motorCenter.setRunMode(Motor.RunMode.RawPower);
+        motorCenter.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
+
         controller = new PIDFController(p, i, d, f);
         controller.setTolerance(tolerance);
         resetProfiler();
@@ -92,13 +104,13 @@ public class Slides {
         if (manual > powerMin || manual < -powerMin) {
             manualPower = manual;
             // Changing Position enum manually!
-            if (motorLeft.getCurrentPosition() == bottom) {
+            if (getPosition() == bottom) {
                 position = Position.BOTTOM;
-            } else if ((motorLeft.getCurrentPosition() > bottom) && (motorLeft.getCurrentPosition() <= low)) {
+            } else if ((getPosition() > bottom) && (getPosition() <= low)) {
                 position = Position.LOW;
-            } else if ((motorLeft.getCurrentPosition() > low) && (motorLeft.getCurrentPosition() <= mid)) {
+            } else if ((getPosition() > low) && (getPosition() <= mid)) {
                 position = Position.MID;
-            } else if ((motorLeft.getCurrentPosition() > mid) && (motorLeft.getCurrentPosition() <= high)) {
+            } else if ((getPosition() > mid) && (getPosition() <= high)) {
                 position = Position.HIGH;
             }
         } else {
@@ -109,6 +121,7 @@ public class Slides {
     public void periodic() {
         motorRight.setInverted(false);
         motorLeft.setInverted(true);
+        motorCenter.setInverted(false);
         controller.setPIDF(p, i, d, f);
         double dt = opMode.time - profile_init_time;
         if (!profiler.isOver()) {
@@ -119,6 +132,7 @@ public class Slides {
             }
             motorLeft.set(power);
             motorRight.set(power);
+            motorCenter.set(power);
         } else {
             if (profiler.isDone()) {
                 profiler = new MotionProfiler(30000, 20000);
@@ -127,16 +141,14 @@ public class Slides {
                 controller.setSetPoint(motorLeft.getCurrentPosition());
                 motorLeft.set(manualPower / manualDivide);
                 motorRight.set(manualPower / manualDivide);
+                motorCenter.set(manualPower / manualDivide);
             } else {
                 double power = staticF * controller.calculate(motorLeft.getCurrentPosition());
                 motorLeft.set(power);
                 motorRight.set(power);
+                motorCenter.set(power);
             }
         }
-    }
-
-    public double isHigh() {
-        return (double) motorLeft.getCurrentPosition() / MAXHEIGHT;
     }
 
     public double getCurrent() {
