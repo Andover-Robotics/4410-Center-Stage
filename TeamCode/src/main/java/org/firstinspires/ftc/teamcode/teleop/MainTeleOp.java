@@ -44,6 +44,7 @@ public class MainTeleOp extends LinearOpMode {
         rightY = gp2.getRightY();
 
         // Initialize bot
+        bot.stopMotors();
         bot.state = Bot.BotState.STORAGE;
         bot.claw.open();
         bot.storage();
@@ -72,7 +73,7 @@ public class MainTeleOp extends LinearOpMode {
         waitForStart();
         while (opModeIsActive() && !isStopRequested()) {
 
-            headingAligner.setPID(kp, ki, kd);
+            //headingAligner.setPID(kp, ki, kd);
             gp1.readButtons();
             gp2.readButtons();
 
@@ -81,9 +82,9 @@ public class MainTeleOp extends LinearOpMode {
                 // TRANSFER
                 if (gp2.wasJustPressed(GamepadKeys.Button.A)) { // top pixel
                     thread = new Thread(() -> {
+                        bot.slides.runToBottom();
                         bot.claw.open();
                         sleep(100);
-                        bot.slides.runToBottom();
                         bot.fourbar.topPixel();
                         sleep(400);
                         bot.claw.close();
@@ -94,9 +95,9 @@ public class MainTeleOp extends LinearOpMode {
                 }
                 if (gp2.wasJustPressed(GamepadKeys.Button.B)) { // bottom pixel
                     thread = new Thread(() -> {
+                        bot.slides.runToBottom();
                         bot.claw.open();
                         sleep(100);
-                        bot.slides.runToBottom();
                         bot.fourbar.bottomPixel();
                         sleep(400);
                         bot.claw.close();
@@ -132,7 +133,6 @@ public class MainTeleOp extends LinearOpMode {
                     bot.outtakeOut();
                 }
             }
-            //DRIVING FSM kept separate from other fsm part because didnt want to put gp1drive in every other state in case something changes or smt unexpected happens
 
             // SLIDES
             // manual slides positioning with joystick
@@ -164,11 +164,11 @@ public class MainTeleOp extends LinearOpMode {
             }
 
             // OTHER
-            // auto align
-            if (gp1.wasJustPressed(GamepadKeys.Button.BACK)) {
-                bot.resetIMU();
-                autoAlignForward = !autoAlignForward;
-            }
+//            // auto align
+//            if (gp1.wasJustPressed(GamepadKeys.Button.BACK)) {
+//                bot.resetIMU();
+//                autoAlignForward = !autoAlignForward;
+//            }
             telemetry.addData("Bot State:",bot.state);
             telemetry.addData("Intake Power:", bot.intake.power +"(running=" + bot.intake.getIsRunning() + ")");
             telemetry.addData("Slides Position:", bot.slides.getPosition() + " (" + bot.slides.position + ")");

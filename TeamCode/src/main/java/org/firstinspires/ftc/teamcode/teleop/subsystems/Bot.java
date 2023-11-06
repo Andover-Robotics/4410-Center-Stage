@@ -83,6 +83,13 @@ public class Bot {
         } else intake.runReverseIntake();
     }
 
+    // TODO: FIX THIS DISCARD
+    public void discard() { // discard pixel
+        fourbar.discard();
+        claw.open();
+        storage();
+    }
+
 
     // TODO: Figure out how much to turn and drive forward
     public void alignSpike() {
@@ -113,6 +120,13 @@ public class Bot {
         fr.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
         bl.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
         br.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
+    }
+
+    public void stopMotors() {
+        fl.set(0.0);
+        fr.set(0.0);
+        bl.set(0.0);
+        br.set(0.0);
     }
 
     public void drive(double strafeSpeed, double forwardBackSpeed, double turnSpeed) {
