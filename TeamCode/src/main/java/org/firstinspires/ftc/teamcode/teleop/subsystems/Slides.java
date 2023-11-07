@@ -46,7 +46,7 @@ public class Slides {
 
         motorRight.setInverted(true);
         motorLeft.setInverted(false);
-        motorCenter.setInverted(true);
+        motorCenter.setInverted(false);
 
         controller = new PIDFController(p, i, d, f);
         controller.setTolerance(tolerance);
@@ -121,7 +121,7 @@ public class Slides {
     public void periodic() {
         motorRight.setInverted(false);
         motorLeft.setInverted(true);
-        motorCenter.setInverted(false);
+        motorCenter.setInverted(true);
         controller.setPIDF(p, i, d, f);
         double dt = opMode.time - profile_init_time;
         if (!profiler.isOver()) {
@@ -152,7 +152,7 @@ public class Slides {
     }
 
     public double getCurrent() {
-        return motorLeft.motorEx.getCurrent(CurrentUnit.MILLIAMPS) + motorRight.motorEx.getCurrent(CurrentUnit.MILLIAMPS);
+        return motorLeft.motorEx.getCurrent(CurrentUnit.MILLIAMPS) + motorRight.motorEx.getCurrent(CurrentUnit.MILLIAMPS) + motorCenter.motorEx.getCurrent(CurrentUnit.MILLIAMPS);
     }
 
     public void resetEncoder() {

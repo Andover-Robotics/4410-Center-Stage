@@ -172,6 +172,7 @@ public class MainTeleOp extends LinearOpMode {
             telemetry.addData("Bot State:",bot.state);
             telemetry.addData("Intake Power:", bot.intake.power +"(running=" + bot.intake.getIsRunning() + ")");
             telemetry.addData("Slides Position:", bot.slides.getPosition() + " (" + bot.slides.position + ")");
+            telemetry.addData("Slides Power:", bot.slides.getCurrent());
 
             telemetry.update();
             bot.slides.periodic();
