@@ -30,8 +30,10 @@ public class Slides {
 
     public Position position = Position.BOTTOM;
     public static double p = 0.015, i = 0, d = 0, f = 0, staticF = 0.25;
-    private final double tolerance = 20, powerUp = 0.1, powerDown = 0.05, manualDivide = 1, powerMin = 0.1;
+    private final double tolerance = 20, powerUp = 0.1, powerDown = 0.05, manualDivide = 3, powerMin = 0.1;
     private double manualPower = 0;
+
+    public double power;
     public static int MAXHEIGHT = -1550, high = -1550, mid = -800, low = -400, bottom = 0;
     private final OpMode opMode;
     private double target = 0;
@@ -62,7 +64,7 @@ public class Slides {
         this.opMode = opMode;
     }
 
-    public void runTo(double t) {
+    public void runTo(double pos) {
         motorLeft.setRunMode(Motor.RunMode.RawPower);
         motorLeft.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
         motorRight.setRunMode(Motor.RunMode.RawPower);
@@ -73,11 +75,11 @@ public class Slides {
         controller = new PIDFController(p, i, d, f);
         controller.setTolerance(tolerance);
         resetProfiler();
-        profiler.init_new_profile(motorLeft.getCurrentPosition(), t);
+        profiler.init_new_profile(motorLeft.getCurrentPosition(), pos);
         profile_init_time = opMode.time;
 
-        goingDown = t > target;
-        target = t;
+        goingDown = pos > target;
+        target = pos;
     }
 
     public void runToTop() {
@@ -103,16 +105,6 @@ public class Slides {
     public void runManual(double manual) {
         if (manual > powerMin || manual < -powerMin) {
             manualPower = manual;
-            // Changing Position enum manually!
-            if (getPosition() == bottom) {
-                position = Position.BOTTOM;
-            } else if ((getPosition() > bottom) && (getPosition() <= low)) {
-                position = Position.LOW;
-            } else if ((getPosition() > low) && (getPosition() <= mid)) {
-                position = Position.MID;
-            } else if ((getPosition() > mid) && (getPosition() <= high)) {
-                position = Position.HIGH;
-            }
         } else {
             manualPower = 0;
         }
@@ -126,7 +118,7 @@ public class Slides {
         double dt = opMode.time - profile_init_time;
         if (!profiler.isOver()) {
             controller.setSetPoint(profiler.motion_profile_pos(dt));
-            double power = powerUp * controller.calculate(motorLeft.getCurrentPosition());
+            power = powerUp * controller.calculate(motorLeft.getCurrentPosition());
             if (goingDown) {
                 power = powerDown * controller.calculate(motorLeft.getCurrentPosition());
             }
@@ -143,7 +135,7 @@ public class Slides {
                 motorRight.set(manualPower / manualDivide);
                 motorCenter.set(manualPower / manualDivide);
             } else {
-                double power = staticF * controller.calculate(motorLeft.getCurrentPosition());
+                power = staticF * controller.calculate(motorLeft.getCurrentPosition());
                 motorLeft.set(power);
                 motorRight.set(power);
                 motorCenter.set(power);

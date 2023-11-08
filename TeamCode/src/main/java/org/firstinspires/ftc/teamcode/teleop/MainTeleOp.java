@@ -169,10 +169,9 @@ public class MainTeleOp extends LinearOpMode {
 //                bot.resetIMU();
 //                autoAlignForward = !autoAlignForward;
 //            }
-            telemetry.addData("Bot State:",bot.state);
-            telemetry.addData("Intake Power:", bot.intake.power +"(running=" + bot.intake.getIsRunning() + ")");
-            telemetry.addData("Slides Position:", bot.slides.getPosition() + " (" + bot.slides.position + ")");
-            telemetry.addData("Slides Power:", bot.slides.getCurrent());
+            telemetry.addData("Bot State",bot.state);
+            telemetry.addData("Intake Power", bot.intake.power +"(running=" + bot.intake.getIsRunning() + ")");
+            telemetry.addData("Slides Position", bot.slides.getPosition() + " (pos=" + bot.slides.position + " power=" + bot.slides.power + ")");
 
             telemetry.update();
             bot.slides.periodic();

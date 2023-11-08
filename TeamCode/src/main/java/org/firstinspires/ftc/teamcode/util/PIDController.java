@@ -1,6 +1,6 @@
 package org.firstinspires.ftc.teamcode.util;
 
-import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.arcrobotics.ftclib.hardware.motors.MotorEx;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 public class PIDController {
@@ -22,7 +22,7 @@ public class PIDController {
         this.setPoint = setPoint;
     }
 
-    public double calculatePower(DcMotorEx motor, double timeElapsed) {
+    public double calculatePower(MotorEx motor, double timeElapsed) {
         double encoderPosition = motor.getCurrentPosition();
         double error = setPoint - encoderPosition;
 
