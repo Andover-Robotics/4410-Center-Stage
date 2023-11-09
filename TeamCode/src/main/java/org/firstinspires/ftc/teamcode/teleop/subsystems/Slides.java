@@ -42,9 +42,9 @@ public class Slides {
     private MotionProfiler profiler = new MotionProfiler(30000, 20000);
 
     public Slides(OpMode opMode) {
-        motorLeft = new MotorEx(opMode.hardwareMap, "slidesLeft", Motor.GoBILDA.RPM_435);
-        motorRight = new MotorEx(opMode.hardwareMap, "slidesRight", Motor.GoBILDA.RPM_435);
-        motorCenter = new MotorEx(opMode.hardwareMap, "slidesCenter", Motor.GoBILDA.RPM_435);
+        motorLeft = new MotorEx(opMode.hardwareMap, "slidesLeft", Motor.GoBILDA.RPM_312);
+        motorRight = new MotorEx(opMode.hardwareMap, "slidesRight", Motor.GoBILDA.RPM_312);
+        motorCenter = new MotorEx(opMode.hardwareMap, "slidesCenter", Motor.GoBILDA.RPM_312);
 
         motorRight.setInverted(true);
         motorLeft.setInverted(false);
