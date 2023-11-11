@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.teleop.subsystems;
 
 
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
+import com.arcrobotics.ftclib.gamepad.GamepadKeys;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
@@ -17,12 +18,21 @@ public class ColorDetectionTest extends LinearOpMode {
     private Bot bot;
     private double cycleTime = 1;
 
+//    while () {
+//        telemetry.addData("moveDiff (positive is more ???)", moveDiff);
+//        if (gp1.wasJustPressed(GamepadKeys.Button.LEFT_BUMPER)) {
+//            moveDiff -= 0.5;
+//        } else if (gp1.wasJustPressed(GamepadKeys.Button.RIGHT_BUMPER)) {
+//            moveDiff += 0.5;
+//        }
+//    }
+
     @Override
     public void runOpMode() throws InterruptedException {
 
         WebcamName camName = hardwareMap.get(WebcamName.class, "Webcam 1");
         OpenCvCamera camera = OpenCvCameraFactory.getInstance().createWebcam(camName);
-        ColorDetectionPipeline colorDetectionPipeline = new ColorDetectionPipeline(telemetry);
+        ColorDetectionPipeline colorDetectionPipeline = new ColorDetectionPipeline(telemetry, 1);
         camera.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
             @Override
             public void onOpened() {

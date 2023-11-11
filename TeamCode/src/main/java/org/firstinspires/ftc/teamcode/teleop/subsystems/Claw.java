@@ -10,8 +10,8 @@ public class Claw {
 
     // TODO: Tune open and close values
     public static double open = 0.7;
-    public static double close = 0.74;
-    public boolean isOpen = false;
+    public static double close = 0.78;
+    public boolean isOpen = true;
 
     public Claw(OpMode opMode){
         claw = opMode.hardwareMap.servo.get("claw");

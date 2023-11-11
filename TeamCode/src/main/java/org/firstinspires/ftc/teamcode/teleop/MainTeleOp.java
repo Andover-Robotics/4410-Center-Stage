@@ -10,9 +10,12 @@ import com.arcrobotics.ftclib.geometry.Vector2d;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import org.firstinspires.ftc.teamcode.teleop.subsystems.Bot;
+import org.firstinspires.ftc.teamcode.teleop.subsystems.Slides;
+
+import java.lang.*;
 
 @Config
-@TeleOp(name = "MainTeleOp", group = "Main")
+@TeleOp(name = "MainTeleOp")
 public class MainTeleOp extends LinearOpMode {
 
     private Bot bot;
@@ -22,7 +25,8 @@ public class MainTeleOp extends LinearOpMode {
     public static double kp = 0.025, ki = 0, kd = 0;
     private PIDController headingAligner = new PIDController(kp, ki, kd);
     private final int manualSlideAmt = 1;
-    double leftX = gp2.getLeftX(), rightX = gp2.getRightX(), leftY = gp2.getLeftY(), rightY = gp2.getRightY();
+    double leftX, rightX, leftY, rightY;
+    Thread thread;
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -34,19 +38,27 @@ public class MainTeleOp extends LinearOpMode {
 
         gp1 = new GamepadEx(gamepad1);
         gp2 = new GamepadEx(gamepad2);
+        leftX = gp2.getLeftX();
+        rightX = gp2.getRightX();
+        leftY = gp2.getLeftY();
+        rightY = gp2.getRightY();
 
         // Initialize bot
+        bot.stopMotors();
         bot.state = Bot.BotState.STORAGE;
+        bot.claw.open();
         bot.storage();
 
         /*
-        COMPLETE LIST OF DRIVER CONTROLS (so far):
+        LIST OF DRIVER CONTROLS (so far) - Zachery:
+
         Driver 1 (gp1):
         joysticks - driving
         right trigger - slow down
         left bumper - run intake
         right bumper - run reverse intake
-        back - auto align
+        back button - auto align
+
         Driver 2 (gp2):
         A - pick up pixel (top)
         B - pick up pixel (bottom)
@@ -61,26 +73,38 @@ public class MainTeleOp extends LinearOpMode {
         waitForStart();
         while (opModeIsActive() && !isStopRequested()) {
 
-            headingAligner.setPID(kp, ki, kd);
+            //headingAligner.setPID(kp, ki, kd);
             gp1.readButtons();
             gp2.readButtons();
 
             // FINITE STATES
             if (bot.state == Bot.BotState.STORAGE) { // INITIALIZED
-                // INTAKE (driver 1)
-                if (gp1.wasJustPressed(GamepadKeys.Button.LEFT_BUMPER)) { // intake
-                    bot.intake(false);
-                }
-                if (gp1.wasJustPressed(GamepadKeys.Button.RIGHT_BUMPER)) { // reverse intake
-                    bot.intake(true);
-                }
-
                 // TRANSFER
                 if (gp2.wasJustPressed(GamepadKeys.Button.A)) { // top pixel
-                    bot.pickup(1);
+                    thread = new Thread(() -> {
+                        bot.slides.runToBottom();
+                        bot.claw.open();
+                        sleep(100);
+                        bot.fourbar.topPixel();
+                        sleep(400);
+                        bot.claw.close();
+                        sleep(300);
+                        bot.storage();
+                    });
+                    thread.start();
                 }
                 if (gp2.wasJustPressed(GamepadKeys.Button.B)) { // bottom pixel
-                    bot.pickup(2);
+                    thread = new Thread(() -> {
+                        bot.slides.runToBottom();
+                        bot.claw.open();
+                        sleep(100);
+                        bot.fourbar.bottomPixel();
+                        sleep(400);
+                        bot.claw.close();
+                        sleep(300);
+                        bot.storage();
+                    });
+                    thread.start();
                 }
                 if (gp2.wasJustPressed(GamepadKeys.Button.Y)) { // go to outtake out position
                     bot.outtakeOut();
@@ -90,21 +114,29 @@ public class MainTeleOp extends LinearOpMode {
                 }
             } else if (bot.state == Bot.BotState.OUTTAKE_OUT) { // SCORING BACKBOARD
                 if (gp2.wasJustPressed(GamepadKeys.Button.Y)) { // drop and return to storage
-                    bot.drop();
+                    drop();
+                }
+                if (gp2.wasJustPressed(GamepadKeys.Button.B)) { // cancel and return to storage
+                    bot.storage();
+                }
+                if (gp2.wasJustPressed(GamepadKeys.Button.X)) { // go to outtake ground position
+                    bot.outtakeDown();
                 }
             } else if (bot.state == Bot.BotState.OUTTAKE_DOWN) { // SCORING GROUND
-                if (gp2.wasJustPressed(GamepadKeys.Button.X)) { // drop and return to storage
-                    bot.drop();
+                if (gp2.wasJustPressed(GamepadKeys.Button.X)) {
+                    drop();
                 }
-            }
-
-            if (bot.state == Bot.BotState.OUTTAKE_OUT) {
-                gp2strafe();
-            } else {
-                gp1drive();
+                if (gp2.wasJustPressed(GamepadKeys.Button.A)) { // cancel and return to storage
+                    bot.storage();
+                }
+                if (gp2.wasJustPressed(GamepadKeys.Button.Y)) { // go to outtake out position
+                    bot.outtakeOut();
+                }
             }
 
             // SLIDES
+            // manual slides positioning with joystick
+            bot.slides.runManual(gp2.getLeftY()*-0.5);
             // preset positions
             if (gp2.wasJustPressed(GamepadKeys.Button.DPAD_UP)) {
                 bot.slides.runToTop();
@@ -115,23 +147,47 @@ public class MainTeleOp extends LinearOpMode {
             } else if (gp2.wasJustPressed(GamepadKeys.Button.DPAD_LEFT)) {
                 bot.slides.runToLow();
             }
-            // manual slides positioning with joystick
-            if (gp2.getLeftY() > 0.1) {
-                bot.slides.runManual(leftY*0.5);
+
+            if (bot.state == Bot.BotState.OUTTAKE_OUT) {
+                gp2strafe();
+            } else {
+                gp1drive();
+            }
+
+            // INTAKE (driver 1)
+            if (gp1.isDown(GamepadKeys.Button.LEFT_BUMPER)) { // intake
+                bot.intake(false);
+            } else if (gp1.isDown(GamepadKeys.Button.RIGHT_BUMPER)) { // reverse intake
+                bot.intake(true);
+            } else {
+                bot.intake.stopIntake();
             }
 
             // OTHER
-            // auto align
-            if (gp1.wasJustPressed(GamepadKeys.Button.BACK)) {
-                bot.resetIMU();
-                autoAlignForward = !autoAlignForward;
-            }
-            telemetry.addData("Bot State", bot.state.toString());
-            telemetry.addData("Claw", bot.claw.isOpen);
+//            // auto align
+//            if (gp1.wasJustPressed(GamepadKeys.Button.BACK)) {
+//                bot.resetIMU();
+//                autoAlignForward = !autoAlignForward;
+//            }
+            telemetry.addData("Bot State",bot.state);
+            telemetry.addData("Intake Power", bot.intake.power +"(running=" + bot.intake.getIsRunning() + ")");
+            telemetry.addData("Slides Position", bot.slides.getPosition() + " (pos=" + bot.slides.position + " current=" + bot.slides.getCurrent() + ")");
+
             telemetry.update();
             bot.slides.periodic();
+
             //gp1drive(); put in fsm of outtake out -> gp2strafe
         }
+    }
+
+    // drop pixel thread
+    private void drop() {
+        thread = new Thread(() -> {
+            bot.claw.open();
+            sleep(150);
+            bot.storage();
+        });
+        thread.start();
     }
 
     private void gp1drive() { // all directions
@@ -161,31 +217,29 @@ public class MainTeleOp extends LinearOpMode {
             );
         }
     }
-    private void gp2strafe() { // strafing left right
-        driveSpeed = 0.3; // speed for strafe
+    private void gp2strafe() { // strafing left/right, no turning or forward/backward
+        driveSpeed = 0.25; // strafing speed for driver 2 to adjust when scoring
         driveSpeed = Math.max(0, driveSpeed);
         bot.fixMotors();
 
-        Vector2d driveVector = new Vector2d(gp2.getLeftX(), -gp2.getLeftY()),
-                turnVector = new Vector2d(
-                        gp1.getRightX(), 0);
+        Vector2d driveVector = new Vector2d(-gp2.getLeftX(), -gp2.getRightY());
 
         bot.drive(driveVector.getX() * driveSpeed,
                 driveVector.getY() * driveSpeed,
-                turnVector.getX() * driveSpeed / 1.7
+                0.0
         );
-        if (autoAlignForward) {
-            double power = headingAligner.calculate(bot.getIMU());
-            bot.drive(driveVector.getX() * driveSpeed,
-                    driveVector.getY() * driveSpeed,
-                    -power
-            );
-        } else {
-            bot.drive(driveVector.getX() * driveSpeed,
-                    driveVector.getY() * driveSpeed,
-                    turnVector.getX() * driveSpeed / 1.7
-            );
-        }
+//        if (autoAlignForward) {
+//            double power = headingAligner.calculate(bot.getIMU());
+//            bot.drive(driveVector.getX() * driveSpeed,
+//                    driveVector.getY() * driveSpeed,
+//                    -power
+//            );
+//        } else {
+//            bot.drive(driveVector.getX() * driveSpeed,
+//                    driveVector.getY() * driveSpeed,
+//                    turnVector.getX() * driveSpeed / 1.7
+//            );
+//        }
     }
 
 }

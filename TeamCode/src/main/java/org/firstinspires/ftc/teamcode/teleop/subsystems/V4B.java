@@ -10,14 +10,8 @@ import com.acmerobotics.dashboard.config.Config;
 public class V4B {
     private final Servo armLeft, armRight, wrist;
 
-    //values need to be changed
-//    0.88 - top
-//0.9 - bottom
-//0.35 - outtake
-//0.79 - ground
-    public static double armOuttake = 0.35, armStorage=0.82, armGround = 0.3, armTopPixel = 0.88, armBottomPixel = 0.9;
-    public static double wristOuttake = 0.5, wristStorage=0.2;
-
+    public static double armOuttake = 0.33, armStorage = 0.76, armGround = 0.08, armTopPixel = 0.89, armBottomPixel = 0.92, armDiscard = 0.8;
+    public static double wristOuttake = 0.6, wristStorage=0.375, wristGround = 0.42, wristTopPixel = 0.35, wristBottomPixel = 0.36, wristTransfer = 0.26, wristDiscard = 0.28;
 
     public V4B(OpMode opMode) {
         armLeft = opMode.hardwareMap.servo.get("armLeft");
@@ -30,36 +24,42 @@ public class V4B {
 
     private void setArm(double position) {
         armLeft.setPosition(position);
-        armRight.setPosition(0.95 - position);
+        armRight.setPosition(0.96 - position);
     }
 
     private void setWrist(double position) {
         wrist.setPosition(position);
     }
 
-    public void outtake(){
+    public void outtake() {
+        setWrist(wristTransfer);
         setArm(armOuttake);
         setWrist(wristOuttake);
     }
 
+    public void discard() {
+        setWrist(wristDiscard);
+        setArm(armDiscard);
+    }
+
     public void ground() {
+        setWrist(wristGround);
         setArm(armGround);
-        setWrist(wristStorage);
     }
 
     public void storage() {
-        setArm(armStorage);
         setWrist(wristStorage);
+        setArm(armStorage);
     }
 
     public void topPixel() {
+        setWrist(wristTopPixel);
         setArm(armTopPixel);
-        setWrist(wristStorage);
     }
 
     public void bottomPixel() {
+        setWrist(wristBottomPixel);
         setArm(armBottomPixel);
-        setWrist(wristStorage);
     }
 
     public void runManualOuttake(double fourpos, double clawpos) {
