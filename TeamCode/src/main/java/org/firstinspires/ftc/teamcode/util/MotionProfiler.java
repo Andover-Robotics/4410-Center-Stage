@@ -1,6 +1,6 @@
 package org.firstinspires.ftc.teamcode.util;
 
-public class MotionProfiler {
+public class  MotionProfiler {
 
     public MotionProfiler(double max_velocity, double max_acceleration){
         this.max_acceleration = max_acceleration;

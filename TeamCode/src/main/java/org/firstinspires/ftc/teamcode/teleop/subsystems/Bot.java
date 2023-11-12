@@ -5,6 +5,7 @@ import com.arcrobotics.ftclib.hardware.motors.MotorEx;
 import com.qualcomm.hardware.bosch.BHI260IMU;
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.hardware.ImuOrientationOnRobot;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
@@ -23,7 +24,7 @@ public class Bot {
     public BotState state = BotState.STORAGE; // Default bot state
     private final MotorEx fl, fr, bl, br;
     public OpMode opMode;
-    public BHI260IMU imu0;
+    public IMU imu0;
     private double imuOffset = 0;
 
     // Define subsystem objects
@@ -161,9 +162,8 @@ public class Bot {
     }
 
     public void initializeImus() {
-        imu0 = opMode.hardwareMap.get(BHI260IMU.class, "imu");
-        final BHI260IMU.Parameters parameters = new BHI260IMU.Parameters((ImuOrientationOnRobot) imu0.getRobotOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES));
-
+        imu0 = opMode.hardwareMap.get(IMU.class, "imu");
+        final IMU.Parameters parameters = new IMU.Parameters((ImuOrientationOnRobot) imu0.getRobotOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.RADIANS));
         imu0.initialize(parameters);
         resetIMU();
     }
