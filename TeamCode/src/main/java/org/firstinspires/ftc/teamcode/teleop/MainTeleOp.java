@@ -228,18 +228,18 @@ public class MainTeleOp extends LinearOpMode {
                 driveVector.getY() * driveSpeed,
                 0.0
         );
-//        if (autoAlignForward) {
-//            double power = headingAligner.calculate(bot.getIMU());
-//            bot.drive(driveVector.getX() * driveSpeed,
-//                    driveVector.getY() * driveSpeed,
-//                    -power
-//            );
-//        } else {
-//            bot.drive(driveVector.getX() * driveSpeed,
-//                    driveVector.getY() * driveSpeed,
-//                    turnVector.getX() * driveSpeed / 1.7
-//            );
-//        }
+        if (autoAlignForward) {
+            double power = headingAligner.calculate(bot.getIMU());
+            bot.drive(driveVector.getX() * driveSpeed,
+                    driveVector.getY() * driveSpeed,
+                    -power
+            );
+        } else {
+            bot.drive(driveVector.getX() * driveSpeed,
+                    driveVector.getY() * driveSpeed,
+                    0.0
+            );
+        }
     }
 
 }

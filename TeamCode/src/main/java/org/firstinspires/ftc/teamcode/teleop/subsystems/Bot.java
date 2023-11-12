@@ -2,10 +2,14 @@ package org.firstinspires.ftc.teamcode.teleop.subsystems;
 
 import com.arcrobotics.ftclib.hardware.motors.Motor;
 import com.arcrobotics.ftclib.hardware.motors.MotorEx;
+import com.qualcomm.hardware.bosch.BHI260IMU;
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+import com.qualcomm.robotcore.hardware.ImuOrientationOnRobot;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 
 public class Bot {
 
@@ -19,7 +23,7 @@ public class Bot {
     public BotState state = BotState.STORAGE; // Default bot state
     private final MotorEx fl, fr, bl, br;
     public OpMode opMode;
-    public BNO055IMU imu0;
+    public BHI260IMU imu0;
     private double imuOffset = 0;
 
     // Define subsystem objects
@@ -157,14 +161,8 @@ public class Bot {
     }
 
     public void initializeImus() {
-        imu0 = opMode.hardwareMap.get(BNO055IMU.class, "imu");
-
-        final BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
-
-        parameters.mode = BNO055IMU.SensorMode.IMU;
-        parameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
-        parameters.accelUnit = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
-        parameters.loggingEnabled = false;
+        imu0 = opMode.hardwareMap.get(BHI260IMU.class, "imu");
+        final BHI260IMU.Parameters parameters = new BHI260IMU.Parameters((ImuOrientationOnRobot) imu0.getRobotOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES));
 
         imu0.initialize(parameters);
         resetIMU();
@@ -175,7 +173,7 @@ public class Bot {
     }
 
     public double getIMU() {
-        double angle = (imu0.getAngularOrientation().toAngleUnit(AngleUnit.DEGREES).firstAngle - imuOffset) % 360;
+        double angle = (imu0.getRobotOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES).firstAngle - imuOffset) % 360;
         if (angle > 180) {
             angle = angle - 360;
         }

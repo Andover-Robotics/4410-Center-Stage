@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.auto;
 
 import android.annotation.SuppressLint;
+import android.graphics.Color;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
@@ -11,9 +12,11 @@ import com.arcrobotics.ftclib.gamepad.GamepadKeys;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
+import org.firstinspires.ftc.teamcode.auto.trajectorysequence.TrajectorySequence;
 import org.firstinspires.ftc.teamcode.teleop.subsystems.Bot;
 import org.firstinspires.ftc.teamcode.teleop.subsystems.ColorDetectionPipeline;
 import org.openftc.apriltag.AprilTagDetection;
@@ -34,20 +37,16 @@ public class MainAutonomous extends LinearOpMode {
     Bot bot;
 
     private double moveDiff = -1;
-    private boolean autoaim = false, isRight = false;
 
-    enum Side {
-        RIGHT, LEFT, NULL;
+    // Side - how close to backboard: LEFT - furthest away, RIGHT -
+    public enum Side {
+        LEFT, RIGHT, NULL;
     }
-
-    enum Color {
+    Side side = Side.NULL;
+    public enum Alliance {
         RED, BLUE, NULL;
     }
-
-    Side side = Side.NULL;
-    Color color = Color.NULL;
-
-    boolean isTestMode = false;
+    Alliance alliance = Alliance.NULL;
 
     public static int driveTime = 2000, timeSlidesUp = 900, timeSlidesDown = 550, timeOuttake = 350, timeConeDrop = 150, timeIntakeDown = 200, timeIntakeOut = 700, timeIntakeClose = 350, timeIntakeUp = 450, timeIntakeIn = 400;//old 400
 
@@ -85,14 +84,11 @@ public class MainAutonomous extends LinearOpMode {
         OpenCvCamera camera = OpenCvCameraFactory.getInstance().createWebcam(camName);
         AprilTagDetectionPipeline aprilTagDetectionPipeline = new AprilTagDetectionPipeline(tagsize, fx, fy, cx, cy);
 
-        if (color == Color.RED) {
-            colorDetection = new ColorDetectionPipeline(telemetry, 1);
-        } else if (color == Color.BLUE) {
-            colorDetection = new ColorDetectionPipeline(telemetry, 2);
-        } else {
-            colorDetection = new ColorDetectionPipeline(telemetry, 0);
+        switch (alliance) {
+            case NULL: colorDetection = new ColorDetectionPipeline(telemetry, 0); break;
+            case RED: colorDetection = new ColorDetectionPipeline(telemetry, 1); break;
+            case BLUE: colorDetection = new ColorDetectionPipeline(telemetry, 2); break;
         }
-
 
         camera.setPipeline(aprilTagDetectionPipeline);
         camera.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
@@ -100,17 +96,12 @@ public class MainAutonomous extends LinearOpMode {
             public void onOpened() {
                 camera.startStreaming(1280, 720, OpenCvCameraRotation.UPRIGHT);
             }
-
             @Override
-            public void onError(int errorCode) {
-
-            }
+            public void onError(int errorCode) {}
         });
-
 
         Pose2d startPose = new Pose2d(0, 0, 0);
         drive.setPoseEstimate(startPose);
-
 
         Thread periodic = new Thread(() -> {
             while (opModeIsActive() && !isStopRequested()) {
@@ -118,23 +109,32 @@ public class MainAutonomous extends LinearOpMode {
             }
         });
 
-//        telemetry.setMsTransmissionInterval(50);
-
-
+        // Initialized, before started
         while (!isStarted()) {
+            // Change move differential
             telemetry.addData("moveDiff (positive is more ???)", moveDiff);
-            if(gp1.wasJustPressed(GamepadKeys.Button.LEFT_BUMPER)){
+            if (gp1.wasJustPressed(GamepadKeys.Button.LEFT_BUMPER)){
                 moveDiff -= 0.5;
-            }else if(gp1.wasJustPressed(GamepadKeys.Button.RIGHT_BUMPER)){
+            } else if (gp1.wasJustPressed(GamepadKeys.Button.RIGHT_BUMPER)){
                 moveDiff += 0.5;
             }
-
-            telemetry.addData("side?", side.toString());
-            telemetry.addData("testmode", isTestMode);
-            telemetry.addData("AutoAim", autoaim);
-
-            telemetry.addData("Current FPS:", camera.getFps());
-            telemetry.addData("Current Max FPS:", camera.getCurrentPipelineMaxFps());
+            // Change alliance
+            telemetry.addData("Alliance", alliance.toString());
+            if (gp1.wasJustPressed(GamepadKeys.Button.B)) {
+                alliance = Alliance.RED;
+            }
+            if (gp1.wasJustPressed(GamepadKeys.Button.X)) {
+                alliance = Alliance.BLUE;
+            }
+            // Change side
+            telemetry.addData("Side", side.toString());
+            if (gp1.wasJustPressed(GamepadKeys.Button.A)) {
+                side = Side.RIGHT;
+            }
+            if (gp1.wasJustPressed(GamepadKeys.Button.Y)) {
+                side = Side.LEFT;
+            }
+            telemetry.addData("Current Camera FPS:", camera.getFps());
 //
 //            ArrayList<AprilTagDetection> currentDetections = aprilTagDetectionPipeline.getLatestDetections();
 //
@@ -177,7 +177,6 @@ public class MainAutonomous extends LinearOpMode {
 
             telemetry.update();
             sleep(20);
-
         }
 
 //        try {
@@ -188,27 +187,68 @@ public class MainAutonomous extends LinearOpMode {
 //        }
         //END CAMERA STUFF ===============
 
-        Trajectory forwardFarSide = drive.trajectoryBuilder(startPose)
-                .lineTo(new Vector2d(52, moveDiff))
-                .build();
+        // TRAJECTORIES
+        Pose2d startPoseBlueFar = new Pose2d(-36, 60, -90);
+        Pose2d startPoseBlueClose = new Pose2d(12, 60, -90);
+        Pose2d startPoseRedClose = new Pose2d(12, -60, 90);
+        Pose2d startPoseRedFar = new Pose2d(-36, -60, 90);
 
-        Trajectory forwardNearSide = drive.trajectoryBuilder(startPose)
-                .lineTo(new Vector2d(26, moveDiff))
-                .build();
+        Vector2d parkingPosBlue = new Vector2d(56,56);
+        Vector2d parkingPosRed = new Vector2d(56,-56);
+        Vector2d scoreBlue = new Vector2d(42,30);
+        Vector2d scoreRed = new Vector2d(42,-30);
 
-
-        Trajectory strafeLeftFarSide = drive.trajectoryBuilder(forwardFarSide.end())
-                .strafeLeft(26)
-                .build();
-        Trajectory strafeLeftNearSide = drive.trajectoryBuilder(forwardNearSide.end())
-                .strafeLeft(26)
-                .build();
-        Trajectory strafeRightFarSide = drive.trajectoryBuilder(forwardFarSide.end())
+        TrajectorySequence redClose = drive.trajectorySequenceBuilder(startPoseRedClose)
+                .splineTo(new Vector2d(12,-36),Math.toRadians(90))
+                .waitSeconds(1.5)
+                .splineTo(scoreRed,Math.toRadians(0))
+                .waitSeconds(1.5)
                 .strafeRight(26)
+                .splineTo(parkingPosRed,Math.toRadians(0))
                 .build();
-        Trajectory strafeRightNearSide = drive.trajectoryBuilder(forwardNearSide.end())
-                .strafeRight(26)
-                .build();
+        TrajectorySequence blueClose = drive.trajectorySequenceBuilder(startPoseBlueClose)
+                                .splineTo(new Vector2d(12,36),-Math.toRadians(90))
+                                .waitSeconds(1.5)
+                                .splineTo(scoreBlue,Math.toRadians(0))
+                                .waitSeconds(1.5)
+                                .strafeLeft(26)
+                                .splineTo(parkingPosBlue,Math.toRadians(0))
+                                .build();
+        TrajectorySequence redFar = drive.trajectorySequenceBuilder(startPoseRedFar)
+                                .splineTo(new Vector2d(-36,-36),Math.toRadians(90))
+                                .waitSeconds(1.5)
+                                .splineTo(scoreRed,Math.toRadians(0))
+                                .waitSeconds(1.5)
+                                .strafeRight(26)
+                                .splineTo(parkingPosRed,Math.toRadians(0))
+                                .build();
+        TrajectorySequence blueFar = drive.trajectorySequenceBuilder(startPoseBlueFar)
+                                .splineTo(new Vector2d(-36,36),-Math.toRadians(90))
+                                .waitSeconds(1.5)
+                                .splineTo(scoreBlue,Math.toRadians(0))
+                                .waitSeconds(1.5)
+                                .strafeLeft(26)
+                                .splineTo(parkingPosBlue,Math.toRadians(0))
+                                .build();
+//        Trajectory forwardFar = drive.trajectoryBuilder(startPose)
+//                .lineTo(new Vector2d(52, moveDiff))
+//                .build();
+//        Trajectory forwardNear = drive.trajectoryBuilder(startPose)
+//                .lineTo(new Vector2d(26, moveDiff))
+//                .build();
+//
+//        Trajectory strafeLeftFar = drive.trajectoryBuilder(forwardFar.end())
+//                .strafeLeft(26)
+//                .build();
+//        Trajectory strafeLeftNear = drive.trajectoryBuilder(forwardNear.end())
+//                .strafeLeft(26)
+//                .build();
+//        Trajectory strafeRightFar = drive.trajectoryBuilder(forwardFar.end())
+//                .strafeRight(26)
+//                .build();
+//        Trajectory strafeRightNear= drive.trajectoryBuilder(forwardNear.end())
+//                .strafeRight(26)
+//                .build();
 
 //        Trajectory parkLeft = drive.trajectoryBuilder(forward.end())
 //                .strafeLeft(22)
@@ -226,38 +266,49 @@ public class MainAutonomous extends LinearOpMode {
 
         waitForStart();
         if (!isStopRequested()) {
-            Trajectory forward;
-            Trajectory strafe;
-            if ((side == Side.LEFT && color == Color.RED) || (side == Side.RIGHT && color == Color.BLUE)) {
-                if (side == Side.LEFT && color == Color.RED) {
-                    strafe = strafeLeftFarSide;
-                } else {
-                    strafe = strafeLeftNearSide;
+            TrajectorySequence sequence;
+//            Trajectory forward;
+//            Trajectory strafe;
+//            if ((side == Side.LEFT && alliance == Alliance.RED) || (side == Side.RIGHT && alliance == Alliance.BLUE)) {
+//                if (side == Side.LEFT && alliance == Alliance.RED) {
+//                    strafe = strafeLeftFar;
+//                } else {
+//                    strafe = strafeLeftNear;
+//                }
+//                forward = forwardFar;
+//            } else {
+//                if (side == Side.RIGHT && alliance == Alliance.RED) {
+//                    strafe = strafeRightFar;
+//                } else {
+//                    strafe = strafeRightNear;
+//                }
+//                forward = forwardFar;
+//            }
+            if ((side == Side.LEFT)) {
+                switch (alliance) {
+                    case RED:
+                        sequence = redFar;
+                        break;
+                    default:
+                        sequence = blueClose;
                 }
-                forward = forwardFarSide;
             } else {
-                if (side == Side.RIGHT && color == Color.RED) {
-                    strafe = strafeRightNearSide;
-                } else {
-                    strafe = strafeRightFarSide;
+                switch (alliance) {
+                    case BLUE:
+                        sequence = blueFar;
+                        break;
+                    default:
+                        sequence = redClose;
+                        break;
                 }
-                forward = forwardNearSide;
             }
-
 //            camera.setPipeline(colorDetection);
 
             periodic.start();
-
-            drive.turn(Math.toRadians(90));
-            forward.start();
-
-            sleep(driveTime);
-
-            strafe.start();
-
+            sequence.start();
             ArrayList<AprilTagDetection> currentDetections = aprilTagDetectionPipeline.getLatestDetections();
 
-            while (strafe.duration()>0.0) {
+            while (sequence.duration()>6.0 && sequence.duration() <8.0) {
                 if (currentDetections.size() != 0) {
                     boolean tagFound = false;
 
@@ -300,7 +351,9 @@ public class MainAutonomous extends LinearOpMode {
             try {
                 camera.stopStreaming();
                 camera.closeCameraDevice();
-            } catch (OpenCvCameraException e) {}
+            } catch (OpenCvCameraException e) {
+                telemetry.addLine("Exception as follows: "+e);
+            }
 
         }
     }
