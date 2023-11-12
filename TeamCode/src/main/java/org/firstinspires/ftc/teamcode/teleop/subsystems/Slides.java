@@ -34,7 +34,7 @@ public class Slides {
     private double manualPower = 0;
 
     public double power;
-    public static int MAXHEIGHT = -1550, high = -1550, mid = -800, low = -400, bottom = 0;
+    public static int MAXHEIGHT = -2200, high = -2150, mid = -1350, low = -600, bottom = 0;
     private final OpMode opMode;
     private double target = 0;
     private boolean goingDown = false;
