@@ -15,6 +15,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.teamcode.auto.trajectorysequence.TrajectorySequence;
 import org.firstinspires.ftc.teamcode.teleop.subsystems.Bot;
@@ -26,6 +27,7 @@ import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import java.util.Timer;
@@ -74,6 +76,7 @@ public class MainAutonomous extends LinearOpMode {
         telemetry.setAutoClear(true);
         bot = Bot.getInstance(this);
         SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
+        TwoWheelTrackingLocalizer odometry = new TwoWheelTrackingLocalizer(hardwareMap, drive);
 
         GamepadEx gp1 = new GamepadEx(gamepad1);
         GamepadEx gp2 = new GamepadEx(gamepad2);
@@ -135,46 +138,6 @@ public class MainAutonomous extends LinearOpMode {
                 side = Side.LEFT;
             }
             telemetry.addData("Current Camera FPS:", camera.getFps());
-//
-//            ArrayList<AprilTagDetection> currentDetections = aprilTagDetectionPipeline.getLatestDetections();
-//
-//            if (currentDetections.size() != 0) {
-//                boolean tagFound = false;
-//
-//                for (AprilTagDetection tag : currentDetections) {
-//                    if (tag.id == ID_ONE || tag.id == ID_TWO || tag.id == ID_THREE) {
-//                        tagOfInterest = tag;
-//                        tagFound = true;
-//                        break;
-//                    }
-//                }
-//
-//                if (tagFound) {
-//                    telemetry.addLine("Tag of interest is in sight!\n\nLocation data:");
-//                    tagToTelemetry(tagOfInterest);
-//                } else {
-//                    telemetry.addLine("Don't see tag of interest :(");
-//
-//                    if (tagOfInterest == null) {
-//                        telemetry.addLine("(The tag has never been seen)");
-//                    } else {
-//                        telemetry.addLine("\nBut we HAVE seen the tag before; last seen at:");
-//                        tagToTelemetry(tagOfInterest);
-//                    }
-//                }
-//
-//            } else {
-//                telemetry.addLine("Don't see tag of interest :(");
-//
-//                if (tagOfInterest == null) {
-//                    telemetry.addLine("(The tag has never been seen)");
-//                } else {
-//                    telemetry.addLine("\nBut we HAVE seen the tag before; last seen at:");
-//                    tagToTelemetry(tagOfInterest);
-//                }
-//
-//            }
-
             telemetry.update();
             sleep(20);
         }
@@ -188,127 +151,25 @@ public class MainAutonomous extends LinearOpMode {
         //END CAMERA STUFF ===============
 
         // TRAJECTORIES
-        Pose2d startPoseBlueFar = new Pose2d(-36, 60, -90);
-        Pose2d startPoseBlueClose = new Pose2d(12, 60, -90);
-        Pose2d startPoseRedClose = new Pose2d(12, -60, 90);
-        Pose2d startPoseRedFar = new Pose2d(-36, -60, 90);
-
-        Vector2d parkingPosBlue = new Vector2d(56,56);
-        Vector2d parkingPosRed = new Vector2d(56,-56);
-        Vector2d scoreBlue = new Vector2d(42,30);
-        Vector2d scoreRed = new Vector2d(42,-30);
-
-        TrajectorySequence redClose = drive.trajectorySequenceBuilder(startPoseRedClose)
-                .splineTo(new Vector2d(12,-36),Math.toRadians(90))
-                .waitSeconds(1.5)
-                .splineTo(scoreRed,Math.toRadians(0))
-                .waitSeconds(1.5)
-                .strafeRight(26)
-                .splineTo(parkingPosRed,Math.toRadians(0))
-                .build();
-        TrajectorySequence blueClose = drive.trajectorySequenceBuilder(startPoseBlueClose)
-                                .splineTo(new Vector2d(12,36),-Math.toRadians(90))
-                                .waitSeconds(1.5)
-                                .splineTo(scoreBlue,Math.toRadians(0))
-                                .waitSeconds(1.5)
-                                .strafeLeft(26)
-                                .splineTo(parkingPosBlue,Math.toRadians(0))
-                                .build();
-        TrajectorySequence redFar = drive.trajectorySequenceBuilder(startPoseRedFar)
-                                .splineTo(new Vector2d(-36,-36),Math.toRadians(90))
-                                .waitSeconds(1.5)
-                                .splineTo(scoreRed,Math.toRadians(0))
-                                .waitSeconds(1.5)
-                                .strafeRight(26)
-                                .splineTo(parkingPosRed,Math.toRadians(0))
-                                .build();
-        TrajectorySequence blueFar = drive.trajectorySequenceBuilder(startPoseBlueFar)
-                                .splineTo(new Vector2d(-36,36),-Math.toRadians(90))
-                                .waitSeconds(1.5)
-                                .splineTo(scoreBlue,Math.toRadians(0))
-                                .waitSeconds(1.5)
-                                .strafeLeft(26)
-                                .splineTo(parkingPosBlue,Math.toRadians(0))
-                                .build();
-//        Trajectory forwardFar = drive.trajectoryBuilder(startPose)
-//                .lineTo(new Vector2d(52, moveDiff))
-//                .build();
-//        Trajectory forwardNear = drive.trajectoryBuilder(startPose)
-//                .lineTo(new Vector2d(26, moveDiff))
-//                .build();
-//
-//        Trajectory strafeLeftFar = drive.trajectoryBuilder(forwardFar.end())
-//                .strafeLeft(26)
-//                .build();
-//        Trajectory strafeLeftNear = drive.trajectoryBuilder(forwardNear.end())
-//                .strafeLeft(26)
-//                .build();
-//        Trajectory strafeRightFar = drive.trajectoryBuilder(forwardFar.end())
-//                .strafeRight(26)
-//                .build();
-//        Trajectory strafeRightNear= drive.trajectoryBuilder(forwardNear.end())
-//                .strafeRight(26)
-//                .build();
-
-//        Trajectory parkLeft = drive.trajectoryBuilder(forward.end())
-//                .strafeLeft(22)
-//                .build();
-
-//        Trajectory parkRight = drive.trajectoryBuilder()
-//                .strafeRight(30)
-//                .build();
-//        Trajectory parkLeft = drive.trajectoryBuilder(forward.end())
-//                .strafeRight(30)
-//                .build();
-
-//        Thread driveForward = new Thread(() -> drive.followTrajectory(forward));
         bot.resetIMU();
 
         waitForStart();
         if (!isStopRequested()) {
-            TrajectorySequence sequence;
-//            Trajectory forward;
-//            Trajectory strafe;
-//            if ((side == Side.LEFT && alliance == Alliance.RED) || (side == Side.RIGHT && alliance == Alliance.BLUE)) {
-//                if (side == Side.LEFT && alliance == Alliance.RED) {
-//                    strafe = strafeLeftFar;
-//                } else {
-//                    strafe = strafeLeftNear;
-//                }
-//                forward = forwardFar;
-//            } else {
-//                if (side == Side.RIGHT && alliance == Alliance.RED) {
-//                    strafe = strafeRightFar;
-//                } else {
-//                    strafe = strafeRightNear;
-//                }
-//                forward = forwardFar;
-//            }
-            if ((side == Side.LEFT)) {
-                switch (alliance) {
-                    case RED:
-                        sequence = redFar;
-                        break;
-                    default:
-                        sequence = blueClose;
-                }
-            } else {
-                switch (alliance) {
-                    case BLUE:
-                        sequence = blueFar;
-                        break;
-                    default:
-                        sequence = redClose;
-                        break;
-                }
-            }
-//            camera.setPipeline(colorDetection);
-
             periodic.start();
-            sequence.start();
-            ArrayList<AprilTagDetection> currentDetections = aprilTagDetectionPipeline.getLatestDetections();
 
-            while (sequence.duration()>6.0 && sequence.duration() <8.0) {
+            camera.setPipeline(colorDetection);
+            boolean aligned = bot.alignSpike();
+            if (aligned) {
+                telemetry.addLine("SPIKE ALIGNED!!!!");
+            }
+
+            TrajectorySequence sequence = makeTrajectories(drive);
+            drive.followTrajectorySequenceAsync(sequence);
+
+
+            camera.setPipeline(aprilTagDetectionPipeline);
+            while (sequence.duration() > 6.0 && sequence.duration() < 8.0) {
+                ArrayList<AprilTagDetection> currentDetections = aprilTagDetectionPipeline.getLatestDetections();
                 if (currentDetections.size() != 0) {
                     boolean tagFound = false;
 
@@ -346,20 +207,76 @@ public class MainAutonomous extends LinearOpMode {
 
                 }
             }
-            periodic.interrupt();
+        }
+        periodic.interrupt();
 
-            try {
-                camera.stopStreaming();
-                camera.closeCameraDevice();
-            } catch (OpenCvCameraException e) {
-                telemetry.addLine("Exception as follows: "+e);
+        try {
+            camera.stopStreaming();
+            camera.closeCameraDevice();
+        } catch (OpenCvCameraException e) {
+            telemetry.addLine("Exception as follows: "+e);
+        }
+
+    }
+    public TrajectorySequence makeTrajectories(SampleMecanumDrive drive) {
+        Pose2d startPoseBlueFar = new Pose2d(-36, 60, -90);
+        Pose2d startPoseBlueClose = new Pose2d(12, 60, -90);
+        Pose2d startPoseRedClose = new Pose2d(12, -60, 90);
+        Pose2d startPoseRedFar = new Pose2d(-36, -60, 90);
+
+        Vector2d parkingPosBlue = new Vector2d(56,56);
+        Vector2d parkingPosRed = new Vector2d(56,-56);
+        Vector2d scoreBlue = new Vector2d(42,30);
+        Vector2d scoreRed = new Vector2d(42,-30);
+
+        TrajectorySequence redClose = drive.trajectorySequenceBuilder(startPoseRedClose)
+                .splineTo(new Vector2d(12,-36),Math.toRadians(90))
+                .waitSeconds(1.5)
+                .splineTo(scoreRed,Math.toRadians(0))
+                .waitSeconds(1.5)
+                .strafeRight(26)
+                .splineTo(parkingPosRed,Math.toRadians(0))
+                .build();
+        TrajectorySequence blueClose = drive.trajectorySequenceBuilder(startPoseBlueClose)
+                .splineTo(new Vector2d(12,36),-Math.toRadians(90))
+                .waitSeconds(1.5)
+                .splineTo(scoreBlue,Math.toRadians(0))
+                .waitSeconds(1.5)
+                .strafeLeft(26)
+                .splineTo(parkingPosBlue,Math.toRadians(0))
+                .build();
+        TrajectorySequence redFar = drive.trajectorySequenceBuilder(startPoseRedFar)
+                .splineTo(new Vector2d(-36,-36),Math.toRadians(90))
+                .waitSeconds(1.5)
+                .splineTo(scoreRed,Math.toRadians(0))
+                .waitSeconds(1.5)
+                .strafeRight(26)
+                .splineTo(parkingPosRed,Math.toRadians(0))
+                .build();
+        TrajectorySequence blueFar = drive.trajectorySequenceBuilder(startPoseBlueFar)
+                .splineTo(new Vector2d(-36,36),-Math.toRadians(90))
+                .waitSeconds(1.5)
+                .splineTo(scoreBlue,Math.toRadians(0))
+                .waitSeconds(1.5)
+                .strafeLeft(26)
+                .splineTo(parkingPosBlue,Math.toRadians(0))
+                .build();
+        if ((side == Side.LEFT)) {
+            switch (alliance) {
+                case RED:
+                    return redFar;
+                default:
+                    return blueClose;
             }
-
+        } else {
+            switch (alliance) {
+                case BLUE:
+                    return blueFar;
+                default:
+                    return redClose;
+            }
         }
     }
-
-
-
     @SuppressLint("DefaultLocale")
     void tagToTelemetry(AprilTagDetection detection) {
         telemetry.addLine(String.format("Detected tag ID=%d", detection.id));

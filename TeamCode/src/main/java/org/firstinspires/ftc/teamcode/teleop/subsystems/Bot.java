@@ -4,6 +4,7 @@ import com.arcrobotics.ftclib.hardware.motors.Motor;
 import com.arcrobotics.ftclib.hardware.motors.MotorEx;
 import com.qualcomm.hardware.bosch.BHI260IMU;
 import com.qualcomm.hardware.bosch.BNO055IMU;
+import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.ImuOrientationOnRobot;
 
@@ -96,17 +97,21 @@ public class Bot {
 
 
     // TODO: Figure out how much to turn and drive forward
-    public void alignSpike() {
-        double turn = 1.7;
-        if (ColorDetectionPipeline.spikeMark == ColorDetectionPipeline.SpikeMark.LEFT) {
-            drive(0,0, -1* turn * Math.abs((ColorDetectionPipeline.camwidth/2.0)-ColorDetectionPipeline.midpointrect));
+    public boolean alignSpike() {
+        double turn;
+        if (ColorDetectionPipeline.spikeMark != ColorDetectionPipeline.SpikeMark.NOTDETECTED) {
+            return false;
         }
-        if (ColorDetectionPipeline.spikeMark == ColorDetectionPipeline.SpikeMark.RIGHT) {
-            drive(0,0, turn * Math.abs((ColorDetectionPipeline.camwidth/2.0)-ColorDetectionPipeline.midpointrect));
+
+        while (ColorDetectionPipeline.spikeMark != ColorDetectionPipeline.SpikeMark.MIDDLE) {
+            if (ColorDetectionPipeline.spikeMark == ColorDetectionPipeline.SpikeMark.LEFT) {
+                turn = -1.7;
+            } else {
+                turn = 1.7;
+            }
+            drive(0,0,turn);
         }
-        if (ColorDetectionPipeline.spikeMark == ColorDetectionPipeline.SpikeMark.MIDDLE) {
-            drive(0,0,0);
-        }
+        return true;
     }
 
     public void fixMotors() {
@@ -162,8 +167,10 @@ public class Bot {
 
     public void initializeImus() {
         imu0 = opMode.hardwareMap.get(BHI260IMU.class, "imu");
-        final BHI260IMU.Parameters parameters = new BHI260IMU.Parameters((ImuOrientationOnRobot) imu0.getRobotOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES));
-
+        final BHI260IMU.Parameters parameters = new BHI260IMU.Parameters(new RevHubOrientationOnRobot(
+                RevHubOrientationOnRobot.LogoFacingDirection.LEFT,
+                RevHubOrientationOnRobot.UsbFacingDirection.UP
+        ));
         imu0.initialize(parameters);
         resetIMU();
     }
