@@ -89,11 +89,7 @@ public class MainAutonomous extends LinearOpMode {
         OpenCvCamera camera = OpenCvCameraFactory.getInstance().createWebcam(camName);
         AprilTagDetectionPipeline aprilTagDetectionPipeline = new AprilTagDetectionPipeline(tagsize, fx, fy, cx, cy);
 
-        switch (alliance) {
-            case NULL: colorDetection = new ColorDetectionPipeline(telemetry, 0); break;
-            case RED: colorDetection = new ColorDetectionPipeline(telemetry, 1); break;
-            case BLUE: colorDetection = new ColorDetectionPipeline(telemetry, 2); break;
-        }
+
 
         camera.setPipeline(aprilTagDetectionPipeline);
         camera.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
@@ -116,6 +112,7 @@ public class MainAutonomous extends LinearOpMode {
 
         // Initialized, before started
         while (!isStarted()) {
+            gp1.readButtons();
             // Change move differential
             telemetry.addData("moveDiff (positive is more ???)", moveDiff);
             if (gp1.wasJustPressed(GamepadKeys.Button.LEFT_BUMPER)){
@@ -124,25 +121,34 @@ public class MainAutonomous extends LinearOpMode {
                 moveDiff += 0.5;
             }
             // Change alliance
-            telemetry.addData("Alliance", alliance.toString());
-            if (gp1.wasJustPressed(GamepadKeys.Button.B)) {
-                alliance = Alliance.RED;
-            }
-            if (gp1.wasJustPressed(GamepadKeys.Button.X)) {
-                alliance = Alliance.BLUE;
+            telemetry.addData("Alliance", alliance);
+            if (gp1.wasJustPressed(GamepadKeys.Button.Y)) {
+                switch (alliance) {
+                    case RED: alliance = alliance.BLUE; break;
+                    case BLUE: alliance = alliance.RED; break;
+                    case NULL: alliance = alliance.RED; break;
+                }
             }
             // Change side
-            telemetry.addData("Side", side.toString());
+            telemetry.addData("Side", side);
             if (gp1.wasJustPressed(GamepadKeys.Button.A)) {
-                side = Side.RIGHT;
-            }
-            if (gp1.wasJustPressed(GamepadKeys.Button.Y)) {
-                side = Side.LEFT;
+                switch (side) {
+                    case LEFT: side = Side.RIGHT; break;
+                    case RIGHT: side = Side.LEFT; break;
+                    case NULL: side = Side.LEFT; break;
+                }
             }
             telemetry.addData("Current Camera FPS:", camera.getFps());
+            switch (alliance) {
+                case NULL: colorDetection = new ColorDetectionPipeline(telemetry, 0); break;
+                case RED: colorDetection = new ColorDetectionPipeline(telemetry, 1); break;
+                case BLUE: colorDetection = new ColorDetectionPipeline(telemetry, 2); break;
+            }
             telemetry.update();
             sleep(20);
         }
+
+
 
 //        try {
 //            camera.stopStreaming();
@@ -165,7 +171,8 @@ public class MainAutonomous extends LinearOpMode {
                 telemetry.addLine("SPIKE ALIGNED!!!!");
             }
 
-            TrajectorySequence sequence = makeTrajectories(drive);
+            Pose2d startP = drive.getPoseEstimate();
+            TrajectorySequence sequence = makeTrajectories(drive, startP);
             drive.followTrajectorySequenceAsync(sequence);
 
 
@@ -220,7 +227,7 @@ public class MainAutonomous extends LinearOpMode {
         }
 
     }
-    public TrajectorySequence makeTrajectories(SampleMecanumDrive drive) {
+    public TrajectorySequence makeTrajectories(SampleMecanumDrive drive, Pose2d startPose) {
         Pose2d startPoseBlueFar = new Pose2d(-36, 60, -90);
         Pose2d startPoseBlueClose = new Pose2d(12, 60, -90);
         Pose2d startPoseRedClose = new Pose2d(12, -60, 90);
@@ -231,7 +238,7 @@ public class MainAutonomous extends LinearOpMode {
         Vector2d scoreBlue = new Vector2d(42,30);
         Vector2d scoreRed = new Vector2d(42,-30);
 
-        TrajectorySequence redClose = drive.trajectorySequenceBuilder(startPoseRedClose)
+        TrajectorySequence redClose = drive.trajectorySequenceBuilder(startPose)
                 .splineTo(new Vector2d(12,-36),Math.toRadians(90))
                 .waitSeconds(1.5)
                 .splineTo(scoreRed,Math.toRadians(0))
@@ -239,7 +246,7 @@ public class MainAutonomous extends LinearOpMode {
                 .strafeRight(26)
                 .splineTo(parkingPosRed,Math.toRadians(0))
                 .build();
-        TrajectorySequence blueClose = drive.trajectorySequenceBuilder(startPoseBlueClose)
+        TrajectorySequence blueClose = drive.trajectorySequenceBuilder(startPose)
                 .splineTo(new Vector2d(12,36),-Math.toRadians(90))
                 .waitSeconds(1.5)
                 .splineTo(scoreBlue,Math.toRadians(0))
@@ -247,7 +254,7 @@ public class MainAutonomous extends LinearOpMode {
                 .strafeLeft(26)
                 .splineTo(parkingPosBlue,Math.toRadians(0))
                 .build();
-        TrajectorySequence redFar = drive.trajectorySequenceBuilder(startPoseRedFar)
+        TrajectorySequence redFar = drive.trajectorySequenceBuilder(startPose)
                 .splineTo(new Vector2d(-36,-36),Math.toRadians(90))
                 .waitSeconds(1.5)
                 .splineTo(scoreRed,Math.toRadians(0))
@@ -255,7 +262,7 @@ public class MainAutonomous extends LinearOpMode {
                 .strafeRight(26)
                 .splineTo(parkingPosRed,Math.toRadians(0))
                 .build();
-        TrajectorySequence blueFar = drive.trajectorySequenceBuilder(startPoseBlueFar)
+        TrajectorySequence blueFar = drive.trajectorySequenceBuilder(startPose)
                 .splineTo(new Vector2d(-36,36),-Math.toRadians(90))
                 .waitSeconds(1.5)
                 .splineTo(scoreBlue,Math.toRadians(0))
