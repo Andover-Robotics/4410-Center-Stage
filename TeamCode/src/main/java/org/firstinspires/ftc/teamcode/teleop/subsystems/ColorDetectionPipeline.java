@@ -24,7 +24,7 @@ public class ColorDetectionPipeline extends OpenCvPipeline{
     Mat HSV = new Mat();
     MatOfPoint biggest;
 
-    public static int minwidth = 60;
+    public static int minwidth = 10;
     public static int width = 0;
     public static int camwidth = 1280;
     public static int camheight = 720;
@@ -43,12 +43,12 @@ public class ColorDetectionPipeline extends OpenCvPipeline{
     int alliance = 0;
 
     // Red HSV Values
-    public static double redLH = 19, redLS = 145, redLV = 100, redHH = 28, redHS = 255, redHV = 255;
+    public static double redLH = 142, redLS = 50, redLV = 50, redHH = 172, redHS = 255, redHV = 255;
     public static Scalar redLowHSV= new Scalar(redLH,redLS,redLV);
     public static Scalar redHighHSV = new Scalar(redHH,redHS,redHV);
 
     // Blue HSV Values
-    public static double blueLH = 19, blueLS = 145, blueLV = 100, blueHH = 28, blueHS = 255, blueHV = 255;
+    public static double blueLH = 90, blueLS = 50, blueLV = 50, blueHH = 117, blueHS = 255, blueHV = 255;
     public static Scalar blueLowHSV= new Scalar(blueLH,blueLS,blueLV);
     public static Scalar blueHighHSV = new Scalar(blueHH,blueHS,blueHV);
 
