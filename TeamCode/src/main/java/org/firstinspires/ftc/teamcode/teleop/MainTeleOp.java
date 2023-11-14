@@ -192,12 +192,13 @@ public class MainTeleOp extends LinearOpMode {
 
     private void gp1drive() { // all directions
         driveSpeed = 1;
-        driveSpeed *= 1 - 0.5 * gp1.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER);
+        driveSpeed *= 1; //- 0.5 * gp1.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER);
         driveSpeed = Math.max(0, driveSpeed);
         bot.fixMotors();
 
         Vector2d driveVector = new Vector2d(gp1.getLeftX(), -gp1.getLeftY()),
-                turnVector = new Vector2d(
+                turnVector = new Vector2d(\
+
                         gp1.getRightX(), 0);
 
         bot.drive(driveVector.getX() * driveSpeed,
