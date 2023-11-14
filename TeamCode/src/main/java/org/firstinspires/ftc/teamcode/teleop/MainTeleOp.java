@@ -203,7 +203,7 @@ public class MainTeleOp extends LinearOpMode {
 
         bot.drive(driveVector.getX() * driveSpeed,
                 driveVector.getY() * driveSpeed,
-                turnVector.getX() * driveSpeed / 1.7
+                turnVector.getX() * driveSpeed
         );
         if (autoAlignForward) {
             double power = headingAligner.calculate(bot.getIMU());
@@ -214,7 +214,7 @@ public class MainTeleOp extends LinearOpMode {
         } else {
             bot.drive(driveVector.getX() * driveSpeed,
                     driveVector.getY() * driveSpeed,
-                    turnVector.getX() * driveSpeed / 1.7
+                    turnVector.getX() * driveSpeed
             );
         }
     }

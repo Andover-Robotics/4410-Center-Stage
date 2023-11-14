@@ -1,13 +1,12 @@
-package org.firstinspires.ftc.teamcode.teleop.subsystems;
-
+package org.firstinspires.ftc.teamcode.auto;
 
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
-import com.arcrobotics.ftclib.gamepad.GamepadKeys;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
-import org.firstinspires.ftc.teamcode.teleop.subsystems.ColorDetectionPipeline;
+import org.firstinspires.ftc.teamcode.auto.pipelines.ColorDetectionPipeline;
+import org.firstinspires.ftc.teamcode.teleop.subsystems.Bot;
 import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
@@ -59,25 +58,21 @@ public class ColorDetectionTest extends LinearOpMode {
 
 
         while (opModeIsActive() && !isStopRequested()) {
-
-            telemetry.addData("Spikemark Status: ", ColorDetectionPipeline.spikeMark);
-            telemetry.addData("minwidth = ", ColorDetectionPipeline.minwidth);
-            telemetry.addData("width: ", ColorDetectionPipeline.width);
+            telemetry.addData("Spikemark Status", ColorDetectionPipeline.spikeMark);
+            telemetry.addData("minwidth", ColorDetectionPipeline.minwidth);
+            telemetry.addData("width", ColorDetectionPipeline.width);
 
             telemetry.addData("cycle", time - cycleTime);
             cycleTime = time;
 
             telemetry.update();
-
         }
+
         while (!isStarted()) {
-            telemetry.addData("Spikemark Status: ", ColorDetectionPipeline.spikeMark);
-            telemetry.addData("minwidth = ", ColorDetectionPipeline.minwidth);
-            telemetry.addData("width: ", ColorDetectionPipeline.width);
-
-
+            telemetry.addData("Spikemark Status", ColorDetectionPipeline.spikeMark);
+            telemetry.addData("minwidth", ColorDetectionPipeline.minwidth);
+            telemetry.addData("width", ColorDetectionPipeline.width);
             telemetry.update();
-
         }
 
 

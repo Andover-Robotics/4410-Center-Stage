@@ -3,14 +3,13 @@ package org.firstinspires.ftc.teamcode.teleop.subsystems;
 import com.arcrobotics.ftclib.hardware.motors.Motor;
 import com.arcrobotics.ftclib.hardware.motors.MotorEx;
 import com.qualcomm.hardware.bosch.BHI260IMU;
-import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
-import com.qualcomm.robotcore.hardware.ImuOrientationOnRobot;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
+import org.firstinspires.ftc.teamcode.auto.pipelines.ColorDetectionPipeline;
 
 public class Bot {
 
@@ -97,21 +96,14 @@ public class Bot {
 
 
     // TODO: Figure out how much to turn and drive forward
-    public boolean alignSpike() {
-        double turn;
-        if (ColorDetectionPipeline.spikeMark != ColorDetectionPipeline.SpikeMark.NOTDETECTED) {
-            return false;
+    public int alignSpike() {
+        switch(ColorDetectionPipeline.spikeMark) {
+            case LEFT: return 1;
+            case MIDDLE: return 2;
+            case RIGHT: return 3;
+            default:
+                return 0;
         }
-
-        while (ColorDetectionPipeline.spikeMark != ColorDetectionPipeline.SpikeMark.MIDDLE) {
-            if (ColorDetectionPipeline.spikeMark == ColorDetectionPipeline.SpikeMark.LEFT) {
-                turn = -1.7;
-            } else {
-                turn = 1.7;
-            }
-            drive(0,0,turn);
-        }
-        return true;
     }
 
     public void fixMotors() {

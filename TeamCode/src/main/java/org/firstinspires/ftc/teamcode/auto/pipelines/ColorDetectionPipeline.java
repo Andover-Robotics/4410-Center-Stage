@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.teleop.subsystems;
+package org.firstinspires.ftc.teamcode.auto.pipelines;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -62,8 +62,8 @@ public class ColorDetectionPipeline extends OpenCvPipeline{
     public Mat processFrame(Mat input) {
         Imgproc.cvtColor(input, HSV, Imgproc.COLOR_RGB2HSV); //converting RGB colors to HSV
 
-        Rect rightrect = new Rect(858, 1, 425, 719);
-        Rect leftrect = new Rect(1, 1, 425, 719); // rectangle sizes
+        Rect rightrect = new Rect(600, 100, 450, 240);
+        Rect leftrect = new Rect(100, 100, 325, 300); // rectangle sizes
 
         Imgproc.rectangle(input, leftrect, new Scalar(0, 255, 0), 5); //displays rectangles with red color
         Imgproc.rectangle(input, rightrect, new Scalar(0, 255, 0), 5);
@@ -95,10 +95,10 @@ public class ColorDetectionPipeline extends OpenCvPipeline{
 
                 if (midpointrect > leftrect.tl().x && midpointrect < leftrect.br().x) { // checks if within boundaries of left side rectangle
                     spikeMark = SpikeMark.LEFT;
-                } else if (midpointrect > rightrect.tl().x && midpointrect < rightrect.br().x) { // checks if within boundaries of right side rectangle
-                    spikeMark = SpikeMark.RIGHT;
-                } else if (midpointrect < rightrect.tl().x && midpointrect > leftrect.br().x){
+                } else if (midpointrect < rightrect.tl().x && midpointrect > leftrect.br().x) { // checks if within boundaries of right side rectangle
                     spikeMark = SpikeMark.MIDDLE;
+                } else{
+                    spikeMark = SpikeMark.RIGHT;
                 }
 //
 //                telemetry.addLine("Midpoint of Bounding Box :"+ midpointrect);
