@@ -30,8 +30,6 @@ public class MeepMeepTesting {
                 .setConstraints(60, 60, Math.toRadians(180), Math.toRadians(180), 15)
                 .followTrajectorySequence(drive ->
                         drive.trajectorySequenceBuilder(startPoseRedClose)
-                                .splineTo(new Vector2d(12,-36),Math.toRadians(90))
-                                .waitSeconds(1.5)
                                 .splineTo(scoreRed,Math.toRadians(0))
                                 .waitSeconds(1.5)
                                 .strafeRight(26)

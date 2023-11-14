@@ -29,9 +29,9 @@ import com.qualcomm.robotcore.hardware.configuration.typecontainers.MotorConfigu
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.auto.drive.DriveConstants;
-import org.firstinspires.ftc.teamcode.auto.util.trajectorysequence.TrajectorySequence;
-import org.firstinspires.ftc.teamcode.auto.util.trajectorysequence.TrajectorySequenceRunner;
-import org.firstinspires.ftc.teamcode.auto.util.trajectorysequence.TrajectorySequenceBuilder;
+import org.firstinspires.ftc.teamcode.auto.trajectorysequence.TrajectorySequence;
+import org.firstinspires.ftc.teamcode.auto.trajectorysequence.TrajectorySequenceRunner;
+import org.firstinspires.ftc.teamcode.auto.trajectorysequence.TrajectorySequenceBuilder;
 import org.firstinspires.ftc.teamcode.auto.util.LynxModuleUtil;
 
 import java.util.ArrayList;
