@@ -97,21 +97,14 @@ public class Bot {
 
 
     // TODO: Figure out how much to turn and drive forward
-    public boolean alignSpike() {
-        double turn;
-        if (ColorDetectionPipeline.spikeMark != ColorDetectionPipeline.SpikeMark.NOTDETECTED) {
-            return false;
+    public int alignSpike() {
+        switch(ColorDetectionPipeline.spikeMark) {
+            case LEFT: return 1;
+            case MIDDLE: return 2;
+            case RIGHT: return 3;
+            default:
+                return 0;
         }
-
-        while (ColorDetectionPipeline.spikeMark != ColorDetectionPipeline.SpikeMark.MIDDLE) {
-            if (ColorDetectionPipeline.spikeMark == ColorDetectionPipeline.SpikeMark.LEFT) {
-                turn = -1.7;
-            } else {
-                turn = 1.7;
-            }
-            drive(0,0,turn);
-        }
-        return true;
     }
 
     public void fixMotors() {

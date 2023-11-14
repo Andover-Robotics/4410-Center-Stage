@@ -6,7 +6,6 @@ import android.graphics.Color;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.geometry.Vector2d;
-import com.acmerobotics.roadrunner.trajectory.Trajectory;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.arcrobotics.ftclib.gamepad.GamepadKeys;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
@@ -17,9 +16,10 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
+import org.firstinspires.ftc.teamcode.auto.drive.AprilTagDetectionPipeline;
 import org.firstinspires.ftc.teamcode.auto.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.auto.drive.TwoWheelTrackingLocalizer;
-import org.firstinspires.ftc.teamcode.auto.trajectorysequence.TrajectorySequence;
+import org.firstinspires.ftc.teamcode.auto.util.trajectorysequence.*;
 import org.firstinspires.ftc.teamcode.teleop.subsystems.Bot;
 import org.firstinspires.ftc.teamcode.teleop.subsystems.ColorDetectionPipeline;
 import org.openftc.apriltag.AprilTagDetection;
@@ -124,9 +124,10 @@ public class MainAutonomous extends LinearOpMode {
             telemetry.addData("Alliance", alliance);
             if (gp1.wasJustPressed(GamepadKeys.Button.Y)) {
                 switch (alliance) {
-                    case RED: alliance = alliance.BLUE; break;
-                    case BLUE: alliance = alliance.RED; break;
-                    case NULL: alliance = alliance.RED; break;
+                    case RED: alliance = Alliance.BLUE; break;
+                    case BLUE:
+                    case NULL:
+                        alliance = Alliance.RED; break;
                 }
             }
             // Change side
@@ -134,8 +135,9 @@ public class MainAutonomous extends LinearOpMode {
             if (gp1.wasJustPressed(GamepadKeys.Button.A)) {
                 switch (side) {
                     case LEFT: side = Side.RIGHT; break;
-                    case RIGHT: side = Side.LEFT; break;
-                    case NULL: side = Side.LEFT; break;
+                    case RIGHT:
+                    case NULL:
+                        side = Side.LEFT; break;
                 }
             }
             telemetry.addData("Current Camera FPS:", camera.getFps());
@@ -166,18 +168,22 @@ public class MainAutonomous extends LinearOpMode {
             periodic.start();
 
             camera.setPipeline(colorDetection);
-            boolean aligned = bot.alignSpike();
-            if (aligned) {
-                telemetry.addLine("SPIKE ALIGNED!!!!");
+            int aligned = bot.alignSpike();
+            switch(aligned) {
+                case 0: telemetry.addLine("spike mark not found");
+                case 1: telemetry.addLine("spike mark found on left side and going to run left spikemark autopath");
+                case 2: telemetry.addLine("spike mark found on middle and going to run middle spikemark autopath");
+                case 3: telemetry.addLine("spike mark found on right and going to run right side autopath");
             }
 
             Pose2d startP = drive.getPoseEstimate();
-            TrajectorySequence sequence = makeTrajectories(drive, startP);
-            drive.followTrajectorySequenceAsync(sequence);
+            TrajectorySequence[] sequence = makeTrajectories(drive, startP, aligned);
+            drive.followTrajectorySequence(sequence[0]);
+            drive.followTrajectorySequenceAsync(sequence[1]);
 
 
             camera.setPipeline(aprilTagDetectionPipeline);
-            while (sequence.duration() > 6.0 && sequence.duration() < 8.0) {
+            while (sequence[1].duration() > 6.0 && sequence[1].duration() < 8.0) {
                 ArrayList<AprilTagDetection> currentDetections = aprilTagDetectionPipeline.getLatestDetections();
                 if (currentDetections.size() != 0) {
                     boolean tagFound = false;
@@ -227,44 +233,58 @@ public class MainAutonomous extends LinearOpMode {
         }
 
     }
-    public TrajectorySequence makeTrajectories(SampleMecanumDrive drive, Pose2d startPose) {
-        Pose2d startPoseBlueFar = new Pose2d(-36, 60, -90);
-        Pose2d startPoseBlueClose = new Pose2d(12, 60, -90);
-        Pose2d startPoseRedClose = new Pose2d(12, -60, 90);
-        Pose2d startPoseRedFar = new Pose2d(-36, -60, 90);
+
+    public TrajectorySequence generateSpikeMarkTrajectory(SampleMecanumDrive drive, Pose2d startPose, int alignment) {
+        switch(alignment) {
+            case 1:
+                return drive.trajectorySequenceBuilder(startPose)
+                        .forward(26)
+                        .turn(Math.toRadians(90))
+                        .build();
+            case 2:
+                return drive.trajectorySequenceBuilder(startPose)
+                        .forward(30)
+                        .build();
+            case 3:
+                return drive.trajectorySequenceBuilder(startPose)
+                        .forward(26)
+                        .turn(Math.toRadians(-90))
+                        .build();
+            default:
+                return drive.trajectorySequenceBuilder(startPose)
+                        .build();
+        }
+    }
+    public TrajectorySequence[] makeTrajectories(SampleMecanumDrive drive, Pose2d startPose, int alignment) {
 
         Vector2d parkingPosBlue = new Vector2d(56,56);
         Vector2d parkingPosRed = new Vector2d(56,-56);
         Vector2d scoreBlue = new Vector2d(42,30);
         Vector2d scoreRed = new Vector2d(42,-30);
 
-        TrajectorySequence redClose = drive.trajectorySequenceBuilder(startPose)
-                .splineTo(new Vector2d(12,-36),Math.toRadians(90))
-                .waitSeconds(1.5)
+        TrajectorySequence spikeMark = generateSpikeMarkTrajectory(drive, startPose, alignment);
+        Pose2d startPose2 = drive.getPoseEstimate();
+
+
+        TrajectorySequence redClose = drive.trajectorySequenceBuilder(startPose2)
                 .splineTo(scoreRed,Math.toRadians(0))
                 .waitSeconds(1.5)
                 .strafeRight(26)
                 .splineTo(parkingPosRed,Math.toRadians(0))
                 .build();
-        TrajectorySequence blueClose = drive.trajectorySequenceBuilder(startPose)
-                .splineTo(new Vector2d(12,36),-Math.toRadians(90))
-                .waitSeconds(1.5)
+        TrajectorySequence blueClose = drive.trajectorySequenceBuilder(startPose2)
                 .splineTo(scoreBlue,Math.toRadians(0))
                 .waitSeconds(1.5)
                 .strafeLeft(26)
                 .splineTo(parkingPosBlue,Math.toRadians(0))
                 .build();
-        TrajectorySequence redFar = drive.trajectorySequenceBuilder(startPose)
-                .splineTo(new Vector2d(-36,-36),Math.toRadians(90))
-                .waitSeconds(1.5)
+        TrajectorySequence redFar = drive.trajectorySequenceBuilder(startPose2)
                 .splineTo(scoreRed,Math.toRadians(0))
                 .waitSeconds(1.5)
                 .strafeRight(26)
                 .splineTo(parkingPosRed,Math.toRadians(0))
                 .build();
-        TrajectorySequence blueFar = drive.trajectorySequenceBuilder(startPose)
-                .splineTo(new Vector2d(-36,36),-Math.toRadians(90))
-                .waitSeconds(1.5)
+        TrajectorySequence blueFar = drive.trajectorySequenceBuilder(startPose2)
                 .splineTo(scoreBlue,Math.toRadians(0))
                 .waitSeconds(1.5)
                 .strafeLeft(26)
@@ -273,16 +293,16 @@ public class MainAutonomous extends LinearOpMode {
         if ((side == Side.LEFT)) {
             switch (alliance) {
                 case RED:
-                    return redFar;
+                    return new TrajectorySequence[]{spikeMark, redFar};
                 default:
-                    return blueClose;
+                    return new TrajectorySequence[]{spikeMark, blueClose};
             }
         } else {
             switch (alliance) {
                 case BLUE:
-                    return blueFar;
+                    return new TrajectorySequence[]{spikeMark, blueFar};
                 default:
-                    return redClose;
+                    return new TrajectorySequence[]{spikeMark, redClose};
             }
         }
     }
