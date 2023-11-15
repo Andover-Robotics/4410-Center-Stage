@@ -95,16 +95,16 @@ public class Bot {
     }
 
 
-    // TODO: Figure out how much to turn and drive forward
-    public int alignSpike() {
-        switch(ColorDetectionPipeline.spikeMark) {
-            case LEFT: return 1;
-            case MIDDLE: return 2;
-            case RIGHT: return 3;
-            default:
-                return 0;
-        }
-    }
+//    // TODO: Figure out how much to turn and drive forward
+//    public int alignSpike() {
+//        switch(ColorDetectionPipeline.spikeMark) {
+//            case LEFT: return 1;
+//            case MIDDLE: return 2;
+//            case RIGHT: return 3;
+//            default:
+//                return 3;
+//        }
+//    }
 
     public void fixMotors() {
         fl.setInverted(false);

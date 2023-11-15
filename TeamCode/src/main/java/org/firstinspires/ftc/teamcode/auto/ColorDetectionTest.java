@@ -35,7 +35,7 @@ public class ColorDetectionTest extends LinearOpMode {
         GamepadEx gp1 = new GamepadEx(gamepad1);
         WebcamName camName = hardwareMap.get(WebcamName.class, "Webcam 1");
         OpenCvCamera camera = OpenCvCameraFactory.getInstance().createWebcam(camName);
-        ColorDetectionPipeline colorDetectionPipeline = new ColorDetectionPipeline(telemetry, alliance);
+        ColorDetectionPipeline colorDetectionPipeline = new ColorDetectionPipeline(telemetry);
 
         camera.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
             @Override

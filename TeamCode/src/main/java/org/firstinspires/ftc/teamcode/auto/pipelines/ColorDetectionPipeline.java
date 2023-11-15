@@ -53,9 +53,22 @@ public class ColorDetectionPipeline extends OpenCvPipeline{
     public static Scalar blueHighHSV = new Scalar(blueHH,blueHS,blueHV);
 
 
-    public ColorDetectionPipeline(Telemetry telemetry, int alliance){ // CONSTRUCTOR :D
+    public ColorDetectionPipeline(Telemetry telemetry){ // CONSTRUCTOR :D
+        spikeMark = SpikeMark.NOTDETECTED;
         this.telemetry = telemetry;
+    }
+
+    public void setAlliance(int alliance) {
         this.alliance = alliance;
+    }
+
+    public int getSpikeMark() {
+        switch (spikeMark) {
+            case LEFT: return 1;
+            case MIDDLE: return 2;
+            case RIGHT: return 3;
+        }
+        return 0;
     }
 
     @Override

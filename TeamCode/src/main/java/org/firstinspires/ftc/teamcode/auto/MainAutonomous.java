@@ -63,7 +63,6 @@ public class MainAutonomous extends LinearOpMode {
     int ID_TWO = 2;
     int ID_THREE = 3;
     AprilTagDetection tagOfInterest = null;
-    ColorDetectionPipeline colorDetection;
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -81,18 +80,22 @@ public class MainAutonomous extends LinearOpMode {
         WebcamName camName = hardwareMap.get(WebcamName.class, "Webcam 1");
         OpenCvCamera camera = OpenCvCameraFactory.getInstance().createWebcam(camName);
         AprilTagDetectionPipeline aprilTagDetectionPipeline = new AprilTagDetectionPipeline(tagsize, fx, fy, cx, cy);
+        ColorDetectionPipeline colorDetection = new ColorDetectionPipeline(telemetry);
 
 
 
-        camera.setPipeline(aprilTagDetectionPipeline);
         camera.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
             @Override
             public void onOpened() {
                 camera.startStreaming(1280, 720, OpenCvCameraRotation.UPRIGHT);
             }
+
             @Override
-            public void onError(int errorCode) {}
+            public void onError(int errorCode) {
+                telemetry.addData("Error code:", errorCode);
+            }
         });
+        camera.setPipeline(colorDetection);
 
         Pose2d startPose = new Pose2d(0, 0, 0);
         drive.setPoseEstimate(startPose);
@@ -107,7 +110,6 @@ public class MainAutonomous extends LinearOpMode {
         while (!isStarted()) {
             gp1.readButtons();
             // Change move differential
-            telemetry.addData("moveDiff (positive is more ???)", moveDiff);
             if (gp1.wasJustPressed(GamepadKeys.Button.LEFT_BUMPER)){
                 moveDiff -= 0.5;
             } else if (gp1.wasJustPressed(GamepadKeys.Button.RIGHT_BUMPER)){
@@ -131,12 +133,13 @@ public class MainAutonomous extends LinearOpMode {
                     case NULL: side = Side.LEFT; break;
                 }
             }
-            telemetry.addData("Current Camera FPS:", camera.getFps());
             switch (alliance) {
-                case NULL: colorDetection = new ColorDetectionPipeline(telemetry, 0); break;
-                case RED: colorDetection = new ColorDetectionPipeline(telemetry, 1); break;
-                case BLUE: colorDetection = new ColorDetectionPipeline(telemetry, 2); break;
+                case RED: colorDetection.setAlliance(1); break;
+                case BLUE: colorDetection.setAlliance(2); break;
+                case NULL: colorDetection.setAlliance(2); break;
             }
+            telemetry.addData("Current Camera FPS", camera.getFps());
+            telemetry.addData("spike mark", colorDetection.getSpikeMark());
             telemetry.update();
             sleep(20);
         }
@@ -157,12 +160,12 @@ public class MainAutonomous extends LinearOpMode {
             periodic.start();
 
             camera.setPipeline(colorDetection);
-            int aligned = bot.alignSpike();
-            switch(aligned) {
-                case 0: telemetry.addLine("spike mark not found");
-                case 1: telemetry.addLine("spike mark found on left");
-                case 2: telemetry.addLine("spike mark found on middle");
-                case 3: telemetry.addLine("spike mark found on right");
+            int aligned = 1;
+            switch(colorDetection.spikeMark) {
+                case LEFT: aligned = 1; break;
+                case MIDDLE: aligned = 2; break;
+                case RIGHT: aligned = 3; break;
+                default: aligned = 3; break;
             }
 
             Pose2d startP = drive.getPoseEstimate();
@@ -212,6 +215,7 @@ public class MainAutonomous extends LinearOpMode {
                     }
                 }
             }
+            requestOpModeStop();
         }
         periodic.interrupt();
 
@@ -242,6 +246,8 @@ public class MainAutonomous extends LinearOpMode {
                         .build();
             default:
                 return drive.trajectorySequenceBuilder(startPose)
+                        .forward(26)
+                        .turn(Math.toRadians(90))
                         .build();
         }
     }
