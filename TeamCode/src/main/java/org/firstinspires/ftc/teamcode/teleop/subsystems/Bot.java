@@ -172,7 +172,7 @@ public class Bot {
     }
 
     public double getIMU() {
-        double angle = (imu0.getRobotOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES).firstAngle - imuOffset) % 360;
+        double angle = (imu0.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES)- imuOffset) % 360;
         if (angle > 180) {
             angle = angle - 360;
         }

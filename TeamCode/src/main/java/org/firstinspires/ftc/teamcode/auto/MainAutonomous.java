@@ -150,7 +150,7 @@ public class MainAutonomous extends LinearOpMode {
         //END CAMERA STUFF ===============
 
         // TRAJECTORIES
-        bot.resetIMU();
+        //bot.resetIMU();
 
         waitForStart();
         if (!isStopRequested()) {

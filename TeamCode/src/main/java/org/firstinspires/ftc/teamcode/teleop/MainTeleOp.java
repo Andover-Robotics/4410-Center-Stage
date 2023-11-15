@@ -197,7 +197,7 @@ public class MainTeleOp extends LinearOpMode {
         bot.fixMotors();
 
         Vector2d driveVector = new Vector2d(gp1.getLeftX(), -gp1.getLeftY()),
-                turnVector = new Vector2d(\
+                turnVector = new Vector2d(
 
                         gp1.getRightX(), 0);
 
