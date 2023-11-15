@@ -139,12 +139,15 @@ public class MainTeleOp extends LinearOpMode {
             bot.slides.runManual(gp2.getLeftY()*-0.5);
             // preset positions
             if (gp2.wasJustPressed(GamepadKeys.Button.DPAD_UP)) {
+                bot.outtakeOut();
                 bot.slides.runToTop();
             } else if (gp2.wasJustPressed(GamepadKeys.Button.DPAD_RIGHT)) {
+                bot.outtakeOut();
                 bot.slides.runToMiddle();
             } else if (gp2.wasJustPressed(GamepadKeys.Button.DPAD_DOWN)) {
                 bot.slides.runToBottom();
             } else if (gp2.wasJustPressed(GamepadKeys.Button.DPAD_LEFT)) {
+                bot.outtakeOut();
                 bot.slides.runToLow();
             }
 
