@@ -156,7 +156,7 @@ public class MainAutonomous extends LinearOpMode {
                         .turn(Math.toRadians(-90))
                         .build();
                     drive.followTrajectorySequence(right);
-                default: // MIDDLE (also case 2)
+                default: // MIDDLE (case 2)
                     TrajectorySequence middle = drive.trajectorySequenceBuilder(startPose)
                         .back(30)
                         .forward(4)
@@ -182,102 +182,90 @@ public class MainAutonomous extends LinearOpMode {
             bot.claw.open();
             sleep(1000);
 
-//            // Run to backboard trajectory (checks side and alliance)
-//            Pose2d startPose2 = drive.getPoseEstimate();
-//            Vector2d scoreBlue = new Vector2d(42,30), scoreRed = new Vector2d(42,-30); // Vector2d spline end positions (backboard)
-//            if ((side == Side.LEFT)) {
-//                if (alliance == Alliance.RED) {
-//                    Trajectory redFar = drive.trajectoryBuilder(startPose2)
-//                            .splineTo(scoreRed,Math.toRadians(0))
-//                            .build();
-//                    drive.followTrajectory(redFar);
-//                }
-//                Trajectory blueClose = drive.trajectoryBuilder(startPose2)
-//                        .splineTo(scoreBlue,Math.toRadians(0))
-//                        .build();
-//                drive.followTrajectory(blueClose);
-//            } else {
-//                if (alliance == Alliance.BLUE) {
-//                    Trajectory blueFar = drive.trajectoryBuilder(startPose2)
-//                            .splineTo(scoreBlue,Math.toRadians(0))
-//                            .build();
-//                    drive.followTrajectory(blueFar);
-//                }
-//                Trajectory redClose = drive.trajectoryBuilder(startPose2)
-//                        .splineTo(scoreRed,Math.toRadians(0))
-//                        .build();
-//                drive.followTrajectory(redClose);
-//            }
-//
-//            // Set april tag pipeline
-//            camera.setPipeline(aprilTagDetectionPipeline);
-//
-//            // Strafing along backboard trajectory
-//            Trajectory strafe;
-//            if (alliance == Alliance.BLUE) {
-//                strafe = drive.trajectoryBuilder(drive.getPoseEstimate())
-//                        .strafeRight(26)
-//                        .build();
-//                drive.followTrajectory(strafe);
-//            } else { // alliance == Alliance.RED
-//                strafe = drive.trajectoryBuilder(drive.getPoseEstimate())
-//                        .strafeLeft(26)
-//                        .build();
-//                drive.followTrajectory(strafe);
-//            }
-//            drive.followTrajectoryAsync(strafe);
-//
-//            // Repeatedly detecting april tag
-//            while (strafe.duration() > 6.0 && strafe.duration() < 8.0) { // TODO: tune this time frame to be accurate (if it even works lmao)
-//                ArrayList<AprilTagDetection> currentDetections = aprilTagDetectionPipeline.getLatestDetections();
-//                if (currentDetections.size() != 0) {
-//                    boolean tagFound = false;
-//                    for (AprilTagDetection tag : currentDetections) {
-//                        if (tag.id == ID_ONE || tag.id == ID_TWO || tag.id == ID_THREE) {
-//                            tagOfInterest = tag;
-//                            tagFound = true;
-//                            strafe.end();
-//                            break;
-//                        }
-//                    }
-//                    if (tagFound) {
-//                        telemetry.addLine("Tag of interest is in sight!\n\nLocation data:");
-//                        tagToTelemetry(tagOfInterest);
-//                    } else {
-//                        telemetry.addLine("Don't see tag of interest :(");
-//                        if (tagOfInterest == null) {
-//                            telemetry.addLine("(The tag has never been seen)");
-//                        } else {
-//                            telemetry.addLine("\nBut we HAVE seen the tag before; last seen at:");
-//                            tagToTelemetry(tagOfInterest);
-//                        }
-//                    }
-//                } else {
-//                    telemetry.addLine("Don't see tag of interest :(");
-//                    if (tagOfInterest == null) {
-//                        telemetry.addLine("(The tag has never been seen)");
-//                    } else {
-//                        telemetry.addLine("\nBut we HAVE seen the tag before; last seen at:");
-//                        tagToTelemetry(tagOfInterest);
-//                    }
-//                }
-//            }
-//
-//            // Place yellow/bottom pixel on backboard
-//            bot.slides.runToBottom();
-//            bot.claw.open();
-//            sleep(100);
-//            bot.fourbar.bottomPixel();
-//            sleep(400);
-//            bot.claw.close();
-//            sleep(300);
-//            bot.outtakeOut();
-//
-//            // Drop :)
-//            bot.claw.open();
-//            sleep(150);
-//            bot.storage();
+            // Run to backboard trajectory
+            Vector2d scoreBlue = new Vector2d(42,30), scoreRed = new Vector2d(42,-30); // Vector2d spline end positions (backboard)
+            Trajectory backboard;
+            if (alliance == Alliance.RED) {
+                backboard = drive.trajectoryBuilder(drive.getPoseEstimate())
+                        .splineTo(scoreRed, Math.toRadians(0))
+                        .build();
+            } else {
+                backboard = drive.trajectoryBuilder(drive.getPoseEstimate())
+                        .splineTo(scoreBlue, Math.toRadians(0))
+                        .build();
+            }
+            drive.followTrajectory(backboard);
+
+            // Set april tag pipeline
+            camera.setPipeline(aprilTagDetectionPipeline);
+
+            // Strafing along backboard trajectory
+            Trajectory strafe;
+            if (alliance == Alliance.RED) {
+                strafe = drive.trajectoryBuilder(drive.getPoseEstimate())
+                        .strafeLeft(26)
+                        .build();
+            } else { // alliance == Alliance.BLUE
+                strafe = drive.trajectoryBuilder(drive.getPoseEstimate())
+                        .strafeRight(26)
+                        .build();
+            }
+            drive.followTrajectory(strafe);
+            drive.followTrajectoryAsync(strafe);
+
+            // Repeatedly detecting april tag
+            while (strafe.duration() > 6.0 && strafe.duration() < 8.0) { // TODO: tune this time frame to be accurate (if it even works lmao)
+                ArrayList<AprilTagDetection> currentDetections = aprilTagDetectionPipeline.getLatestDetections();
+                if (currentDetections.size() != 0) {
+                    boolean tagFound = false;
+                    for (AprilTagDetection tag : currentDetections) {
+                        if (tag.id == ID_ONE || tag.id == ID_TWO || tag.id == ID_THREE) {
+                            tagOfInterest = tag;
+                            tagFound = true;
+                            strafe.end();
+                            break;
+                        }
+                    }
+                    if (tagFound) {
+                        telemetry.addLine("Tag of interest is in sight!\n\nLocation data:");
+                        tagToTelemetry(tagOfInterest);
+                    } else {
+                        telemetry.addLine("Don't see tag of interest :(");
+                        if (tagOfInterest == null) {
+                            telemetry.addLine("(The tag has never been seen)");
+                        } else {
+                            telemetry.addLine("\nBut we HAVE seen the tag before; last seen at:");
+                            tagToTelemetry(tagOfInterest);
+                        }
+                    }
+                } else {
+                    telemetry.addLine("Don't see tag of interest :(");
+                    if (tagOfInterest == null) {
+                        telemetry.addLine("(The tag has never been seen)");
+                    } else {
+                        telemetry.addLine("\nBut we HAVE seen the tag before; last seen at:");
+                        tagToTelemetry(tagOfInterest);
+                    }
+                }
+            }
+
+            // Place yellow/bottom pixel on backboard
+            bot.slides.runToBottom();
+            bot.claw.open();
             sleep(100);
+            bot.fourbar.bottomPixel();
+            sleep(400);
+            bot.claw.close();
+            sleep(300);
+            bot.outtakeOut();
+
+            // Drop :)
+            bot.claw.open();
+            sleep(150);
+            bot.storage();
+            sleep(1000);
+
+            // Stop op mode
             requestOpModeStop();
         }
         periodic.interrupt();
