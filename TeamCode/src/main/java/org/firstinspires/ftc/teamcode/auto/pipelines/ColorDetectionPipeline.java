@@ -24,7 +24,7 @@ public class ColorDetectionPipeline extends OpenCvPipeline{
     Mat HSV = new Mat();
     MatOfPoint biggest;
 
-    public static int minwidth = 10;
+    public static int minheight = 100;
     public static int width = 0;
     public static int camwidth = 1280;
     public static int camheight = 720;
@@ -98,7 +98,7 @@ public class ColorDetectionPipeline extends OpenCvPipeline{
 
             Rect rect = Imgproc.boundingRect(biggest); // turns biggest contour into a rectangle
 
-            if (rect.width > minwidth) { // rectangle is bigger than 10 pixels
+            if (rect.height > minheight) { // rectangle is bigger than 100 pixels
                 Imgproc.rectangle(input, rect.tl(), rect.br(), new Scalar(0, 255, 0), 6); // puts border around contours with a green shade
 
                 midpointrect = rect.tl().x + rect.width/2.0; // gets midpoint x of the rectangle

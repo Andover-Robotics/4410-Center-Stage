@@ -60,7 +60,7 @@ public class ColorDetectionTest extends LinearOpMode {
 
         while (opModeIsActive() && !isStopRequested()) {
             telemetry.addData("Spikemark Status", ColorDetectionPipeline.spikeMark);
-            telemetry.addData("minwidth", ColorDetectionPipeline.minwidth);
+            telemetry.addData("minheight", ColorDetectionPipeline.minheight);
             telemetry.addData("width", ColorDetectionPipeline.width);
 
             telemetry.addData("cycle", time - cycleTime);
@@ -71,7 +71,7 @@ public class ColorDetectionTest extends LinearOpMode {
 
         while (!isStarted()) {
             telemetry.addData("Spikemark Status", ColorDetectionPipeline.spikeMark);
-            telemetry.addData("minwidth", ColorDetectionPipeline.minwidth);
+            telemetry.addData("minheight", ColorDetectionPipeline.minheight);
             telemetry.addData("width", ColorDetectionPipeline.width);
             telemetry.update();
         }
