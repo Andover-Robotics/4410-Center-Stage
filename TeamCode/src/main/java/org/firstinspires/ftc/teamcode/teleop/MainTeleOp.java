@@ -57,7 +57,6 @@ public class MainTeleOp extends LinearOpMode {
         right trigger - slow down
         left bumper - run intake
         right bumper - run reverse intake
-        back button - auto align
 
         Driver 2 (gp2):
         A - pick up pixel (top)
@@ -151,6 +150,7 @@ public class MainTeleOp extends LinearOpMode {
                 bot.slides.runToLow();
             }
 
+            // DRIVING SWITCH
             if (bot.state == Bot.BotState.OUTTAKE_OUT) {
                 gp2strafe();
             } else {

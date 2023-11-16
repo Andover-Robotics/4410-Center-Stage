@@ -52,7 +52,6 @@ public class ColorDetectionPipeline extends OpenCvPipeline{
     public static Scalar blueLowHSV= new Scalar(blueLH,blueLS,blueLV);
     public static Scalar blueHighHSV = new Scalar(blueHH,blueHS,blueHV);
 
-
     public ColorDetectionPipeline(Telemetry telemetry){ // CONSTRUCTOR :D
         spikeMark = SpikeMark.NOTDETECTED;
         this.telemetry = telemetry;
@@ -68,7 +67,7 @@ public class ColorDetectionPipeline extends OpenCvPipeline{
             case MIDDLE: return 2;
             case RIGHT: return 3;
         }
-        return 0;
+        return 0; // None detected
     }
 
     @Override
@@ -109,17 +108,17 @@ public class ColorDetectionPipeline extends OpenCvPipeline{
                 if (midpointrect > leftrect.tl().x && midpointrect < leftrect.br().x) { // checks if within boundaries of left side rectangle
                     spikeMark = SpikeMark.LEFT;
                 } else if (midpointrect > rightrect.tl().x && midpointrect < leftrect.br().x) { // checks if within boundaries of right side rectangle
-                    spikeMark = SpikeMark.MIDDLE;
-                } else{
                     spikeMark = SpikeMark.RIGHT;
+                } else{
+                    spikeMark = SpikeMark.MIDDLE;
                 }
 //
 //                telemetry.addLine("Midpoint of Bounding Box :"+ midpointrect);
             } else {
-                spikeMark = SpikeMark.MIDDLE;
+                spikeMark = SpikeMark.RIGHT;
             }
         } else {
-            spikeMark = SpikeMark.MIDDLE;
+            spikeMark = SpikeMark.RIGHT;
         }
 //        telemetry.addData("contours: ", contours.size());
         // telemetry.addData("Spikemark status: ",spikeMark);

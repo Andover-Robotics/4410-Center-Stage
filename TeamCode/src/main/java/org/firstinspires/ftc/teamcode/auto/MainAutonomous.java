@@ -33,35 +33,23 @@ public class MainAutonomous extends LinearOpMode {
 
     Bot bot;
 
-    private double moveDiff = -1;
-
-    // Side - how close to backboard: LEFT - furthest away, RIGHT -
+    // Side - how close to backboard: LEFT - furthest, RIGHT - closest
     public enum Side {
         LEFT, RIGHT, NULL;
     }
     Side side = Side.NULL;
+
+    // Alliance
     public enum Alliance {
         RED, BLUE, NULL;
     }
     Alliance alliance = Alliance.NULL;
 
-    public static int driveTime = 2000, timeSlidesUp = 900, timeSlidesDown = 550, timeOuttake = 350, timeConeDrop = 150, timeIntakeDown = 200, timeIntakeOut = 700, timeIntakeClose = 350, timeIntakeUp = 450, timeIntakeIn = 400;//old 400
-
-    //    private static int horizIntake = {}
+    // TODO: TUNE THESE APRIL TAG VALUES TO FIT WITH APRIL TAGS
     static final double FEET_PER_METER = 3.28084;
-
-    double fx = 1078.03779;
-    double fy = 1084.50988;
-    double cx = 580.850545;
-    double cy = 245.959325;
-
-    // UNITS ARE METERS
-    double tagsize = 0.032; //ONLY FOR TESTING
-
-    // Tag ID 1,2,3 from the 36h11 family
-    int ID_ONE = 1;
-    int ID_TWO = 2;
-    int ID_THREE = 3;
+    double fx = 1078.03779, fy = 1084.50988, cx = 580.850545, cy = 245.959325;
+    double tagsize = 0.032; // UNITS ARE METERS //ONLY FOR TESTIN
+    int ID_ONE = 1, ID_TWO = 2, ID_THREE = 3; // Tag ID 1,2,3 from the 36h11 family
     AprilTagDetection tagOfInterest = null;
 
     @Override
@@ -70,26 +58,22 @@ public class MainAutonomous extends LinearOpMode {
         telemetry.setAutoClear(true);
         bot = Bot.getInstance(this);
         SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
-        TwoWheelTrackingLocalizer odometry = new TwoWheelTrackingLocalizer(hardwareMap, drive);
 
         GamepadEx gp1 = new GamepadEx(gamepad1);
         GamepadEx gp2 = new GamepadEx(gamepad2);
 
-        //CAMERA STUFF =====================
-
+        // Define camera values
         WebcamName camName = hardwareMap.get(WebcamName.class, "Webcam 1");
         OpenCvCamera camera = OpenCvCameraFactory.getInstance().createWebcam(camName);
         AprilTagDetectionPipeline aprilTagDetectionPipeline = new AprilTagDetectionPipeline(tagsize, fx, fy, cx, cy);
         ColorDetectionPipeline colorDetection = new ColorDetectionPipeline(telemetry);
 
-
-
+        // Start camera
         camera.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
             @Override
             public void onOpened() {
                 camera.startStreaming(1280, 720, OpenCvCameraRotation.UPRIGHT);
             }
-
             @Override
             public void onError(int errorCode) {
                 telemetry.addData("Error code:", errorCode);
@@ -106,40 +90,33 @@ public class MainAutonomous extends LinearOpMode {
             }
         });
 
-        // Initialized, before started
+        // Initialized, adjust values before start
         while (!isStarted()) {
             gp1.readButtons();
-            // Change move differential
-            if (gp1.wasJustPressed(GamepadKeys.Button.LEFT_BUMPER)){
-                moveDiff -= 0.5;
-            } else if (gp1.wasJustPressed(GamepadKeys.Button.RIGHT_BUMPER)){
-                moveDiff += 0.5;
-            }
+
             // Change alliance
             telemetry.addData("Alliance", alliance);
             if (gp1.wasJustPressed(GamepadKeys.Button.Y)) {
-                switch (alliance) {
-                    case RED: alliance = Alliance.BLUE; break;
-                    case BLUE: alliance = Alliance.RED; break;
-                    case NULL: alliance = Alliance.RED; break;
-                }
+                if (alliance == Alliance.RED) alliance = Alliance.BLUE;
+                else alliance = Alliance.RED;
             }
-            // Change side
+
+            // Adjust side
             telemetry.addData("Side", side);
             if (gp1.wasJustPressed(GamepadKeys.Button.A)) {
-                switch (side) {
-                    case LEFT: side = Side.RIGHT; break;
-                    case RIGHT: side = Side.LEFT; break;
-                    case NULL: side = Side.LEFT; break;
-                }
+                if (Objects.requireNonNull(side) == Side.LEFT) side = Side.RIGHT;
+                else side = Side.LEFT;
             }
+
+            // Adjust alliance and color detection
             switch (alliance) {
                 case RED: colorDetection.setAlliance(1); break;
                 case BLUE: colorDetection.setAlliance(2); break;
                 case NULL: colorDetection.setAlliance(2); break;
             }
             telemetry.addData("Current Camera FPS", camera.getFps());
-            telemetry.addData("spike mark", colorDetection.getSpikeMark());
+            telemetry.addData("Spike(1-LEFT,2-MIDDLE,3-RIGHT)", colorDetection.getSpikeMark());
+
             telemetry.update();
             sleep(20);
         }
@@ -147,39 +124,26 @@ public class MainAutonomous extends LinearOpMode {
         try {
             camera.stopStreaming();
             camera.closeCameraDevice();
-        } catch (OpenCvCameraException e) {
-
-        }
-        //END CAMERA STUFF ===============
-
-        // TRAJECTORIES
-        //bot.resetIMU();
+        } catch (OpenCvCameraException e) { }
 
         waitForStart();
-        if (!isStopRequested()) {
+
+        // Auto start
+        if (opModeIsActive() && !isStopRequested()) {
             periodic.start();
 
-            camera.setPipeline(colorDetection);
-            int aligned = 1;
-            switch(colorDetection.spikeMark) {
-                case LEFT: aligned = 1; break;
-                case MIDDLE: aligned = 2; break;
-                case RIGHT: aligned = 3; break;
-                default: aligned = 3; break;
-            }
-
             Pose2d startP = drive.getPoseEstimate();
-            TrajectorySequence[] sequence = makeTrajectories(drive, startP, aligned);
+            TrajectorySequence[] sequence = makeTrajectories(drive, startP, colorDetection.getSpikeMark());
+
             drive.followTrajectorySequence(sequence[0]);
             drive.followTrajectorySequenceAsync(sequence[1]);
-
+            // Initiate april tag detection
             camera.setPipeline(aprilTagDetectionPipeline);
             while (sequence[1].duration() < 13.0) {
                 while (sequence[1].duration() > 6.0 && sequence[1].duration() < 8.0) {
                     ArrayList<AprilTagDetection> currentDetections = aprilTagDetectionPipeline.getLatestDetections();
                     if (currentDetections.size() != 0) {
                         boolean tagFound = false;
-
                         for (AprilTagDetection tag : currentDetections) {
                             if (tag.id == ID_ONE || tag.id == ID_TWO || tag.id == ID_THREE) {
                                 tagOfInterest = tag;
@@ -187,7 +151,6 @@ public class MainAutonomous extends LinearOpMode {
                                 break;
                             }
                         }
-
                         if (tagFound) {
                             telemetry.addLine("Tag of interest is in sight!\n\nLocation data:");
                             tagToTelemetry(tagOfInterest);
@@ -201,10 +164,8 @@ public class MainAutonomous extends LinearOpMode {
                                 tagToTelemetry(tagOfInterest);
                             }
                         }
-
                     } else {
                         telemetry.addLine("Don't see tag of interest :(");
-
                         if (tagOfInterest == null) {
                             telemetry.addLine("(The tag has never been seen)");
                         } else {
@@ -215,7 +176,7 @@ public class MainAutonomous extends LinearOpMode {
                     }
                 }
             }
-            requestOpModeStop();
+
         }
         periodic.interrupt();
 
@@ -223,7 +184,7 @@ public class MainAutonomous extends LinearOpMode {
             camera.stopStreaming();
             camera.closeCameraDevice();
         } catch (OpenCvCameraException e) {
-            telemetry.addLine("Exception as follows: "+e);
+            telemetry.addLine("Exception as followsL: " + e);
         }
 
     }
@@ -261,7 +222,6 @@ public class MainAutonomous extends LinearOpMode {
         TrajectorySequence spikeMark = generateSpikeMarkTrajectory(drive, startPose, alignment);
         Pose2d startPose2 = drive.getPoseEstimate();
 
-
         TrajectorySequence redClose = drive.trajectorySequenceBuilder(startPose2)
                 .splineTo(scoreRed,Math.toRadians(0))
                 .waitSeconds(1.5)
@@ -286,18 +246,21 @@ public class MainAutonomous extends LinearOpMode {
                 .strafeLeft(26)
                 .splineTo(parkingPosBlue,Math.toRadians(0))
                 .build();
+
         if ((side == Side.LEFT)) {
-            if (Objects.requireNonNull(alliance) == Alliance.RED) {
+            if (alliance == Alliance.RED) {
                 return new TrajectorySequence[]{spikeMark, redFar};
             }
             return new TrajectorySequence[]{spikeMark, blueClose};
         } else {
-            if (Objects.requireNonNull(alliance) == Alliance.BLUE) {
+            if (alliance == Alliance.BLUE) {
                 return new TrajectorySequence[]{spikeMark, blueFar};
             }
             return new TrajectorySequence[]{spikeMark, redClose};
         }
     }
+
+    // April tag detection telemetry
     @SuppressLint("DefaultLocale")
     void tagToTelemetry(AprilTagDetection detection) {
         telemetry.addLine(String.format("Detected tag ID=%d", detection.id));
