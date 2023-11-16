@@ -165,7 +165,6 @@ public class MainAutonomous extends LinearOpMode {
             sleep(400);
             bot.claw.close();
             sleep(300);
-            bot.storage();
             bot.outtakeGround();
 
             // Drop
@@ -227,6 +226,7 @@ public class MainAutonomous extends LinearOpMode {
                         if (tag.id == ID_ONE || tag.id == ID_TWO || tag.id == ID_THREE) {
                             tagOfInterest = tag;
                             tagFound = true;
+                            strafe.end();
                             break;
                         }
                     }
@@ -263,7 +263,6 @@ public class MainAutonomous extends LinearOpMode {
         sleep(400);
         bot.claw.close();
         sleep(300);
-        bot.storage();
         bot.outtakeOut();
 
         // Drop :)
