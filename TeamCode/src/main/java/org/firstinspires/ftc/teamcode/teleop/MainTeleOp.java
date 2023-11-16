@@ -109,7 +109,7 @@ public class MainTeleOp extends LinearOpMode {
                     bot.outtakeOut();
                 }
                 if (gp2.wasJustPressed(GamepadKeys.Button.X)) { // go to outtake ground position
-                    bot.outtakeDown();
+                    bot.outtakeGround();
                 }
             } else if (bot.state == Bot.BotState.OUTTAKE_OUT) { // SCORING BACKBOARD
                 if (gp2.wasJustPressed(GamepadKeys.Button.Y)) { // drop and return to storage
@@ -119,7 +119,7 @@ public class MainTeleOp extends LinearOpMode {
                     bot.storage();
                 }
                 if (gp2.wasJustPressed(GamepadKeys.Button.X)) { // go to outtake ground position
-                    bot.outtakeDown();
+                    bot.outtakeGround();
                 }
             } else if (bot.state == Bot.BotState.OUTTAKE_DOWN) { // SCORING GROUND
                 if (gp2.wasJustPressed(GamepadKeys.Button.X)) {

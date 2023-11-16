@@ -5,6 +5,7 @@ import android.annotation.SuppressLint;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.geometry.Vector2d;
+import com.acmerobotics.roadrunner.trajectory.Trajectory;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.arcrobotics.ftclib.gamepad.GamepadKeys;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
@@ -37,13 +38,13 @@ public class MainAutonomous extends LinearOpMode {
     public enum Side {
         LEFT, RIGHT, NULL;
     }
-    Side side = Side.NULL;
+    Side side = Side.LEFT;
 
     // Alliance
     public enum Alliance {
         RED, BLUE, NULL;
     }
-    Alliance alliance = Alliance.NULL;
+    Alliance alliance = Alliance.RED;
 
     // TODO: TUNE THESE APRIL TAG VALUES TO FIT WITH APRIL TAGS
     static final double FEET_PER_METER = 3.28084;
@@ -84,6 +85,7 @@ public class MainAutonomous extends LinearOpMode {
         Pose2d startPose = new Pose2d(0, 0, 0);
         drive.setPoseEstimate(startPose);
 
+        // Threads
         Thread periodic = new Thread(() -> {
             while (opModeIsActive() && !isStopRequested()) {
                 bot.slides.periodic();
@@ -95,27 +97,27 @@ public class MainAutonomous extends LinearOpMode {
             gp1.readButtons();
 
             // Change alliance
-            telemetry.addData("Alliance", alliance);
             if (gp1.wasJustPressed(GamepadKeys.Button.Y)) {
                 if (alliance == Alliance.RED) alliance = Alliance.BLUE;
                 else alliance = Alliance.RED;
             }
+            telemetry.addData("Alliance", alliance);
 
-            // Adjust side
-            telemetry.addData("Side", side);
+            // Change side
             if (gp1.wasJustPressed(GamepadKeys.Button.A)) {
-                if (Objects.requireNonNull(side) == Side.LEFT) side = Side.RIGHT;
+                if (side == Side.LEFT) side = Side.RIGHT;
                 else side = Side.LEFT;
             }
+            telemetry.addData("Side", side);
 
-            // Adjust alliance and color detection
-            switch (alliance) {
-                case RED: colorDetection.setAlliance(1); break;
-                case BLUE: colorDetection.setAlliance(2); break;
-                case NULL: colorDetection.setAlliance(2); break;
+            // Initiate color detection
+            if (alliance == Alliance.BLUE) {
+                colorDetection.setAlliance(2);
+            } else { // Automatically checks for red if no alliance is set
+                colorDetection.setAlliance(1);
             }
             telemetry.addData("Current Camera FPS", camera.getFps());
-            telemetry.addData("Spike(1-LEFT,2-MIDDLE,3-RIGHT)", colorDetection.getSpikeMark());
+            telemetry.addData("Spike (1-LEFT,2-MIDDLE,3-RIGHT)", colorDetection.getSpikeMark());
 
             telemetry.update();
             sleep(20);
@@ -131,51 +133,105 @@ public class MainAutonomous extends LinearOpMode {
         // Auto start
         if (opModeIsActive() && !isStopRequested()) {
             periodic.start();
+            startPose = drive.getPoseEstimate();
 
-            Pose2d startP = drive.getPoseEstimate();
-            TrajectorySequence[] sequence = makeTrajectories(drive, startP, colorDetection.getSpikeMark());
-
-            drive.followTrajectorySequence(sequence[0]);
-            drive.followTrajectorySequenceAsync(sequence[1]);
-            // Initiate april tag detection
-            camera.setPipeline(aprilTagDetectionPipeline);
-            while (sequence[1].duration() < 13.0) {
-                while (sequence[1].duration() > 6.0 && sequence[1].duration() < 8.0) {
-                    ArrayList<AprilTagDetection> currentDetections = aprilTagDetectionPipeline.getLatestDetections();
-                    if (currentDetections.size() != 0) {
-                        boolean tagFound = false;
-                        for (AprilTagDetection tag : currentDetections) {
-                            if (tag.id == ID_ONE || tag.id == ID_TWO || tag.id == ID_THREE) {
-                                tagOfInterest = tag;
-                                tagFound = true;
-                                break;
-                            }
-                        }
-                        if (tagFound) {
-                            telemetry.addLine("Tag of interest is in sight!\n\nLocation data:");
-                            tagToTelemetry(tagOfInterest);
-                        } else {
-                            telemetry.addLine("Don't see tag of interest :(");
-
-                            if (tagOfInterest == null) {
-                                telemetry.addLine("(The tag has never been seen)");
-                            } else {
-                                telemetry.addLine("\nBut we HAVE seen the tag before; last seen at:");
-                                tagToTelemetry(tagOfInterest);
-                            }
-                        }
-                    } else {
-                        telemetry.addLine("Don't see tag of interest :(");
-                        if (tagOfInterest == null) {
-                            telemetry.addLine("(The tag has never been seen)");
-                        } else {
-                            telemetry.addLine("\nBut we HAVE seen the tag before; last seen at:");
-                            tagToTelemetry(tagOfInterest);
-                        }
-
-                    }
-                }
+            // Spike mark trajectory
+            switch(colorDetection.getSpikeMark()) {
+                case 1: // LEFT
+                    TrajectorySequence left = drive.trajectorySequenceBuilder(startPose)
+                        .forward(26)
+                        .turn(Math.toRadians(90))
+                        .build();
+                    drive.followTrajectorySequence(left);
+                case 3: // RIGHT
+                    TrajectorySequence right = drive.trajectorySequenceBuilder(startPose)
+                        .forward(26)
+                        .turn(Math.toRadians(-90))
+                        .build();
+                    drive.followTrajectorySequence(right);
+                default: // MIDDLE (also case 2)
+                    TrajectorySequence middle = drive.trajectorySequenceBuilder(startPose)
+                        .forward(30)
+                        .build();
+                    drive.followTrajectorySequence(middle);
             }
+
+            // Pick up purple pixel and place on ground
+            Thread purple = new Thread(() -> {
+                bot.slides.runToBottom();
+                bot.claw.open();
+                sleep(100);
+                bot.fourbar.topPixel();
+                sleep(400);
+                bot.claw.close();
+                sleep(300);
+                bot.storage();
+            });
+            purple.start();
+            bot.outtakeGround();
+
+            // Run to backboard trajectory (checks side and alliance)
+            Pose2d startPose2 = drive.getPoseEstimate();
+            Vector2d scoreBlue = new Vector2d(42,30), scoreRed = new Vector2d(42,-30); // Vector2d spline end positions (backboard)
+            if ((side == Side.LEFT)) {
+                if (alliance == Alliance.RED) {
+                    Trajectory redFar = drive.trajectoryBuilder(startPose2)
+                            .splineTo(scoreRed,Math.toRadians(0))
+                            .build();
+                    drive.followTrajectory(redFar);
+                }
+                Trajectory blueClose = drive.trajectoryBuilder(startPose2)
+                        .splineTo(scoreBlue,Math.toRadians(0))
+                        .build();
+                drive.followTrajectory(blueClose);
+            } else {
+                if (alliance == Alliance.BLUE) {
+                    Trajectory blueFar = drive.trajectoryBuilder(startPose2)
+                            .splineTo(scoreBlue,Math.toRadians(0))
+                            .build();
+                    drive.followTrajectory(blueFar);
+                }
+                Trajectory redClose = drive.trajectoryBuilder(startPose2)
+                        .splineTo(scoreRed,Math.toRadians(0))
+
+                        .build();
+                drive.followTrajectory(redClose);
+            }
+
+            // TODO: IMPLEMENT APRIL TAG DETECTION AS WELL AS STRAFING!
+            // Initiate april tag detection
+//            camera.setPipeline(aprilTagDetectionPipeline);
+//            ArrayList<AprilTagDetection> currentDetections = aprilTagDetectionPipeline.getLatestDetections();
+//            if (currentDetections.size() != 0) {
+//                boolean tagFound = false;
+//                for (AprilTagDetection tag : currentDetections) {
+//                    if (tag.id == ID_ONE || tag.id == ID_TWO || tag.id == ID_THREE) {
+//                        tagOfInterest = tag;
+//                        tagFound = true;
+//                        break;
+//                    }
+//                }
+//                if (tagFound) {
+//                    telemetry.addLine("Tag of interest is in sight!\n\nLocation data:");
+//                    tagToTelemetry(tagOfInterest);
+//                } else {
+//                    telemetry.addLine("Don't see tag of interest :(");
+//                    if (tagOfInterest == null) {
+//                        telemetry.addLine("(The tag has never been seen)");
+//                    } else {
+//                        telemetry.addLine("\nBut we HAVE seen the tag before; last seen at:");
+//                        tagToTelemetry(tagOfInterest);
+//                    }
+//                }
+//            } else {
+//                telemetry.addLine("Don't see tag of interest :(");
+//                if (tagOfInterest == null) {
+//                    telemetry.addLine("(The tag has never been seen)");
+//                } else {
+//                    telemetry.addLine("\nBut we HAVE seen the tag before; last seen at:");
+//                    tagToTelemetry(tagOfInterest);
+//                }
+//            }
 
         }
         periodic.interrupt();
@@ -187,77 +243,6 @@ public class MainAutonomous extends LinearOpMode {
             telemetry.addLine("Exception as followsL: " + e);
         }
 
-    }
-
-    public TrajectorySequence generateSpikeMarkTrajectory(SampleMecanumDrive drive, Pose2d startPose, int alignment) {
-        switch(alignment) {
-            case 1:
-                return drive.trajectorySequenceBuilder(startPose)
-                        .forward(26)
-                        .turn(Math.toRadians(90))
-                        .build();
-            case 2:
-                return drive.trajectorySequenceBuilder(startPose)
-                        .forward(30)
-                        .build();
-            case 3:
-                return drive.trajectorySequenceBuilder(startPose)
-                        .forward(26)
-                        .turn(Math.toRadians(-90))
-                        .build();
-            default:
-                return drive.trajectorySequenceBuilder(startPose)
-                        .forward(26)
-                        .turn(Math.toRadians(90))
-                        .build();
-        }
-    }
-    public TrajectorySequence[] makeTrajectories(SampleMecanumDrive drive, Pose2d startPose, int alignment) {
-
-        Vector2d parkingPosBlue = new Vector2d(56,56);
-        Vector2d parkingPosRed = new Vector2d(56,-56);
-        Vector2d scoreBlue = new Vector2d(42,30);
-        Vector2d scoreRed = new Vector2d(42,-30);
-
-        TrajectorySequence spikeMark = generateSpikeMarkTrajectory(drive, startPose, alignment);
-        Pose2d startPose2 = drive.getPoseEstimate();
-
-        TrajectorySequence redClose = drive.trajectorySequenceBuilder(startPose2)
-                .splineTo(scoreRed,Math.toRadians(0))
-                .waitSeconds(1.5)
-                .strafeRight(26)
-                .splineTo(parkingPosRed,Math.toRadians(0))
-                .build();
-        TrajectorySequence blueClose = drive.trajectorySequenceBuilder(startPose2)
-                .splineTo(scoreBlue,Math.toRadians(0))
-                .waitSeconds(1.5)
-                .strafeLeft(26)
-                .splineTo(parkingPosBlue,Math.toRadians(0))
-                .build();
-        TrajectorySequence redFar = drive.trajectorySequenceBuilder(startPose2)
-                .splineTo(scoreRed,Math.toRadians(0))
-                .waitSeconds(1.5)
-                .strafeRight(26)
-                .splineTo(parkingPosRed,Math.toRadians(0))
-                .build();
-        TrajectorySequence blueFar = drive.trajectorySequenceBuilder(startPose2)
-                .splineTo(scoreBlue,Math.toRadians(0))
-                .waitSeconds(1.5)
-                .strafeLeft(26)
-                .splineTo(parkingPosBlue,Math.toRadians(0))
-                .build();
-
-        if ((side == Side.LEFT)) {
-            if (alliance == Alliance.RED) {
-                return new TrajectorySequence[]{spikeMark, redFar};
-            }
-            return new TrajectorySequence[]{spikeMark, blueClose};
-        } else {
-            if (alliance == Alliance.BLUE) {
-                return new TrajectorySequence[]{spikeMark, blueFar};
-            }
-            return new TrajectorySequence[]{spikeMark, redClose};
-        }
     }
 
     // April tag detection telemetry
