@@ -130,6 +130,7 @@ public class MainAutonomous extends LinearOpMode {
 
         waitForStart();
 
+        // TODO: TUNE/ADJUST TRAJECTORY PATHS (i definitely know what i'm doing)
         // Auto start
         if (opModeIsActive() && !isStopRequested()) {
             periodic.start();
@@ -156,19 +157,21 @@ public class MainAutonomous extends LinearOpMode {
                     drive.followTrajectorySequence(middle);
             }
 
-            // Pick up purple pixel and place on ground
-            Thread purple = new Thread(() -> {
-                bot.slides.runToBottom();
-                bot.claw.open();
-                sleep(100);
-                bot.fourbar.topPixel();
-                sleep(400);
-                bot.claw.close();
-                sleep(300);
-                bot.storage();
-            });
-            purple.start();
+            // Pick up purple/top pixel and place on ground
+            bot.slides.runToBottom();
+            bot.claw.open();
+            sleep(100);
+            bot.fourbar.topPixel();
+            sleep(400);
+            bot.claw.close();
+            sleep(300);
+            bot.storage();
             bot.outtakeGround();
+
+            // Drop
+            bot.claw.open();
+            sleep(150);
+            bot.storage();
 
             // Run to backboard trajectory (checks side and alliance)
             Pose2d startPose2 = drive.getPoseEstimate();
@@ -193,56 +196,91 @@ public class MainAutonomous extends LinearOpMode {
                 }
                 Trajectory redClose = drive.trajectoryBuilder(startPose2)
                         .splineTo(scoreRed,Math.toRadians(0))
-
                         .build();
                 drive.followTrajectory(redClose);
             }
 
-            // TODO: IMPLEMENT APRIL TAG DETECTION AS WELL AS STRAFING!
-            // Initiate april tag detection
-//            camera.setPipeline(aprilTagDetectionPipeline);
-//            ArrayList<AprilTagDetection> currentDetections = aprilTagDetectionPipeline.getLatestDetections();
-//            if (currentDetections.size() != 0) {
-//                boolean tagFound = false;
-//                for (AprilTagDetection tag : currentDetections) {
-//                    if (tag.id == ID_ONE || tag.id == ID_TWO || tag.id == ID_THREE) {
-//                        tagOfInterest = tag;
-//                        tagFound = true;
-//                        break;
-//                    }
-//                }
-//                if (tagFound) {
-//                    telemetry.addLine("Tag of interest is in sight!\n\nLocation data:");
-//                    tagToTelemetry(tagOfInterest);
-//                } else {
-//                    telemetry.addLine("Don't see tag of interest :(");
-//                    if (tagOfInterest == null) {
-//                        telemetry.addLine("(The tag has never been seen)");
-//                    } else {
-//                        telemetry.addLine("\nBut we HAVE seen the tag before; last seen at:");
-//                        tagToTelemetry(tagOfInterest);
-//                    }
-//                }
-//            } else {
-//                telemetry.addLine("Don't see tag of interest :(");
-//                if (tagOfInterest == null) {
-//                    telemetry.addLine("(The tag has never been seen)");
-//                } else {
-//                    telemetry.addLine("\nBut we HAVE seen the tag before; last seen at:");
-//                    tagToTelemetry(tagOfInterest);
-//                }
-//            }
+            // Set april tag pipeline
+            camera.setPipeline(aprilTagDetectionPipeline);
+
+            // Strafing along backboard trajectory
+            Trajectory strafe;
+            if (alliance == Alliance.BLUE) {
+                strafe = drive.trajectoryBuilder(drive.getPoseEstimate())
+                        .strafeRight(26)
+                        .build();
+                drive.followTrajectory(strafe);
+            } else { // alliance == Alliance.RED
+                strafe = drive.trajectoryBuilder(drive.getPoseEstimate())
+                        .strafeLeft(26)
+                        .build();
+                drive.followTrajectory(strafe);
+            }
+            drive.followTrajectoryAsync(strafe);
+
+            // Repeatedly detecting april tag
+            while (strafe.duration() > 6.0 && strafe.duration() < 8.0) { // TODO: tune this time frame to be accurate (if it even works lmao)
+                ArrayList<AprilTagDetection> currentDetections = aprilTagDetectionPipeline.getLatestDetections();
+                if (currentDetections.size() != 0) {
+                    boolean tagFound = false;
+                    for (AprilTagDetection tag : currentDetections) {
+                        if (tag.id == ID_ONE || tag.id == ID_TWO || tag.id == ID_THREE) {
+                            tagOfInterest = tag;
+                            tagFound = true;
+                            break;
+                        }
+                    }
+                    if (tagFound) {
+                        telemetry.addLine("Tag of interest is in sight!\n\nLocation data:");
+                        tagToTelemetry(tagOfInterest);
+                    } else {
+                        telemetry.addLine("Don't see tag of interest :(");
+                        if (tagOfInterest == null) {
+                            telemetry.addLine("(The tag has never been seen)");
+                        } else {
+                            telemetry.addLine("\nBut we HAVE seen the tag before; last seen at:");
+                            tagToTelemetry(tagOfInterest);
+                        }
+                    }
+                } else {
+                    telemetry.addLine("Don't see tag of interest :(");
+                    if (tagOfInterest == null) {
+                        telemetry.addLine("(The tag has never been seen)");
+                    } else {
+                        telemetry.addLine("\nBut we HAVE seen the tag before; last seen at:");
+                        tagToTelemetry(tagOfInterest);
+                    }
+                }
+            }
 
         }
-        periodic.interrupt();
 
+        // Place yellow/bottom pixel on backboard
+        bot.slides.runToBottom();
+        bot.claw.open();
+        sleep(100);
+        bot.fourbar.bottomPixel();
+        sleep(400);
+        bot.claw.close();
+        sleep(300);
+        bot.storage();
+        bot.outtakeOut();
+
+        // Drop :)
+        bot.claw.open();
+        sleep(150);
+        bot.storage();
+        sleep(100);
+
+        // Stop op mode
+        periodic.interrupt();
         try {
             camera.stopStreaming();
             camera.closeCameraDevice();
         } catch (OpenCvCameraException e) {
             telemetry.addLine("Exception as followsL: " + e);
         }
-
+        requestOpModeStop();
     }
 
     // April tag detection telemetry
