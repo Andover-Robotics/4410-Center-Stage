@@ -148,12 +148,16 @@ public class MainAutonomous extends LinearOpMode {
                     TrajectorySequence left = drive.trajectorySequenceBuilder(startPose)
                         .back(26)
                         .turn(Math.toRadians(90))
+                        .back(5)
+                        .forward(5)
                         .build();
                     drive.followTrajectorySequence(left);
                 case 3: // RIGHT
                     TrajectorySequence right = drive.trajectorySequenceBuilder(startPose)
                         .back(26)
                         .turn(Math.toRadians(-90))
+                        .back(5)
+                        .forward(5)
                         .build();
                     drive.followTrajectorySequence(right);
                 default: // MIDDLE (case 2)
@@ -263,6 +267,7 @@ public class MainAutonomous extends LinearOpMode {
             bot.claw.open();
             sleep(150);
             bot.storage();
+            bot.claw.open();
             sleep(1000);
 
             // Stop op mode
