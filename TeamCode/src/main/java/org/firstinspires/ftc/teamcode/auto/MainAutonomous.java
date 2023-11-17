@@ -217,7 +217,6 @@ public class MainAutonomous extends LinearOpMode {
                         .strafeRight(26)
                         .build();
             }
-            drive.followTrajectory(strafe);
             drive.followTrajectoryAsync(strafe);
 
             // Repeatedly detecting april tag
