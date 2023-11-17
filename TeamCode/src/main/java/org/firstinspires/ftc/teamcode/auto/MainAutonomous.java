@@ -95,7 +95,8 @@ public class MainAutonomous extends LinearOpMode {
         });
         camera.setPipeline(colorDetection);
 
-        Pose2d startPose = new Pose2d(0, 0, 0);
+        // Define starting pose for robot
+        Pose2d startPose = new Pose2d(0, 0, Math.toRadians(0));
         drive.setPoseEstimate(startPose);
 
         // Threads
@@ -158,27 +159,27 @@ public class MainAutonomous extends LinearOpMode {
             // Spike mark trajectory
             switch(colorDetection.getSpikeMark()) {
                 case 1: // LEFT
-                    TrajectorySequence left = drive.trajectorySequenceBuilder(startPose)
-                        .back(26)
-                        .turn(Math.toRadians(90))
-                        .back(5)
-                        .forward(5)
-                        .build();
-                    drive.followTrajectorySequence(left);
+                    drive.followTrajectorySequence(
+                            drive.trajectorySequenceBuilder(startPose)
+                                .back(26)
+                                .turn(Math.toRadians(90))
+                                .back(5)
+                                .forward(5)
+                                .build());
                 case 3: // RIGHT
-                    TrajectorySequence right = drive.trajectorySequenceBuilder(startPose)
-                        .back(26)
-                        .turn(Math.toRadians(-90))
-                        .back(5)
-                        .forward(5)
-                        .build();
-                    drive.followTrajectorySequence(right);
+                    drive.followTrajectorySequence(
+                            drive.trajectorySequenceBuilder(startPose)
+                                .back(26)
+                                .turn(Math.toRadians(-90))
+                                .back(5)
+                                .forward(5)
+                                .build());
                 default: // MIDDLE (case 2)
-                    TrajectorySequence middle = drive.trajectorySequenceBuilder(startPose)
-                        .back(30)
-                        .forward(4)
-                        .build();
-                    drive.followTrajectorySequence(middle);
+                    drive.followTrajectorySequence(
+                            drive.trajectorySequenceBuilder(startPose)
+                                .back(30)
+                                .forward(4)
+                                .build());
             }
 
             // Pick up purple/top and outtake pixel
