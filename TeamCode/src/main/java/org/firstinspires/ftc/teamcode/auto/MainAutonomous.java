@@ -190,19 +190,42 @@ public class MainAutonomous extends LinearOpMode {
             bot.claw.open();
             sleep(1000);
 
-            // Run to backboard trajectory
-            Vector2d scoreBlue = new Vector2d(42,30), scoreRed = new Vector2d(42,-30); // Vector2d spline end positions (backboard)
-            Trajectory backboard;
-            if (alliance == Alliance.RED) {
-                backboard = drive.trajectoryBuilder(drive.getPoseEstimate())
-                        .splineTo(scoreRed, Math.toRadians(0))
-                        .build();
-            } else {
-                backboard = drive.trajectoryBuilder(drive.getPoseEstimate())
-                        .splineTo(scoreBlue, Math.toRadians(0))
-                        .build();
+            // To park trajectory
+            switch(colorDetection.getSpikeMark()) {
+                case 1: // LEFT
+                    drive.followTrajectorySequence(
+                            drive.trajectorySequenceBuilder(startPose)
+                                    .turn(Math.toRadians(-90))
+                                    .forward(5)
+                                    .strafeLeft(10)
+                                    .build());
+                case 3: // RIGHT
+                    drive.followTrajectorySequence(
+                            drive.trajectorySequenceBuilder(startPose)
+                                    .turn(Math.toRadians(90))
+                                    .forward(5)
+                                    .strafeLeft(10)
+                                    .build());
+                default: // MIDDLE (case 2)
+                    drive.followTrajectorySequence(
+                            drive.trajectorySequenceBuilder(startPose)
+                                    .strafeLeft(10)
+                                    .build());
             }
-            drive.followTrajectory(backboard);
+
+            // Run to backboard trajectory
+//            Vector2d scoreBlue = new Vector2d(42,30), scoreRed = new Vector2d(42,-30); // Vector2d spline end positions (backboard)
+//            Trajectory backboard;
+//            if (alliance == Alliance.RED) {
+//                backboard = drive.trajectoryBuilder(drive.getPoseEstimate())
+//                        .splineTo(scoreRed, Math.toRadians(0))
+//                        .build();
+//            } else {
+//                backboard = drive.trajectoryBuilder(drive.getPoseEstimate())
+//                        .splineTo(scoreBlue, Math.toRadians(0))
+//                        .build();
+//            }
+//            drive.followTrajectory(backboard);
 
             // Set april tag pipeline
             camera.setPipeline(aprilTagDetectionPipeline);
