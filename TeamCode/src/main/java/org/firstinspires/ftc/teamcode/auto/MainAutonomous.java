@@ -53,6 +53,19 @@ public class MainAutonomous extends LinearOpMode {
     int ID_ONE = 1, ID_TWO = 2, ID_THREE = 3; // Tag ID 1,2,3 from the 36h11 family
     AprilTagDetection tagOfInterest = null;
 
+    // Pick up purple/top pixel and go to outtake out position
+    public void pickupTop(Bot bot) {
+        bot.slides.runToBottom();
+        bot.claw.open();
+        sleep(100);
+        bot.fourbar.topPixel();
+        sleep(400);
+        bot.claw.close();
+        sleep(300);
+        bot.outtakeGround();
+        sleep(1000);
+    }
+
     @Override
     public void runOpMode() throws InterruptedException {
 
@@ -168,18 +181,8 @@ public class MainAutonomous extends LinearOpMode {
                     drive.followTrajectorySequence(middle);
             }
 
-            // Pick up purple/top pixel and place on ground
-            bot.slides.runToBottom();
-            bot.claw.open();
-            sleep(100);
-            bot.fourbar.topPixel();
-            sleep(400);
-            bot.claw.close();
-            sleep(300);
-            bot.outtakeGround();
-            sleep(1000);
-
-            // Drop
+            // Pick up purple/top and outtake pixel
+            pickupTop(bot);
             bot.claw.open();
             sleep(150);
             bot.storage();
