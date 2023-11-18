@@ -103,8 +103,8 @@ public class ColorDetectionPipeline extends OpenCvPipeline{
             width = rect.width;
             height = rect.height;
             while (height < 50) {
-                iterations++;
-                if (iterations <= contours.size()) {
+                if (iterations < contours.size()) {
+                    iterations++;
                     biggest = contours.get(contours.indexOf(biggest) + 1);
                     rect = Imgproc.boundingRect(biggest); // turns biggest contour into a rectangle
                     midpointrect = rect.tl().x + rect.width / 2.0; // gets midpoint x of the rectangle
@@ -113,7 +113,6 @@ public class ColorDetectionPipeline extends OpenCvPipeline{
                 } else {
                     iterations = 0;
                     spikeMark = SpikeMark.RIGHT;
-                    break;
                 }
             }
 
@@ -122,7 +121,7 @@ public class ColorDetectionPipeline extends OpenCvPipeline{
 
             // Check which zone it is in (left or right)
             if (midpointrect > leftrect.tl().x && midpointrect < leftrect.br().x) { // LEFT SPIKE
-                if (height < 300) { // make sure it is not left tape
+                if (height < 200) { // make sure it is not left tape
                     spikeMark = SpikeMark.RIGHT;
                 } else {
                     spikeMark = SpikeMark.LEFT;
