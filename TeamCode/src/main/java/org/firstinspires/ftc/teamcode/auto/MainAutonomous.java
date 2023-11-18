@@ -221,32 +221,62 @@ public class MainAutonomous extends LinearOpMode {
             // Park trajectory (only run if park = true)
             if (park) {
                 startPose = drive.getPoseEstimate();
-                switch (spikeMark) {
-                    case 1: // LEFT
-                        drive.followTrajectorySequence(
-                                drive.trajectorySequenceBuilder(startPose)
-                                        .forward(2)
-                                        .turn(Math.toRadians(-90))
-                                        .forward(24)
-                                        .strafeRight(38)
-                                        .build());
-                        break;
-                    case 2: // MIDDLE (case 2)
-                        drive.followTrajectorySequence(
-                                drive.trajectorySequenceBuilder(startPose)
-                                        .forward(26)
-                                        .strafeRight(36)
-                                        .build());
-                        break;
-                    case 3: // RIGHT
-                        drive.followTrajectorySequence(
-                                drive.trajectorySequenceBuilder(startPose)
-                                        .forward(2)
-                                        .turn(Math.toRadians(90))
-                                        .forward(24)
-                                        .strafeRight(34)
-                                        .build());
-                        break;
+                if (alliance == Alliance.BLUE) {
+                    switch (spikeMark) {
+                        case 1: // LEFT
+                            drive.followTrajectorySequence(
+                                    drive.trajectorySequenceBuilder(startPose)
+                                            .forward(2)
+                                            .turn(Math.toRadians(-90))
+                                            .forward(24)
+                                            .strafeRight(38)
+                                            .build());
+                            break;
+                        case 2: // MIDDLE (case 2)
+                            drive.followTrajectorySequence(
+                                    drive.trajectorySequenceBuilder(startPose)
+                                            .forward(26)
+                                            .strafeRight(36)
+                                            .build());
+                            break;
+                        case 3: // RIGHT
+                            drive.followTrajectorySequence(
+                                    drive.trajectorySequenceBuilder(startPose)
+                                            .forward(2)
+                                            .turn(Math.toRadians(90))
+                                            .forward(24)
+                                            .strafeRight(34)
+                                            .build());
+                            break;
+                    }
+                } else {
+                    switch (spikeMark) {
+                        case 1: // LEFT
+                            drive.followTrajectorySequence(
+                                    drive.trajectorySequenceBuilder(startPose)
+                                            .forward(2)
+                                            .turn(Math.toRadians(-90))
+                                            .forward(24)
+                                            .strafeLeft(38)
+                                            .build());
+                            break;
+                        case 2: // MIDDLE (case 2)
+                            drive.followTrajectorySequence(
+                                    drive.trajectorySequenceBuilder(startPose)
+                                            .forward(26)
+                                            .strafeLeft(36)
+                                            .build());
+                            break;
+                        case 3: // RIGHT
+                            drive.followTrajectorySequence(
+                                    drive.trajectorySequenceBuilder(startPose)
+                                            .forward(2)
+                                            .turn(Math.toRadians(90))
+                                            .forward(24)
+                                            .strafeLeft(34)
+                                            .build());
+                            break;
+                    }
                 }
             }
 

@@ -66,7 +66,6 @@ public class Bot {
     public void storage() {//was initialized
         fourbar.storage();
         slides.runToBottom();
-        claw.open();
         state = BotState.STORAGE;
     }
 

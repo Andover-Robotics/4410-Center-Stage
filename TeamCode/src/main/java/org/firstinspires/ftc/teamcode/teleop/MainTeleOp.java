@@ -137,24 +137,28 @@ public class MainTeleOp extends LinearOpMode {
             bot.slides.runManual(gp2.getLeftY()*-0.5);
             // preset positions
             if (gp2.wasJustPressed(GamepadKeys.Button.DPAD_UP)) {
+                bot.claw.close();
                 bot.outtakeOut();
                 bot.slides.runToTop();
             } else if (gp2.wasJustPressed(GamepadKeys.Button.DPAD_RIGHT)) {
+                bot.claw.close();
                 bot.outtakeOut();
                 bot.slides.runToMiddle();
             } else if (gp2.wasJustPressed(GamepadKeys.Button.DPAD_DOWN)) {
                 bot.slides.runToBottom();
             } else if (gp2.wasJustPressed(GamepadKeys.Button.DPAD_LEFT)) {
+                bot.claw.close();
                 bot.outtakeOut();
                 bot.slides.runToLow();
             }
 
-            // DRIVING SWITCH
-            if (bot.state == Bot.BotState.OUTTAKE_OUT) {
-                gp2strafe();
-            } else {
-                gp1drive();
-            }
+//            // DRIVING SWITCH
+//            if (bot.state == Bot.BotState.OUTTAKE_OUT) {
+//                gp2strafe();
+//            } else {
+//                gp1drive();
+//            }
+            gp1drive();
 
             // INTAKE (driver 1)
             if (gp1.isDown(GamepadKeys.Button.LEFT_BUMPER)) { // intake
@@ -186,7 +190,8 @@ public class MainTeleOp extends LinearOpMode {
     private void drop() {
         thread = new Thread(() -> {
             bot.claw.open();
-            sleep(150);
+            sleep(250);
+            bot.claw.close();
             bot.storage();
         });
         thread.start();
@@ -194,7 +199,7 @@ public class MainTeleOp extends LinearOpMode {
 
     private void gp1drive() { // all directions
         driveSpeed = 1;
-        driveSpeed *= 1; //- 0.5 * gp1.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER);
+        driveSpeed *= 0.5 * gp1.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER);
         driveSpeed = Math.max(0, driveSpeed);
         bot.fixMotors();
 

@@ -104,15 +104,16 @@ public class ColorDetectionPipeline extends OpenCvPipeline{
             height = rect.height;
             while (height < 50) {
                 if (iterations < contours.size()) {
-                    iterations++;
-                    biggest = contours.get(contours.indexOf(biggest) + 1);
+                    biggest = contours.get(iterations);
                     rect = Imgproc.boundingRect(biggest); // turns biggest contour into a rectangle
                     midpointrect = rect.tl().x + rect.width / 2.0; // gets midpoint x of the rectangle
                     width = rect.width;
                     height = rect.height;
+                    iterations++;
                 } else {
                     iterations = 0;
                     spikeMark = SpikeMark.RIGHT;
+                    break;
                 }
             }
 
