@@ -15,7 +15,7 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.opencv.core.Scalar;
 
 /*
-TODO: NEED TO TUNE HSV VALUES
+TODO: FIX WHATEVER MESS OF CODE THIS IS SOME OTHER TIME AFTER SCRIMMAGE - ZACHERY
  */
 
 public class ColorDetectionPipeline extends OpenCvPipeline{
@@ -27,6 +27,7 @@ public class ColorDetectionPipeline extends OpenCvPipeline{
     public static int minheight = 100;
     public static int minwidth = 100;
     public static int width = 0;
+    public static int height = 0;
     public static int camwidth = 1280;
     public static int camheight = 720;
 
@@ -93,40 +94,56 @@ public class ColorDetectionPipeline extends OpenCvPipeline{
 
         if (!contours.isEmpty()) { // checks if no contours are found
             contours.sort(Collections.reverseOrder(Comparator.comparingDouble(m -> Imgproc.boundingRect(m).width))); //orders contours in array from big to small(by width)
-            // ____biggest are variables for the biggest on each side
+
+            // Make rectangle
+            int iterations = 0;
             biggest = contours.get(0); //contour with the largest width(first in the array)
-            // use biggest.width to get the width
-
             Rect rect = Imgproc.boundingRect(biggest); // turns biggest contour into a rectangle
+            midpointrect = rect.tl().x + rect.width/2.0; // gets midpoint x of the rectangle
+            width = rect.width;
+            height = rect.height;
+            while (height < 50) {
+                iterations++;
+                if (iterations <= contours.size()) {
+                    biggest = contours.get(contours.indexOf(biggest) + 1);
+                    rect = Imgproc.boundingRect(biggest); // turns biggest contour into a rectangle
+                    midpointrect = rect.tl().x + rect.width / 2.0; // gets midpoint x of the rectangle
+                    width = rect.width;
+                    height = rect.height;
+                } else {
+                    iterations = 0;
+                    spikeMark = SpikeMark.RIGHT;
+                    break;
+                }
+            }
 
-            if (rect.height > minheight && rect.width < minwidth) { // rectangle is bigger than 100 pixels
-                Imgproc.rectangle(input, rect.tl(), rect.br(), new Scalar(0, 255, 0), 6); // puts border around contours with a green shade
+            // Draw rectangle on screen
+            Imgproc.rectangle(input, rect.tl(), rect.br(), new Scalar(0, 255, 0), 6); // puts border around contours with a green shade
 
-                midpointrect = rect.tl().x + rect.width/2.0; // gets midpoint x of the rectangle
-
-                width = rect.width;
-
-                if (midpointrect > leftrect.tl().x && midpointrect < leftrect.br().x) { // checks if within boundaries of left side rectangle
+            // Check which zone it is in (left or right)
+            if (midpointrect > leftrect.tl().x && midpointrect < leftrect.br().x) { // LEFT SPIKE
+                if (height < 300) { // make sure it is not left tape
+                    spikeMark = SpikeMark.RIGHT;
+                } else {
                     spikeMark = SpikeMark.LEFT;
-                } else if (midpointrect > rightrect.tl().x && midpointrect < leftrect.br().x) { // checks if within boundaries of right side rectangle
+                }
+            } else if (midpointrect > rightrect.tl().x && midpointrect < leftrect.br().x) {
+                spikeMark = SpikeMark.MIDDLE;
+            } else {
+                if (width > 500) {
                     spikeMark = SpikeMark.MIDDLE;
-                } else{
+                } else { // make sure it is not center tape
                     spikeMark = SpikeMark.RIGHT;
                 }
-//
-//                telemetry.addLine("Midpoint of Bounding Box :"+ midpointrect);
-            } else {
-                spikeMark = SpikeMark.RIGHT;
             }
-        } else {
+            //telemetry.addLine("Midpoint of Bounding Box :"+ midpointrect);
+        } else { // NOT IN FRAME, RIGHT SPIKE
             spikeMark = SpikeMark.RIGHT;
         }
-//        telemetry.addData("contours: ", contours.size());
+        //telemetry.addData("contours: ", contours.size());
         // telemetry.addData("Spikemark status: ",spikeMark);
-
         // Releasing all our mats for the next iteration
         HSV.release();
-
         return input; // return end frame with rectangles drawn
     }
 }

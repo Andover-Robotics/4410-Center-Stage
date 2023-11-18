@@ -46,7 +46,6 @@ public class MainTeleOp extends LinearOpMode {
         // Initialize bot
         bot.stopMotors();
         bot.state = Bot.BotState.STORAGE;
-        bot.claw.open();
         bot.storage();
 
         /*
