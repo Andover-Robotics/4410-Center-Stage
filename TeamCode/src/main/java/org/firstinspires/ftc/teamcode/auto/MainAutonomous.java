@@ -255,9 +255,9 @@ public class MainAutonomous extends LinearOpMode {
                             drive.followTrajectorySequence(
                                     drive.trajectorySequenceBuilder(startPose)
                                             .forward(2)
-                                            .turn(Math.toRadians(-90))
+                                            .turn(Math.toRadians(90))
                                             .forward(24)
-                                            .strafeLeft(38)
+                                            .strafeLeft(34)
                                             .build());
                             break;
                         case 2: // MIDDLE (case 2)
@@ -271,9 +271,9 @@ public class MainAutonomous extends LinearOpMode {
                             drive.followTrajectorySequence(
                                     drive.trajectorySequenceBuilder(startPose)
                                             .forward(2)
-                                            .turn(Math.toRadians(90))
+                                            .turn(Math.toRadians(-90))
                                             .forward(24)
-                                            .strafeLeft(34)
+                                            .strafeLeft(38)
                                             .build());
                             break;
                     }
