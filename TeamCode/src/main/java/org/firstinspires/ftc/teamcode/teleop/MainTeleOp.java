@@ -64,10 +64,12 @@ public class MainTeleOp extends LinearOpMode {
         X - toggle between claw positions
         dpad up - slides to top
         dpad right - slides to middle
+        dpad left - slides to low
         dpad down - slides to bottom
         right bumper - manual position slides up
         left bumper - manual position slides down
         */
+
         waitForStart();
         while (opModeIsActive() && !isStopRequested()) {
 
@@ -136,23 +138,23 @@ public class MainTeleOp extends LinearOpMode {
             // manual slides positioning with joystick
             bot.slides.runManual(gp2.getLeftY()*-0.5);
             // preset positions
-            if (gp2.wasJustPressed(GamepadKeys.Button.DPAD_UP)) {
+            if (gp2.wasJustPressed(GamepadKeys.Button.DPAD_UP)) { // TOP
                 bot.claw.close();
                 bot.outtakeOut();
                 bot.slides.runToTop();
-            } else if (gp2.wasJustPressed(GamepadKeys.Button.DPAD_RIGHT)) {
+            } else if (gp2.wasJustPressed(GamepadKeys.Button.DPAD_RIGHT)) { // MIDDLE
                 bot.claw.close();
                 bot.outtakeOut();
                 bot.slides.runToMiddle();
-            } else if (gp2.wasJustPressed(GamepadKeys.Button.DPAD_DOWN)) {
-                bot.slides.runToBottom();
-            } else if (gp2.wasJustPressed(GamepadKeys.Button.DPAD_LEFT)) {
+            } else if (gp2.wasJustPressed(GamepadKeys.Button.DPAD_LEFT)) { // LOW
                 bot.claw.close();
                 bot.outtakeOut();
                 bot.slides.runToLow();
+            } else if (gp2.wasJustPressed(GamepadKeys.Button.DPAD_DOWN)) { // BOTTOM
+                bot.slides.runToBottom();
             }
 
-//            // DRIVING SWITCH
+            // DRIVE
 //            if (bot.state == Bot.BotState.OUTTAKE_OUT) {
 //                gp2strafe();
 //            } else {
@@ -169,24 +171,23 @@ public class MainTeleOp extends LinearOpMode {
                 bot.intake.stopIntake();
             }
 
-            // OTHER
-//            // auto align
-//            if (gp1.wasJustPressed(GamepadKeys.Button.BACK)) {
-//                bot.resetIMU();
-//                autoAlignForward = !autoAlignForward;
-//            }
+            // AUTO ALIGN
+            if (gp1.wasJustPressed(GamepadKeys.Button.BACK)) {
+                bot.resetIMU();
+                autoAlignForward = !autoAlignForward;
+            }
+
+            // TELEMETRY
             telemetry.addData("Bot State",bot.state);
             telemetry.addData("Intake Power", bot.intake.power +"(running=" + bot.intake.getIsRunning() + ")");
             telemetry.addData("Slides Position", bot.slides.getPosition() + " (pos=" + bot.slides.position + " current=" + bot.slides.getCurrent() + ")");
 
             telemetry.update();
             bot.slides.periodic();
-
-            //gp1drive(); put in fsm of outtake out -> gp2strafe
         }
     }
 
-    // drop pixel thread
+    // Drop pixel thread
     private void drop() {
         thread = new Thread(() -> {
             bot.claw.open();
@@ -197,7 +198,8 @@ public class MainTeleOp extends LinearOpMode {
         thread.start();
     }
 
-    private void gp1drive() { // all directions
+    // Drving
+    private void gp1drive() { // Driver 1
         driveSpeed = 1;
         driveSpeed *= 0.5 * gp1.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER);
         driveSpeed = Math.max(0, driveSpeed);
@@ -208,46 +210,43 @@ public class MainTeleOp extends LinearOpMode {
 
                         gp1.getRightX(), 0);
 
-        bot.drive(driveVector.getX() * driveSpeed,
-                driveVector.getY() * driveSpeed,
-                turnVector.getX() * driveSpeed
-        );
-        if (autoAlignForward) {
+        if (autoAlignForward) { // with auto align
             double power = headingAligner.calculate(bot.getIMU());
             bot.drive(driveVector.getX() * driveSpeed,
                     driveVector.getY() * driveSpeed,
                     -power
             );
-        } else {
+        } else { // without auto align
             bot.drive(driveVector.getX() * driveSpeed,
                     driveVector.getY() * driveSpeed,
                     turnVector.getX() * driveSpeed
             );
         }
     }
-    private void gp2strafe() { // strafing left/right, no turning or forward/backward
-        driveSpeed = 0.25; // strafing speed for driver 2 to adjust when scoring
-        driveSpeed = Math.max(0, driveSpeed);
-        bot.fixMotors();
 
-        Vector2d driveVector = new Vector2d(-gp2.getLeftX(), -gp2.getRightY());
-
-        bot.drive(driveVector.getX() * driveSpeed,
-                driveVector.getY() * driveSpeed,
-                0.0
-        );
-        if (autoAlignForward) {
-            double power = headingAligner.calculate(bot.getIMU());
-            bot.drive(driveVector.getX() * driveSpeed,
-                    driveVector.getY() * driveSpeed,
-                    -power
-            );
-        } else {
-            bot.drive(driveVector.getX() * driveSpeed,
-                    driveVector.getY() * driveSpeed,
-                    0.0
-            );
-        }
-    }
+//    private void gp2strafe() { // strafing left/right, no turning or forward/backward
+//        driveSpeed = 0.25; // strafing speed for driver 2 to adjust when scoring
+//        driveSpeed = Math.max(0, driveSpeed);
+//        bot.fixMotors();
+//
+//        Vector2d driveVector = new Vector2d(-gp2.getLeftX(), -gp2.getRightY());
+//
+//        bot.drive(driveVector.getX() * driveSpeed,
+//                driveVector.getY() * driveSpeed,
+//                0.0
+//        );
+//        if (autoAlignForward) {
+//            double power = headingAligner.calculate(bot.getIMU());
+//            bot.drive(driveVector.getX() * driveSpeed,
+//                    driveVector.getY() * driveSpeed,
+//                    -power
+//            );
+//        } else {
+//            bot.drive(driveVector.getX() * driveSpeed,
+//                    driveVector.getY() * driveSpeed,
+//                    0.0
+//            );
+//        }
+//    }
 
 }

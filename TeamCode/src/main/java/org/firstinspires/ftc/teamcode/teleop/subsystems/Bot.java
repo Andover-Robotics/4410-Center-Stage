@@ -86,25 +86,6 @@ public class Bot {
         } else intake.runReverseIntake();
     }
 
-    // TODO: FIX THIS DISCARD
-    public void discard() { // discard pixel
-        fourbar.discard();
-        claw.open();
-        storage();
-    }
-
-
-//    // TODO: Figure out how much to turn and drive forward
-//    public int alignSpike() {
-//        switch(ColorDetectionPipeline.spikeMark) {
-//            case LEFT: return 1;
-//            case MIDDLE: return 2;
-//            case RIGHT: return 3;
-//            default:
-//                return 3;
-//        }
-//    }
-
     public void fixMotors() {
         fl.setInverted(false);
         fr.setInverted(true);
