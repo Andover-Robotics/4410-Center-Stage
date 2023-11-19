@@ -8,8 +8,10 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.teamcode.auto.pipelines.ColorDetectionPipeline;
+import org.firstinspires.ftc.teamcode.auto.pipelines.ColorDetectionTryPipeline;
 import org.firstinspires.ftc.teamcode.teleop.subsystems.Bot;
 import org.openftc.easyopencv.OpenCvCamera;
+import org.openftc.easyopencv.OpenCvCameraException;
 import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
 
@@ -19,24 +21,13 @@ public class ColorDetectionTest extends LinearOpMode {
     private Bot bot;
     private double cycleTime = 1;
 
-    int alliance = 2;
-
-//    while () {
-//        telemetry.addData("moveDiff (positive is more ???)", moveDiff);
-//        if (gp1.wasJustPressed(GamepadKeys.Button.LEFT_BUMPER)) {
-//            moveDiff -= 0.5;
-//        } else if (gp1.wasJustPressed(GamepadKeys.Button.RIGHT_BUMPER)) {
-//            moveDiff += 0.5;
-//        }
-//    }
-
     @Override
     public void runOpMode() throws InterruptedException {
 
         GamepadEx gp1 = new GamepadEx(gamepad1);
         WebcamName camName = hardwareMap.get(WebcamName.class, "Webcam 1");
         OpenCvCamera camera = OpenCvCameraFactory.getInstance().createWebcam(camName);
-        ColorDetectionPipeline colorDetectionPipeline = new ColorDetectionPipeline(telemetry);
+
 
         camera.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
             @Override
@@ -49,37 +40,69 @@ public class ColorDetectionTest extends LinearOpMode {
                 telemetry.addData("Error code:", errorCode);
             }
         });
-        camera.setPipeline(colorDetectionPipeline);
+        camera.setPipeline(new ColorDetectionPipeline(telemetry));
+
 
         bot = Bot.getInstance(this);
         bot.initializeImus();
+        boolean choice = false;
+        while (!isStarted()) {
+            gp1.readButtons();
+            if (gp1.wasJustPressed(GamepadKeys.Button.A)) {
+                if (choice) {
+                    ColorDetectionTryPipeline colorDetectionPipeline = new ColorDetectionTryPipeline(telemetry);
+                    camera.setPipeline(colorDetectionPipeline);
+                } else {
+                    ColorDetectionPipeline colorDetectionPipeline = new ColorDetectionPipeline(telemetry);
+                    camera.setPipeline(colorDetectionPipeline);
+                }
+                choice = !choice;
+            }
 
+            telemetry.addLine("Press A to toggle pipeline");
+            telemetry.addLine("");
+            if (choice) {
+                telemetry.addLine("Current Pipeline: Vig's ColorDetectionPipeline");
+                telemetry.addData("Spikemark Status", ColorDetectionTryPipeline.spikeMark);
+                telemetry.addData("width", ColorDetectionTryPipeline.width);
+            } else {
+                telemetry.addLine("Current Pipeline: ColorDetectionPipeline");
+                telemetry.addData("Spikemark Status", ColorDetectionPipeline.spikeMark);
+                telemetry.addData("width", ColorDetectionPipeline.width);
+
+            }
+            telemetry.update();
+        }
+
+        try {
+            camera.stopStreaming();
+            camera.closeCameraDevice();
+        } catch (OpenCvCameraException e) { }
         waitForStart();
 
-
-
         while (opModeIsActive() && !isStopRequested()) {
-            telemetry.addData("Spikemark Status", ColorDetectionPipeline.spikeMark);
-            telemetry.addData("width", ColorDetectionPipeline.width);
+            if (choice) {
+                telemetry.addLine("Current Pipeline: Vig's ColorDetectionPipeline");
+                telemetry.addData("Spikemark Status", ColorDetectionTryPipeline.spikeMark);
+                telemetry.addData("width", ColorDetectionTryPipeline.width);
+                telemetry.addData("cycle", time - cycleTime);
+                cycleTime = time;
+            } else {
+                telemetry.addLine("Current Pipeline: ColorDetectionPipeline");
+                telemetry.addData("Spikemark Status", ColorDetectionPipeline.spikeMark);
+                telemetry.addData("width", ColorDetectionPipeline.width);
+                telemetry.addData("cycle", time - cycleTime);
+                cycleTime = time;
 
-            telemetry.addData("cycle", time - cycleTime);
-            cycleTime = time;
-
+            }
             telemetry.update();
         }
 
-        while (!isStarted()) {
-            telemetry.addData("Spikemark Status", ColorDetectionPipeline.spikeMark);
-            telemetry.addData("width", ColorDetectionPipeline.width);
-            telemetry.update();
-        }
 
 
 
-        if (isStarted()) {
-//            camera.stopStreaming();
-            camera.closeCameraDevice();
-        }
+
+
 
     }
 }

@@ -28,7 +28,6 @@ import com.qualcomm.robotcore.hardware.VoltageSensor;
 import com.qualcomm.robotcore.hardware.configuration.typecontainers.MotorConfigurationType;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-import org.firstinspires.ftc.teamcode.auto.drive.DriveConstants;
 import org.firstinspires.ftc.teamcode.auto.trajectorysequence.TrajectorySequence;
 import org.firstinspires.ftc.teamcode.auto.trajectorysequence.TrajectorySequenceRunner;
 import org.firstinspires.ftc.teamcode.auto.trajectorysequence.TrajectorySequenceBuilder;
