@@ -8,7 +8,7 @@ import com.acmerobotics.dashboard.config.Config;
 
 @Config
 public class V4B {
-    private final Servo armLeft, armRight, wrist;
+    public final Servo armLeft, armRight, wrist;
 
     public static double armOuttake = 0.25, armStorage = 0.76, armGround = 0.08, armTopPixel = 0.89, armBottomPixel = 0.92, armDiscard = 0.8;
     public static double wristOuttake = 0.6, wristStorage=0.375, wristGround = 0.42, wristTopPixel = 0.35, wristBottomPixel = 0.36, wristTransfer = 0.26, wristDiscard = 0.28;
@@ -27,7 +27,7 @@ public class V4B {
         armRight.setPosition(0.96 - position);
     }
 
-    private void setWrist(double position) {
+    public void setWrist(double position) {
         wrist.setPosition(position);
     }
 

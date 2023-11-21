@@ -9,8 +9,8 @@ public class Claw {
     private final Servo claw;
 
     // TODO: Tune open and close values
-    public static double open = 0.70;
-    public static double close = 0.78;
+    public static double openOne = 0.68, openTwo = 0.70;
+    public static double close = 0.66;
     public boolean isOpen = true;
 
     public Claw(OpMode opMode){
@@ -18,8 +18,8 @@ public class Claw {
         claw.setDirection(Servo.Direction.FORWARD);
     }
 
-    public void open(){
-        claw.setPosition(open);
+    public void open(int whichOne){
+        claw.setPosition((whichOne == 1) ? openOne : openTwo);
         isOpen = true;
     }
 

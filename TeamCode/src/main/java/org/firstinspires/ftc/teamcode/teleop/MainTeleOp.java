@@ -83,7 +83,7 @@ public class MainTeleOp extends LinearOpMode {
                 if (gp2.wasJustPressed(GamepadKeys.Button.A)) { // top pixel
                     thread = new Thread(() -> {
                         bot.slides.runToBottom();
-                        bot.claw.open();
+                        bot.claw.open(2);
                         sleep(100);
                         bot.fourbar.topPixel();
                         sleep(400);
@@ -96,7 +96,7 @@ public class MainTeleOp extends LinearOpMode {
                 if (gp2.wasJustPressed(GamepadKeys.Button.B)) { // bottom pixel
                     thread = new Thread(() -> {
                         bot.slides.runToBottom();
-                        bot.claw.open();
+                        bot.claw.open(2);
                         sleep(100);
                         bot.fourbar.bottomPixel();
                         sleep(400);
@@ -114,7 +114,7 @@ public class MainTeleOp extends LinearOpMode {
                 }
             } else if (bot.state == Bot.BotState.OUTTAKE_OUT) { // SCORING BACKBOARD
                 if (gp2.wasJustPressed(GamepadKeys.Button.Y)) { // drop and return to storage
-                    drop();
+                    drop(1);
                 }
                 if (gp2.wasJustPressed(GamepadKeys.Button.B)) { // cancel and return to storage
                     bot.storage();
@@ -124,7 +124,7 @@ public class MainTeleOp extends LinearOpMode {
                 }
             } else if (bot.state == Bot.BotState.OUTTAKE_DOWN) { // SCORING GROUND
                 if (gp2.wasJustPressed(GamepadKeys.Button.X)) {
-                    drop();
+                    drop(2);
                 }
                 if (gp2.wasJustPressed(GamepadKeys.Button.A)) { // cancel and return to storage
                     bot.storage();
@@ -188,9 +188,12 @@ public class MainTeleOp extends LinearOpMode {
     }
 
     // Drop pixel thread
-    private void drop() {
+    private void drop(int whichOne) {
         thread = new Thread(() -> {
-            bot.claw.open();
+            bot.claw.open(whichOne);
+            if (whichOne == 2) {
+                bot.fourbar.setWrist(bot.fourbar.wrist.getPosition() + 0.03);
+            }
             sleep(250);
             bot.claw.close();
             bot.storage();
