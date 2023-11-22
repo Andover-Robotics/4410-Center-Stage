@@ -342,6 +342,7 @@ public class MainAutonomous extends LinearOpMode {
                 case 2: strafeAmount = 40; break;
                 case 3: strafeAmount = 60; break;
             }
+            if (alliance == Alliance.RED) strafeAmount = 80 - strafeAmount;
             if (alliance == Alliance.BLUE) { // BLUE SIDE, strafe right
                 drive.followTrajectorySequence(
                         drive.trajectorySequenceBuilder(startPose)
