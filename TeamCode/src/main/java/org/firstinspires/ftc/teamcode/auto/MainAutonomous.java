@@ -338,11 +338,11 @@ public class MainAutonomous extends LinearOpMode {
             startPose = drive.getPoseEstimate();
             int strafeAmount = 0;
             switch (spikeMark) {
-                case 1: strafeAmount = 20; break;
-                case 2: strafeAmount = 40; break;
-                case 3: strafeAmount = 60; break;
+                case 1: strafeAmount = 20; break; // LEFT, close
+                case 2: strafeAmount = 40; break; // MIDDLE,
+                case 3: strafeAmount = 60; break; // RIGHT
             }
-            if (alliance == Alliance.RED) strafeAmount = 80 - strafeAmount;
+            if (alliance == Alliance.RED) strafeAmount = 80 - strafeAmount; // invert if red alliance
             if (alliance == Alliance.BLUE) { // BLUE SIDE, strafe right
                 drive.followTrajectorySequence(
                         drive.trajectorySequenceBuilder(startPose)
@@ -356,6 +356,8 @@ public class MainAutonomous extends LinearOpMode {
                                 .strafeLeft(strafeAmount)
                                 .build());
             }
+            startPose = drive.getPoseEstimate();
+            drive.followTrajectory(drive.trajectoryBuilder(startPose).back(10).build()); // run forward
 
             // Place yellow/bottom pixel on backboard
             bot.slides.runToBottom();
@@ -373,6 +375,34 @@ public class MainAutonomous extends LinearOpMode {
             bot.storage();
             bot.claw.open(1);
 
+            // Stop op mode
+            sleep(1000);
+            requestOpModeStop();
+        }
+        periodic.interrupt();
+        try {
+            camera.stopStreaming();
+            camera.closeCameraDevice();
+        } catch (OpenCvCameraException e) {
+            telemetry.addLine("Exception as followsL: " + e);
+        }
+    }
+
+    // April tag detection telemetry
+    @SuppressLint("DefaultLocale")
+    void tagToTelemetry(AprilTagDetection detection) {
+        telemetry.addLine(String.format("Detected tag ID=%d", detection.id));
+        telemetry.addLine(String.format("Translation X: %.2f feet", detection.pose.x * FEET_PER_METER));
+        telemetry.addLine(String.format("Translation Y: %.2f feet", detection.pose.y * FEET_PER_METER));
+        telemetry.addLine(String.format("Translation Z: %.2f feet", detection.pose.z * FEET_PER_METER));
+        telemetry.addLine(String.format("Rotation Yaw: %.2f degrees", Math.toDegrees(detection.pose.x)));
+        telemetry.addLine(String.format("Rotation Pitch: %.2f degrees", Math.toDegrees(detection.pose.y)));
+        telemetry.addLine(String.format("Rotation Roll: %.2f degrees", Math.toDegrees(detection.pose.z)));
+    }
+
+}
+
+//            // This code should be inside the runOpMode() loop
 //            // Run to backboard spline
 //            Vector2d scoreBlue = new Vector2d(42,30), scoreRed = new Vector2d(42,-30); // Vector2d spline end positions (backboard)
 //            Trajectory backboard;
@@ -438,31 +468,3 @@ public class MainAutonomous extends LinearOpMode {
 //                    }
 //                }
 //            }
-
-            // Stop op mode
-            sleep(1000);
-            requestOpModeStop();
-        }
-        periodic.interrupt();
-        try {
-            camera.stopStreaming();
-            camera.closeCameraDevice();
-        } catch (OpenCvCameraException e) {
-            telemetry.addLine("Exception as followsL: " + e);
-        }
-    }
-
-    // April tag detection telemetry
-    @SuppressLint("DefaultLocale")
-    void tagToTelemetry(AprilTagDetection detection) {
-        telemetry.addLine(String.format("Detected tag ID=%d", detection.id));
-        telemetry.addLine(String.format("Translation X: %.2f feet", detection.pose.x * FEET_PER_METER));
-        telemetry.addLine(String.format("Translation Y: %.2f feet", detection.pose.y * FEET_PER_METER));
-        telemetry.addLine(String.format("Translation Z: %.2f feet", detection.pose.z * FEET_PER_METER));
-        telemetry.addLine(String.format("Rotation Yaw: %.2f degrees", Math.toDegrees(detection.pose.x)));
-        telemetry.addLine(String.format("Rotation Pitch: %.2f degrees", Math.toDegrees(detection.pose.y)));
-        telemetry.addLine(String.format("Rotation Roll: %.2f degrees", Math.toDegrees(detection.pose.z)));
-    }
-
-}
-
