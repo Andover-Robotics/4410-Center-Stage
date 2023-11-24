@@ -3,12 +3,16 @@ package org.firstinspires.ftc.teamcode.teleop;
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
+import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.arcrobotics.ftclib.controller.PIDController;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.arcrobotics.ftclib.gamepad.GamepadKeys;
 import com.arcrobotics.ftclib.geometry.Vector2d;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+
+import org.firstinspires.ftc.teamcode.auto.MainAutonomous;
+import org.firstinspires.ftc.teamcode.auto.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.teleop.subsystems.Bot;
 import org.firstinspires.ftc.teamcode.teleop.subsystems.Slides;
 
@@ -73,7 +77,6 @@ public class MainTeleOp extends LinearOpMode {
         waitForStart();
         while (opModeIsActive() && !isStopRequested()) {
 
-            //headingAligner.setPID(kp, ki, kd);
             gp1.readButtons();
             gp2.readButtons();
 
@@ -156,11 +159,9 @@ public class MainTeleOp extends LinearOpMode {
             }
 
             // DRIVE
-//            if (bot.state == Bot.BotState.OUTTAKE_OUT) {
-//                gp2strafe();
-//            } else {
-//                gp1drive();
-//            }
+            if (bot.state == Bot.BotState.OUTTAKE_OUT) {
+                gp2strafe();
+            }
             gp1drive();
 
             // INTAKE (driver 1)
@@ -198,8 +199,11 @@ public class MainTeleOp extends LinearOpMode {
         thread.start();
     }
 
-    // Drving
+    // Driving
     private void gp1drive() { // Driver 1
+        SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
+        drive.setPoseEstimate(bot.getAutoEndPose());
+
         driveSpeed = 1 - 0.8 * gp1.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER);
         driveSpeed = Math.max(0, driveSpeed);
         bot.fixMotors();
@@ -207,7 +211,7 @@ public class MainTeleOp extends LinearOpMode {
         Vector2d driveVector = new Vector2d(gp1.getLeftX(), -gp1.getLeftY()),
                 turnVector = new Vector2d(gp1.getRightX(), 0);
         if (autoAlignForward) { // with auto align
-            double power = headingAligner.calculate(;
+            double power = headingAligner.calculate(drive.getPoseEstimate().getHeading());
             bot.drive(driveVector.getX() * driveSpeed,
                     driveVector.getY() * driveSpeed,
                     -power
@@ -220,29 +224,17 @@ public class MainTeleOp extends LinearOpMode {
         }
     }
 
-//    private void gp2strafe() { // strafing left/right, no turning or forward/backward
-//        driveSpeed = 0.25; // strafing speed for driver 2 to adjust when scoring
-//        driveSpeed = Math.max(0, driveSpeed);
-//        bot.fixMotors();
-//
-//        Vector2d driveVector = new Vector2d(-gp2.getLeftX(), -gp2.getRightY());
-//
-//        bot.drive(driveVector.getX() * driveSpeed,
-//                driveVector.getY() * driveSpeed,
-//                0.0
-//        );
-//        if (autoAlignForward) {
-//            double power = headingAligner.calculate(bot.getIMU());
-//            bot.drive(driveVector.getX() * driveSpeed,
-//                    driveVector.getY() * driveSpeed,
-//                    -power
-//            );
-//        } else {
-//            bot.drive(driveVector.getX() * driveSpeed,
-//                    driveVector.getY() * driveSpeed,
-//                    0.0
-//            );
-//        }
-//    }
+    private void gp2strafe() { // strafing left/right, no turning or forward/backward
+        driveSpeed = 0.25; // strafing speed for driver 2 to adjust when scoring
+        driveSpeed = Math.max(0, driveSpeed);
+        bot.fixMotors();
+
+        Vector2d driveVector = new Vector2d(-gp2.getLeftX(), -gp2.getRightY());
+
+        bot.drive(driveVector.getX() * driveSpeed,
+                driveVector.getY() * driveSpeed,
+                0.0
+        );
+    }
 
 }

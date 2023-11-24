@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.teleop.subsystems;
 
+import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.arcrobotics.ftclib.hardware.motors.Motor;
 import com.arcrobotics.ftclib.hardware.motors.MotorEx;
 import com.qualcomm.hardware.bosch.BHI260IMU;
@@ -32,6 +33,15 @@ public class Bot {
     public V4B fourbar;
     public Claw claw;
     Thread thread;
+
+    // Auto end pose
+    public static Pose2d autoEndPose = new Pose2d();
+    public void setAutoEndPose(Pose2d pose) {
+        autoEndPose = pose;
+    }
+    public Pose2d getAutoEndPose() {
+        return autoEndPose;
+    }
 
     // get bot instance
     public static Bot getInstance() {
@@ -158,5 +168,7 @@ public class Bot {
         }
         return angle;
     }
+
+
 
 }
