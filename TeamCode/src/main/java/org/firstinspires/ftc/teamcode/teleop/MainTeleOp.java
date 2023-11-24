@@ -83,7 +83,7 @@ public class MainTeleOp extends LinearOpMode {
                 if (gp2.wasJustPressed(GamepadKeys.Button.A)) { // top pixel
                     thread = new Thread(() -> {
                         bot.slides.runToBottom();
-                        bot.claw.open(2);
+                        bot.claw.open();
                         sleep(100);
                         bot.fourbar.topPixel();
                         sleep(400);
@@ -96,7 +96,7 @@ public class MainTeleOp extends LinearOpMode {
                 if (gp2.wasJustPressed(GamepadKeys.Button.B)) { // bottom pixel
                     thread = new Thread(() -> {
                         bot.slides.runToBottom();
-                        bot.claw.open(2);
+                        bot.claw.open();
                         sleep(100);
                         bot.fourbar.bottomPixel();
                         sleep(400);
@@ -114,7 +114,7 @@ public class MainTeleOp extends LinearOpMode {
                 }
             } else if (bot.state == Bot.BotState.OUTTAKE_OUT) { // SCORING BACKBOARD
                 if (gp2.wasJustPressed(GamepadKeys.Button.Y)) { // drop and return to storage
-                    drop(1);
+                    drop();
                 }
                 if (gp2.wasJustPressed(GamepadKeys.Button.B)) { // cancel and return to storage
                     bot.storage();
@@ -124,7 +124,7 @@ public class MainTeleOp extends LinearOpMode {
                 }
             } else if (bot.state == Bot.BotState.OUTTAKE_DOWN) { // SCORING GROUND
                 if (gp2.wasJustPressed(GamepadKeys.Button.X)) {
-                    drop(2);
+                    drop();
                 }
                 if (gp2.wasJustPressed(GamepadKeys.Button.A)) { // cancel and return to storage
                     bot.storage();
@@ -152,6 +152,7 @@ public class MainTeleOp extends LinearOpMode {
                 bot.slides.runToLow();
             } else if (gp2.wasJustPressed(GamepadKeys.Button.DPAD_DOWN)) { // BOTTOM
                 bot.slides.runToBottom();
+                bot.storage();
             }
 
             // DRIVE
@@ -173,7 +174,6 @@ public class MainTeleOp extends LinearOpMode {
 
             // AUTO ALIGN
             if (gp1.wasJustPressed(GamepadKeys.Button.BACK)) {
-                bot.resetIMU();
                 autoAlignForward = !autoAlignForward;
             }
 
@@ -188,12 +188,9 @@ public class MainTeleOp extends LinearOpMode {
     }
 
     // Drop pixel thread
-    private void drop(int whichOne) {
+    private void drop() {
         thread = new Thread(() -> {
-            bot.claw.open(whichOne);
-            if (whichOne == 2) {
-                bot.fourbar.setWrist(bot.fourbar.wrist.getPosition() + 0.03);
-            }
+            bot.claw.open();
             sleep(250);
             bot.claw.close();
             bot.storage();
@@ -203,18 +200,14 @@ public class MainTeleOp extends LinearOpMode {
 
     // Drving
     private void gp1drive() { // Driver 1
-        driveSpeed = 1;
-        driveSpeed *= 0.5 * gp1.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER);
+        driveSpeed = 1 - 0.8 * gp1.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER);
         driveSpeed = Math.max(0, driveSpeed);
         bot.fixMotors();
 
         Vector2d driveVector = new Vector2d(gp1.getLeftX(), -gp1.getLeftY()),
-                turnVector = new Vector2d(
-
-                        gp1.getRightX(), 0);
-
+                turnVector = new Vector2d(gp1.getRightX(), 0);
         if (autoAlignForward) { // with auto align
-            double power = headingAligner.calculate(bot.getIMU());
+            double power = headingAligner.calculate(;
             bot.drive(driveVector.getX() * driveSpeed,
                     driveVector.getY() * driveSpeed,
                     -power

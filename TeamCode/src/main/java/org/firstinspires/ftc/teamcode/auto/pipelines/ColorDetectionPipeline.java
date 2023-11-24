@@ -45,9 +45,11 @@ public class ColorDetectionPipeline extends OpenCvPipeline{
     int alliance = 0;
 
     // Red HSV Values
-    public static double redLH = 142, redLS = 50, redLV = 50, redHH = 172, redHS = 255, redHV = 255;
+    public static double redLH = 145, redLS = 50, redLV = 50, redHH = 10, redHS = 255, redHV = 255, redLH2 = 170, redHH2 = 180;
     public static Scalar redLowHSV= new Scalar(redLH,redLS,redLV);
     public static Scalar redHighHSV = new Scalar(redHH,redHS,redHV);
+    public static Scalar redLowHSV2= new Scalar(redLH2,redLS,redLV);
+    public static Scalar redHighHSV2 = new Scalar(redHH2,redHS,redHV);
 
     // Blue HSV Values
     public static double blueLH = 90, blueLS = 50, blueLV = 50, blueHH = 117, blueHS = 255, blueHV = 255;
@@ -130,11 +132,7 @@ public class ColorDetectionPipeline extends OpenCvPipeline{
             } else if (midpointrect > rightrect.tl().x && midpointrect < leftrect.br().x) {
                 spikeMark = SpikeMark.MIDDLE;
             } else {
-                if (width > 500) {
-                    spikeMark = SpikeMark.MIDDLE;
-                } else { // make sure it is not center tape
-                    spikeMark = SpikeMark.RIGHT;
-                }
+                spikeMark = SpikeMark.MIDDLE;
             }
             //telemetry.addLine("Midpoint of Bounding Box :"+ midpointrect);
         } else { // NOT IN FRAME, RIGHT SPIKE
