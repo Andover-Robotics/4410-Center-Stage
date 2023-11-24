@@ -46,8 +46,10 @@ public class MainAutonomous extends LinearOpMode {
     }
     Alliance alliance = Alliance.BLUE;
 
-    // Boolean park value
-    boolean park = true;
+    // Autonomous config values
+    boolean park = false; // Parking position: false - don't move, true - park in corner
+    boolean toBackboard = true; // Go to backboard: true, false
+    boolean scoreBackboard = true; // Score yellow pixel on the backboard: true, false
 
     // TODO: TUNE THESE APRIL TAG VALUES TO FIT WITH APRIL TAGS
     static final double FEET_PER_METER = 3.28084;
@@ -55,19 +57,6 @@ public class MainAutonomous extends LinearOpMode {
     double tagsize = 0.032; // UNITS ARE METERS //ONLY FOR TESTIN
     int ID_ONE = 1, ID_TWO = 2, ID_THREE = 3; // Tag ID 1,2,3 from the 36h11 family
     AprilTagDetection tagOfInterest = null;
-
-    // Pick up purple/top pixel and go to outtake out position
-    public void pickupTop(Bot bot) {
-        bot.slides.runToBottom();
-        bot.claw.open();
-        sleep(100);
-        bot.fourbar.topPixel();
-        sleep(400);
-        bot.claw.close();
-        sleep(300);
-        bot.outtakeGround();
-        sleep(1000);
-    }
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -117,6 +106,14 @@ public class MainAutonomous extends LinearOpMode {
         int spikeMark = 0;
 
         // Initialized, adjust values before start
+        /*
+        LIST OF CONFIG CONTROLS (so far) - Zachery:
+        Driver 1 (gp1):
+        Y - change alliance
+        A - change side
+        X - toggle run to backboard
+        B - toggle park
+         */
         while (!isStarted()) {
             gp1.readButtons();
 
@@ -138,13 +135,29 @@ public class MainAutonomous extends LinearOpMode {
                 }
             }
             telemetry.addData("Side", side);
+
+            // Toggle run to backboard
+            if (gp1.wasJustPressed(GamepadKeys.Button.X)) {
+                if (toBackboard) {
+                    toBackboard = false;
+                    park = false;
+                } else {
+                    toBackboard = true;
+                }
+            }
+            telemetry.addData("To Backboard", toBackboard);
+
+            // Toggle park
+            if (gp1.wasJustPressed(GamepadKeys.Button.B)) {
+                park = !park;
+            }
             telemetry.addData("Parking", park);
 
             // Initiate color detection
-            if (alliance == Alliance.BLUE) {
-                colorDetection.setAlliance(2);
-            } else { // Automatically checks for red if no alliance is set
+            if (alliance == Alliance.RED) {
                 colorDetection.setAlliance(1);
+            } else { // Automatically checks for blue if no alliance is set
+                colorDetection.setAlliance(2);
             }
             telemetry.addData("Current Camera FPS", camera.getFps());
 
@@ -187,7 +200,7 @@ public class MainAutonomous extends LinearOpMode {
                                 .forward(5)
                                 .build());
                     break;
-                case 2: // MIDDLE (case 2)
+                case 2: // MIDDLE
                     drive.followTrajectorySequence(
                         drive.trajectorySequenceBuilder(startPose)
                             .back(30)
@@ -206,42 +219,43 @@ public class MainAutonomous extends LinearOpMode {
             }
 
             // Pick up purple/top and outtake pixel
-            Thread thread = new Thread(() -> {
-                bot.slides.runToBottom();
-                bot.claw.open();
-                sleep(100);
-                bot.fourbar.topPixel();
-                sleep(600);
-                bot.claw.close();
-                sleep(300);
-                bot.storage();
-                sleep(200);
-                bot.outtakeGround();
-                sleep(1000);
-                bot.claw.open();
-                sleep(150);
-                bot.storage();
-                bot.claw.open();
-                sleep(1000);
-            });
-            thread.start();
-            sleep(3500);
+            // pickup
+            bot.slides.runToBottom();
+            bot.claw.open();
+            sleep(100);
+            bot.fourbar.topPixel();
+            sleep(500);
+            bot.claw.close();
+            sleep(150);
+            bot.storage();
+            sleep(200);
+            // outtake
+            bot.outtakeGround();
+            sleep(500);
+            bot.claw.open();
+            sleep(150);
+            bot.storage();
+            bot.claw.open();
+            sleep(200);
 
-            // Park trajectory (only run if park = true)
+            // Backstage actions
             startPose = drive.getPoseEstimate();
-            if (side == Side.CLOSE) { // Close to backboard
-                if (alliance == Alliance.BLUE) {
+            if (toBackboard) {
+                int turnRadians = 90;
+                if (alliance == Alliance.RED) turnRadians = -90;
+                // Run to backboard
+                if (side == Side.CLOSE) { // closer to backboard
                     switch (spikeMark) {
                         case 1: // LEFT
                             drive.followTrajectorySequence(
                                     drive.trajectorySequenceBuilder(startPose)
                                             .forward(2)
-                                            .turn(Math.toRadians(-90))
+                                            .turn(Math.toRadians(-turnRadians))
                                             .forward(22)
                                             .strafeRight(34)
                                             .build());
                             break;
-                        case 2: // MIDDLE (case 2)
+                        case 2: // MIDDLE
                             drive.followTrajectorySequence(
                                     drive.trajectorySequenceBuilder(startPose)
                                             .forward(24)
@@ -252,54 +266,24 @@ public class MainAutonomous extends LinearOpMode {
                             drive.followTrajectorySequence(
                                     drive.trajectorySequenceBuilder(startPose)
                                             .forward(4)
-                                            .turn(Math.toRadians(90))
+                                            .turn(Math.toRadians(turnRadians))
                                             .forward(22)
                                             .strafeRight(34)
                                             .build());
                             break;
                     }
-                } else {
+                } else { // further from backboard, go through middle truss NEED TO TUNE
                     switch (spikeMark) {
                         case 1: // LEFT
                             drive.followTrajectorySequence(
                                     drive.trajectorySequenceBuilder(startPose)
                                             .forward(2)
-                                            .turn(Math.toRadians(90))
-                                            .forward(22)
-                                            .strafeLeft(34)
-                                            .build());
-                            break;
-                        case 2: // MIDDLE (case 2)
-                            drive.followTrajectorySequence(
-                                    drive.trajectorySequenceBuilder(startPose)
-                                            .forward(24)
-                                            .strafeLeft(36)
-                                            .build());
-                            break;
-                        case 3: // RIGHT
-                            drive.followTrajectorySequence(
-                                    drive.trajectorySequenceBuilder(startPose)
-                                            .forward(4)
-                                            .turn(Math.toRadians(-90))
-                                            .forward(22)
-                                            .strafeLeft(34)
-                                            .build());
-                            break;
-                    }
-                }
-            } else { // Further from backboard (strafe more)
-                if (alliance == Alliance.BLUE) {
-                    switch (spikeMark) {
-                        case 1: // LEFT
-                            drive.followTrajectorySequence(
-                                    drive.trajectorySequenceBuilder(startPose)
-                                            .forward(2)
-                                            .turn(Math.toRadians(-90))
+                                            .turn(Math.toRadians(-turnRadians))
                                             .forward(24)
                                             .strafeRight(68)
                                             .build());
                             break;
-                        case 2: // MIDDLE (case 2)
+                        case 2: // MIDDLE
                             drive.followTrajectorySequence(
                                     drive.trajectorySequenceBuilder(startPose)
                                             .forward(24)
@@ -310,71 +294,40 @@ public class MainAutonomous extends LinearOpMode {
                             drive.followTrajectorySequence(
                                     drive.trajectorySequenceBuilder(startPose)
                                             .forward(5)
-                                            .turn(Math.toRadians(90))
+                                            .turn(Math.toRadians(turnRadians))
                                             .forward(24)
                                             .strafeRight(68)
                                             .build());
                             break;
                     }
-                } else {
-                    switch (spikeMark) {
-                        case 1: // LEFT
-                            drive.followTrajectorySequence(
-                                    drive.trajectorySequenceBuilder(startPose)
-                                            .forward(2)
-                                            .turn(Math.toRadians(-90))
-                                            .forward(28)
-                                            .strafeLeft(68)
-                                            .build());
-                            break;
-                        case 2: // MIDDLE (case 2)
-                            drive.followTrajectorySequence(
-                                    drive.trajectorySequenceBuilder(startPose)
-                                            .forward(28)
-                                            .strafeLeft(70)
-                                            .build());
-                            break;
-                        case 3: // RIGHT
-                            drive.followTrajectorySequence(
-                                    drive.trajectorySequenceBuilder(startPose)
-                                            .forward(5)
-                                            .turn(Math.toRadians(90))
-                                            .forward(28)
-                                            .strafeLeft(68)
-                                            .build());
-                            break;
-                    }
                 }
-            }
 
-            // TODO: TUNE VALUES FOR STRAFING
-            // Scoring on backboard
-            startPose = drive.getPoseEstimate();
-            int strafeAmount = 0;
-            switch (spikeMark) {
-                case 1: strafeAmount = 17; break; // LEFT, close
-                case 2: strafeAmount = 23; break; // MIDDLE,
-                case 3: strafeAmount = 29; break; // RIGHT
-            }
-            if (alliance == Alliance.RED) strafeAmount = 46 - strafeAmount; // invert if red alliance
-            if (alliance == Alliance.BLUE) { // BLUE SIDE, strafe right
-                drive.followTrajectorySequence(
-                        drive.trajectorySequenceBuilder(startPose)
-                                .turn(Math.toRadians(90))
-                                .strafeLeft(strafeAmount)
-                                .build());
-            } else { // RED SIDE, strafe left
-                drive.followTrajectorySequence(
-                        drive.trajectorySequenceBuilder(startPose)
-                                .turn(Math.toRadians(-90))
-                                .strafeRight(strafeAmount)
-                                .build());
-            }
-            startPose = drive.getPoseEstimate();
-            drive.followTrajectory(drive.trajectoryBuilder(startPose).back(10).build()); // run into backboard
+                // Scoring on backboard
+                startPose = drive.getPoseEstimate();
+                int strafeAmount = 0;
+                switch (spikeMark) {
+                    case 1: strafeAmount = 17; break; // LEFT, close
+                    case 2: strafeAmount = 23; break; // MIDDLE,
+                    case 3: strafeAmount = 29; break; // RIGHT
+                }
+                if (alliance == Alliance.RED) strafeAmount = 46 - strafeAmount; // invert if red alliance
+                if (alliance == Alliance.BLUE) { // BLUE SIDE, strafe right
+                    drive.followTrajectorySequence(
+                            drive.trajectorySequenceBuilder(startPose)
+                                    .turn(Math.toRadians(90))
+                                    .strafeLeft(strafeAmount)
+                                    .build());
+                } else { // RED SIDE, strafe left
+                    drive.followTrajectorySequence(
+                            drive.trajectorySequenceBuilder(startPose)
+                                    .turn(Math.toRadians(-90))
+                                    .strafeRight(strafeAmount)
+                                    .build());
+                }
+                startPose = drive.getPoseEstimate();
+                drive.followTrajectory(drive.trajectoryBuilder(startPose).back(10).build()); // run into backboard
 
-            // Place yellow/bottom pixel on backboard
-            Thread thread2 = new Thread(() -> {
+                // Place yellow/bottom pixel on backboard
                 bot.slides.runToBottom();
                 bot.claw.open();
                 sleep(100);
@@ -391,17 +344,23 @@ public class MainAutonomous extends LinearOpMode {
                 bot.storage();
                 bot.claw.open();
                 sleep(1000);
-            });
-            thread2.start();
-            sleep(3500);
-            if (side == Side.CLOSE) {
-                if (alliance == Alliance.BLUE) drive.followTrajectory(drive.trajectoryBuilder(startPose).strafeRight(18).build());
-                else drive.followTrajectory(drive.trajectoryBuilder(startPose).strafeLeft(18).build());
-                drive.followTrajectory(drive.trajectoryBuilder(startPose).back(18).build());
+
+                // Parking
+                if (park) {
+                    if (alliance == Alliance.BLUE) {
+                        drive.followTrajectory(drive.trajectoryBuilder(startPose).strafeRight(18).build());
+                    }
+                    else {
+                        drive.followTrajectory(drive.trajectoryBuilder(startPose).strafeLeft(18).build());
+                    }
+                    drive.followTrajectory(drive.trajectoryBuilder(startPose).forward(18).build());
+                }
             }
 
+
             // Stop op mode
-            sleep(5000);
+            bot.setAutoEndPose(drive.getPoseEstimate());
+            sleep(800);
             requestOpModeStop();
         }
         periodic.interrupt();

@@ -45,7 +45,7 @@ public class ColorDetectionPipeline extends OpenCvPipeline{
     int alliance = 0;
 
     // Red HSV Values
-    public static double redLH = 145, redLS = 50, redLV = 50, redHH = 10, redHS = 255, redHV = 255, redLH2 = 170, redHH2 = 180;
+    public static double redLH = 0, redLS = 50, redLV = 50, redHH = 15, redHS = 255, redHV = 255, redLH2 = 165, redHH2 = 180;
     public static Scalar redLowHSV= new Scalar(redLH,redLS,redLV);
     public static Scalar redHighHSV = new Scalar(redHH,redHS,redHV);
     public static Scalar redLowHSV2= new Scalar(redLH2,redLS,redLV);
@@ -87,6 +87,7 @@ public class ColorDetectionPipeline extends OpenCvPipeline{
         // filters HSV mat into image with black being the lowest red/blue HSV and white being the highest red/blue HSV
         if (alliance == 1) {
             Core.inRange(HSV, redLowHSV, redHighHSV, HSV);
+            Core.inRange(HSV, redLowHSV2, redHighHSV2, HSV);
         } else {
             Core.inRange(HSV, blueLowHSV, blueHighHSV, HSV);
         }
