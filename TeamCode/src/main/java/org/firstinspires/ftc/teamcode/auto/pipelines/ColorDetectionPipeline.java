@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import org.firstinspires.ftc.teamcode.auto.MainAutonomous;
 import org.opencv.core.Mat;
 import org.opencv.core.Core;
 import org.opencv.core.MatOfPoint;
@@ -45,7 +46,7 @@ public class ColorDetectionPipeline extends OpenCvPipeline{
     int alliance = 0;
 
     // Red HSV Values
-    public static double redLH = 0, redLS = 50, redLV = 50, redHH = 15, redHS = 255, redHV = 255, redLH2 = 165, redHH2 = 180;
+    public static double redLH = 0, redLS = 50, redLV = 50, redHH = 5, redHS = 255, redHV = 255, redLH2 = 165, redHH2 = 180;
     public static Scalar redLowHSV= new Scalar(redLH,redLS,redLV);
     public static Scalar redHighHSV = new Scalar(redHH,redHS,redHV);
     public static Scalar redLowHSV2= new Scalar(redLH2,redLS,redLV);
@@ -87,7 +88,7 @@ public class ColorDetectionPipeline extends OpenCvPipeline{
         // filters HSV mat into image with black being the lowest red/blue HSV and white being the highest red/blue HSV
         if (alliance == 1) {
             Core.inRange(HSV, redLowHSV, redHighHSV, HSV);
-            Core.inRange(HSV, redLowHSV2, redHighHSV2, HSV);
+            //Core.inRange(HSV, redLowHSV2, redHighHSV2, HSV);
         } else {
             Core.inRange(HSV, blueLowHSV, blueHighHSV, HSV);
         }
@@ -131,10 +132,20 @@ public class ColorDetectionPipeline extends OpenCvPipeline{
                     spikeMark = SpikeMark.LEFT;
                 }
             } else if (midpointrect > rightrect.tl().x && midpointrect < leftrect.br().x) {
-                spikeMark = SpikeMark.MIDDLE;
+                if (width < 50 || height < 50) {
+                    spikeMark = SpikeMark.RIGHT;
+                } else {
+                    spikeMark = SpikeMark.MIDDLE;
+                }
+
             } else {
-                spikeMark = SpikeMark.MIDDLE;
+                if (width < 50 || height < 50) {
+                    spikeMark = SpikeMark.RIGHT;
+                } else {
+                    spikeMark = SpikeMark.MIDDLE;
+                }
             }
+
             //telemetry.addLine("Midpoint of Bounding Box :"+ midpointrect);
         } else { // NOT IN FRAME, RIGHT SPIKE
             spikeMark = SpikeMark.RIGHT;
