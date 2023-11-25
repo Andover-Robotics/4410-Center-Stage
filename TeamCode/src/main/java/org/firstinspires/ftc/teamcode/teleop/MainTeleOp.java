@@ -159,9 +159,6 @@ public class MainTeleOp extends LinearOpMode {
             }
 
             // DRIVE
-            if (bot.state == Bot.BotState.OUTTAKE_OUT) {
-                gp2strafe();
-            }
             gp1drive();
 
             // INTAKE (driver 1)
@@ -192,9 +189,9 @@ public class MainTeleOp extends LinearOpMode {
     private void drop() {
         thread = new Thread(() -> {
             bot.claw.open();
-            sleep(250);
-            bot.claw.close();
+            sleep(300);
             bot.storage();
+            bot.claw.close();
         });
         thread.start();
     }
