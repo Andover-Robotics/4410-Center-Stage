@@ -48,8 +48,7 @@ public class MainAutonomous extends LinearOpMode {
 
     // Autonomous config values
     boolean park = false; // Parking position: false - don't move, true - park in corner
-    boolean toBackboard = true; // Go to backboard: true, false
-    boolean scoreBackboard = true; // Score yellow pixel on the backboard: true, false
+    boolean toBackboard = true; // Go to backboard: true, false`
 
     // TODO: TUNE THESE APRIL TAG VALUES TO FIT WITH APRIL TAGS
     static final double FEET_PER_METER = 3.28084;
@@ -247,14 +246,13 @@ public class MainAutonomous extends LinearOpMode {
             if (toBackboard) {
                 int turnRadians = 90;
                 // Run to backboard
-                if (alliance == Alliance.BLUE) {
+                if (alliance == Alliance.BLUE) { // BLUE ALLIANCE
                     if (side == Side.CLOSE) { // closer to backboard
                         switch (spikeMark) {
                             case 1: // LEFT
                                 drive.followTrajectorySequence(
                                         drive.trajectorySequenceBuilder(startPose)
                                                 .strafeRight(24)
-                                                //.forward(4)
                                                 .build());
                                 break;
                             case 2: // MIDDLE
@@ -268,45 +266,45 @@ public class MainAutonomous extends LinearOpMode {
                                 drive.followTrajectorySequence(
                                         drive.trajectorySequenceBuilder(startPose)
                                                 .strafeLeft(24)
-                                                //.forward(4)
                                                 .turn(Math.toRadians((2*turnRadians)))
                                                 .build());
                                 break;
                         }
-                    } else { // further from backboard, go through middle truss NEED TO TUNE
+                    } else { // further from backboard, go through middle truss
                         switch (spikeMark) {
                             case 1: // LEFT
                                 drive.followTrajectorySequence(
                                         drive.trajectorySequenceBuilder(startPose)
-                                                .strafeRight(24)
-                                                //.forward(4)
+                                                .strafeLeft(24)
+                                                .back(72)
                                                 .build());
                                 break;
-                            case 2: // MIDDLE
+                            case 2: // MIDDLE NEED TO WRITE
                                 drive.followTrajectorySequence(
                                         drive.trajectorySequenceBuilder(startPose)
-                                                .forward(22)
-                                                .turn(Math.toRadians((2*turnRadians)))
+                                                .strafeLeft(12)
+                                                .back(24)
+                                                .strafeRight(84)
+                                                .turn(Math.toRadians(turnRadians))
                                                 .build());
                                 break;
                             case 3: // RIGHT
                                 drive.followTrajectorySequence(
                                         drive.trajectorySequenceBuilder(startPose)
-                                                .strafeLeft(24)
-                                                //.forward(4)
+                                                .strafeRight(24)
+                                                .forward(72)
                                                 .turn(Math.toRadians((2*turnRadians)))
                                                 .build());
                                 break;
                         }
                     }
-                } else {
+                } else { // RED ALLIANCE
                     if (side == Side.CLOSE) { // closer to backboard
                         switch (spikeMark) {
                             case 1: // LEFT
                                 drive.followTrajectorySequence(
                                         drive.trajectorySequenceBuilder(startPose)
                                                 .strafeRight(24)
-                                                //.forward(4)
                                                 .turn(Math.toRadians(-2*turnRadians))
                                                 .build());
                                 break;
@@ -321,7 +319,6 @@ public class MainAutonomous extends LinearOpMode {
                                 drive.followTrajectorySequence(
                                         drive.trajectorySequenceBuilder(startPose)
                                                 .strafeLeft(24)
-                                                //.forward(4)
                                                 .build());
                                 break;
                         }
@@ -330,54 +327,45 @@ public class MainAutonomous extends LinearOpMode {
                             case 1: // LEFT
                                 drive.followTrajectorySequence(
                                         drive.trajectorySequenceBuilder(startPose)
-                                                .strafeRight(24)
-                                                //.forward(4)
+                                                .strafeLeft(24)
+                                                .forward(72)
                                                 .turn(Math.toRadians(-2*turnRadians))
                                                 .build());
                                 break;
                             case 2: // MIDDLE
                                 drive.followTrajectorySequence(
                                         drive.trajectorySequenceBuilder(startPose)
-                                                .forward(22)
-                                                .turn(Math.toRadians((-turnRadians)))
+                                                .strafeRight(12)
+                                                .back(24)
+                                                .strafeLeft(84)
+                                                .turn(Math.toRadians(-turnRadians))
                                                 .build());
                                 break;
                             case 3: // RIGHT
                                 drive.followTrajectorySequence(
                                         drive.trajectorySequenceBuilder(startPose)
-                                                .strafeLeft(24)
-                                                //.forward(4)
+                                                .strafeRight(24)
+                                                .back(72)
                                                 .build());
                                 break;
                         }
                     }
                 }
-                // backing up to backboard position
+
+                // Backing up to backboard position
                 startPose = drive.getPoseEstimate();
                 int backboardDrive = 34;
-                if (alliance == Alliance.BLUE){
+                if ((alliance == Alliance.BLUE && side == Side.CLOSE) || (alliance == Alliance.RED && side == Side.FAR)){
                     switch (spikeMark) {
-                        case 1:
-                            backboardDrive = 29;
-                            break; // LEFT
-                        case 2:
-                            backboardDrive = 33;
-                            break; // MIDDLE,
-                        case 3:
-                            backboardDrive = 37;
-                            break; // RIGHT
+                        case 1: backboardDrive = 29; break; // LEFT
+                        case 2: backboardDrive = 33; break; // MIDDLE,
+                        case 3: backboardDrive = 37; break; // RIGHT
                     }
-                } else {
+                } else if ((alliance == Alliance.BLUE && side == Side.FAR) || (alliance == Alliance.RED && side == Side.CLOSE)) {
                     switch (spikeMark) {
-                        case 1:
-                            backboardDrive = 37;
-                            break; // LEFT
-                        case 2:
-                            backboardDrive = 33;
-                            break; // MIDDLE,
-                        case 3:
-                            backboardDrive = 29;
-                            break; // RIGHT
+                        case 1: backboardDrive = 37; break; // LEFT
+                        case 2: backboardDrive = 33; break; // MIDDLE,
+                        case 3: backboardDrive = 29; break; // RIGHT
                     }
                 }
                 if (side == Side.FAR) {
@@ -391,31 +379,18 @@ public class MainAutonomous extends LinearOpMode {
                 int scoreStrafe = 0;
                 if (alliance == Alliance.BLUE) {
                     switch (spikeMark) {
-                        case 1:
-                            scoreStrafe = 13;
-                            break; // LEFT, close
-                        case 2:
-                            scoreStrafe = 19;
-                            break; // MIDDLE,
-                        case 3:
-                            scoreStrafe = 25;
-                            break; // RIGHT
+                        case 1: scoreStrafe = 13; break; // LEFT, close
+                        case 2: scoreStrafe = 19; break; // MIDDLE,
+                        case 3: scoreStrafe = 25; break; // RIGHT
                     }
                 } else {
                     switch (spikeMark) {
-                        case 1:
-                            scoreStrafe = 13;
-                            break; // LEFT, close
-                        case 2:
-                            scoreStrafe = 19;
-                            break; // MIDDLE,
-                        case 3:
-                            scoreStrafe = 25;
-                            break; // RIGHT
+                        case 1: scoreStrafe = 13; break; // LEFT, close
+                        case 2: scoreStrafe = 19; break; // MIDDLE,
+                        case 3: scoreStrafe = 25; break; // RIGHT
                     }
                 }
-//                if (alliance == Alliance.RED)
-//                    scoreStrafe = 38 - scoreStrafe; // invert if red alliance
+
                 if (alliance == Alliance.BLUE) { // BLUE SIDE, strafe right
                     drive.followTrajectorySequence(
                             drive.trajectorySequenceBuilder(startPose)
