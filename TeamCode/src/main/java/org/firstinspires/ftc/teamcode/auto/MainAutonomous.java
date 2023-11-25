@@ -211,7 +211,7 @@ public class MainAutonomous extends LinearOpMode {
                             drive.trajectorySequenceBuilder(startPose)
                                 .back(28)
                                 .turn(Math.toRadians(90))
-                                .back(5)
+                                .back(6)
                                 .forward(4)
                                 .build());
                     break;
@@ -227,7 +227,7 @@ public class MainAutonomous extends LinearOpMode {
                         drive.trajectorySequenceBuilder(startPose)
                             .back(28)
                             .turn(Math.toRadians(-90))
-                            .back(5)
+                            .back(6)
                             .forward(4)
                             .build());
                     break;
@@ -235,9 +235,9 @@ public class MainAutonomous extends LinearOpMode {
 
             // Outtake purple/top pixel
             bot.outtakeGround();
-            sleep(800);
+            sleep(1000);
             bot.claw.open();
-            sleep(800);
+            sleep(600);
             bot.storage();
             bot.claw.close();
             sleep(200);
@@ -247,104 +247,185 @@ public class MainAutonomous extends LinearOpMode {
             if (toBackboard) {
                 int turnRadians = 90;
                 // Run to backboard
-                if (side == Side.CLOSE) { // closer to backboard
-                    switch (spikeMark) {
-                        case 1: // LEFT
-                            drive.followTrajectorySequence(
-                                    drive.trajectorySequenceBuilder(startPose)
-                                            .forward(4)
-                                            .turn(Math.toRadians(-turnRadians))
-                                            .strafeRight(1)
-                                            .forward(22)
-                                            .strafeLeft(1)
-                                            .build());
-                            break;
-                        case 2: // MIDDLE
-                            drive.followTrajectorySequence(
-                                    drive.trajectorySequenceBuilder(startPose)
-                                            .forward(22)
-                                            .build());
-                            break;
-                        case 3: // RIGHT
-                            drive.followTrajectorySequence(
-                                    drive.trajectorySequenceBuilder(startPose)
-                                            .forward(4)
-                                            .turn(Math.toRadians(turnRadians))
-                                            .strafeLeft(1)
-                                            .forward(22)
-                                            .strafeRight(1)
-                                            .build());
-                            break;
+                if (alliance == Alliance.BLUE) {
+                    if (side == Side.CLOSE) { // closer to backboard
+                        switch (spikeMark) {
+                            case 1: // LEFT
+                                drive.followTrajectorySequence(
+                                        drive.trajectorySequenceBuilder(startPose)
+                                                .strafeRight(24)
+                                                //.forward(4)
+                                                .build());
+                                break;
+                            case 2: // MIDDLE
+                                drive.followTrajectorySequence(
+                                        drive.trajectorySequenceBuilder(startPose)
+                                                .forward(22)
+                                                .turn(Math.toRadians((turnRadians)))
+                                                .build());
+                                break;
+                            case 3: // RIGHT
+                                drive.followTrajectorySequence(
+                                        drive.trajectorySequenceBuilder(startPose)
+                                                .strafeLeft(24)
+                                                //.forward(4)
+                                                .turn(Math.toRadians((2*turnRadians)))
+                                                .build());
+                                break;
+                        }
+                    } else { // further from backboard, go through middle truss NEED TO TUNE
+                        switch (spikeMark) {
+                            case 1: // LEFT
+                                drive.followTrajectorySequence(
+                                        drive.trajectorySequenceBuilder(startPose)
+                                                .strafeRight(24)
+                                                //.forward(4)
+                                                .build());
+                                break;
+                            case 2: // MIDDLE
+                                drive.followTrajectorySequence(
+                                        drive.trajectorySequenceBuilder(startPose)
+                                                .forward(22)
+                                                .turn(Math.toRadians((2*turnRadians)))
+                                                .build());
+                                break;
+                            case 3: // RIGHT
+                                drive.followTrajectorySequence(
+                                        drive.trajectorySequenceBuilder(startPose)
+                                                .strafeLeft(24)
+                                                //.forward(4)
+                                                .turn(Math.toRadians((2*turnRadians)))
+                                                .build());
+                                break;
+                        }
                     }
-                } else { // further from backboard, go through middle truss NEED TO TUNE
-                    switch (spikeMark) {
-                        case 1: // LEFT
-                            drive.followTrajectorySequence(
-                                    drive.trajectorySequenceBuilder(startPose)
-                                            .forward(3)
-                                            .turn(Math.toRadians(-turnRadians))
-                                            .strafeRight(1)
-                                            .forward(22)
-                                            .strafeLeft(1)
-                                            .build());
-                            break;
-                        case 2: // MIDDLE
-                            drive.followTrajectorySequence(
-                                    drive.trajectorySequenceBuilder(startPose)
-                                            .forward(22)
-                                            .build());
-                            break;
-                        case 3: // RIGHT
-                            drive.followTrajectorySequence(
-                                    drive.trajectorySequenceBuilder(startPose)
-                                            .forward(3)
-                                            .turn(Math.toRadians(turnRadians))
-                                            .strafeLeft(1)
-                                            .forward(22)
-                                            .strafeRight(1)
-                                            .build());
-                            break;
+                } else {
+                    if (side == Side.CLOSE) { // closer to backboard
+                        switch (spikeMark) {
+                            case 1: // LEFT
+                                drive.followTrajectorySequence(
+                                        drive.trajectorySequenceBuilder(startPose)
+                                                .strafeRight(24)
+                                                //.forward(4)
+                                                .turn(Math.toRadians(-2*turnRadians))
+                                                .build());
+                                break;
+                            case 2: // MIDDLE
+                                drive.followTrajectorySequence(
+                                        drive.trajectorySequenceBuilder(startPose)
+                                                .forward(22)
+                                                .turn(Math.toRadians((-turnRadians)))
+                                                .build());
+                                break;
+                            case 3: // RIGHT
+                                drive.followTrajectorySequence(
+                                        drive.trajectorySequenceBuilder(startPose)
+                                                .strafeLeft(24)
+                                                //.forward(4)
+                                                .build());
+                                break;
+                        }
+                    } else { // further from backboard, go through middle truss NEED TO TUNE
+                        switch (spikeMark) {
+                            case 1: // LEFT
+                                drive.followTrajectorySequence(
+                                        drive.trajectorySequenceBuilder(startPose)
+                                                .strafeRight(24)
+                                                //.forward(4)
+                                                .turn(Math.toRadians(-2*turnRadians))
+                                                .build());
+                                break;
+                            case 2: // MIDDLE
+                                drive.followTrajectorySequence(
+                                        drive.trajectorySequenceBuilder(startPose)
+                                                .forward(22)
+                                                .turn(Math.toRadians((-turnRadians)))
+                                                .build());
+                                break;
+                            case 3: // RIGHT
+                                drive.followTrajectorySequence(
+                                        drive.trajectorySequenceBuilder(startPose)
+                                                .strafeLeft(24)
+                                                //.forward(4)
+                                                .build());
+                                break;
+                        }
                     }
+                }
+                // backing up to backboard position
+                startPose = drive.getPoseEstimate();
+                int backboardDrive = 34;
+                if (alliance == Alliance.BLUE){
+                    switch (spikeMark) {
+                        case 1:
+                            backboardDrive = 29;
+                            break; // LEFT
+                        case 2:
+                            backboardDrive = 33;
+                            break; // MIDDLE,
+                        case 3:
+                            backboardDrive = 37;
+                            break; // RIGHT
+                    }
+                } else {
+                    switch (spikeMark) {
+                        case 1:
+                            backboardDrive = 37;
+                            break; // LEFT
+                        case 2:
+                            backboardDrive = 33;
+                            break; // MIDDLE,
+                        case 3:
+                            backboardDrive = 29;
+                            break; // RIGHT
+                    }
+                }
+                if (side == Side.FAR) {
+                    backboardDrive = backboardDrive + 48;
                 }
 
-                // Strafing to backboard position
-                startPose = drive.getPoseEstimate();
-                int backboardStrafe = 33;
-                if (side == Side.FAR) {
-                    backboardStrafe *= 2;
-                }
-                if (alliance == Alliance.BLUE) {
-                    drive.followTrajectory(drive.trajectoryBuilder(startPose).strafeRight(backboardStrafe).build());
-                } else {
-                    drive.followTrajectory(drive.trajectoryBuilder(startPose).strafeLeft(backboardStrafe).build());
-                }
+                drive.followTrajectory(drive.trajectoryBuilder(startPose).back(backboardDrive).build());
 
                 // Scoring on backboard
                 startPose = drive.getPoseEstimate();
                 int scoreStrafe = 0;
-                switch (spikeMark) {
-                    case 1:
-                        scoreStrafe = 16;
-                        break; // LEFT, close
-                    case 2:
-                        scoreStrafe = 23;
-                        break; // MIDDLE,
-                    case 3:
-                        scoreStrafe = 30;
-                        break; // RIGHT
+                if (alliance == Alliance.BLUE) {
+                    switch (spikeMark) {
+                        case 1:
+                            scoreStrafe = 13;
+                            break; // LEFT, close
+                        case 2:
+                            scoreStrafe = 19;
+                            break; // MIDDLE,
+                        case 3:
+                            scoreStrafe = 25;
+                            break; // RIGHT
+                    }
+                } else {
+                    switch (spikeMark) {
+                        case 1:
+                            scoreStrafe = 13;
+                            break; // LEFT, close
+                        case 2:
+                            scoreStrafe = 19;
+                            break; // MIDDLE,
+                        case 3:
+                            scoreStrafe = 25;
+                            break; // RIGHT
+                    }
                 }
-                if (alliance == Alliance.RED)
-                    scoreStrafe = 46 - scoreStrafe; // invert if red alliance
+//                if (alliance == Alliance.RED)
+//                    scoreStrafe = 38 - scoreStrafe; // invert if red alliance
                 if (alliance == Alliance.BLUE) { // BLUE SIDE, strafe right
                     drive.followTrajectorySequence(
                             drive.trajectorySequenceBuilder(startPose)
-                                    .turn(Math.toRadians(90))
+                                    //.turn(Math.toRadians(90))
                                     .strafeLeft(scoreStrafe)
                                     .build());
                 } else { // RED SIDE, strafe left
                     drive.followTrajectorySequence(
                             drive.trajectorySequenceBuilder(startPose)
-                                    .turn(Math.toRadians(-90))
+                                    //.turn(Math.toRadians(-90))
                                     .strafeRight(scoreStrafe)
                                     .build());
                 }
@@ -364,6 +445,7 @@ public class MainAutonomous extends LinearOpMode {
                 });
                 pickupYellow.start();
                 drive.followTrajectory(drive.trajectoryBuilder(drive.getPoseEstimate()).back(13).build()); // run into backboard
+
                 sleep(800);
                 //bot.slides.runTo(200);
                 // Place yellow/bottom pixel on backboard
@@ -380,15 +462,15 @@ public class MainAutonomous extends LinearOpMode {
                 int parkStrafe = 0;
                 if (alliance == Alliance.BLUE) {
                     switch (spikeMark) {
-                        case 1: parkStrafe = 21; break;
-                        case 2: parkStrafe = 24; break;
-                        case 3: parkStrafe = 30; break;
+                        case 1: parkStrafe = 18; break;
+                        case 2: parkStrafe = 25; break;
+                        case 3: parkStrafe = 32; break;
                     }
                 } else {
                     switch (spikeMark) {
-                        case 1: parkStrafe = 30; break;
-                        case 2: parkStrafe = 24; break;
-                        case 3: parkStrafe = 21; break;
+                        case 1: parkStrafe = 32; break;
+                        case 2: parkStrafe = 25; break;
+                        case 3: parkStrafe = 18; break;
                     }
                 }
                 if (park) {
