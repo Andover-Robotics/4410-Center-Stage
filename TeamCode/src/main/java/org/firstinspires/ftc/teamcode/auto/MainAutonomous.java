@@ -282,10 +282,9 @@ public class MainAutonomous extends LinearOpMode {
                             case 2: // MIDDLE NEED TO WRITE
                                 drive.followTrajectorySequence(
                                         drive.trajectorySequenceBuilder(startPose)
-                                                .strafeLeft(12)
-                                                .back(24)
-                                                .strafeRight(84)
-                                                .turn(Math.toRadians(turnRadians))
+                                                .turn(Math.toRadians(-turnRadians))
+                                                .strafeLeft(24)
+                                                .back(72)
                                                 .build());
                                 break;
                             case 3: // RIGHT
@@ -335,10 +334,9 @@ public class MainAutonomous extends LinearOpMode {
                             case 2: // MIDDLE
                                 drive.followTrajectorySequence(
                                         drive.trajectorySequenceBuilder(startPose)
-                                                .strafeRight(12)
-                                                .back(24)
-                                                .strafeLeft(84)
-                                                .turn(Math.toRadians(-turnRadians))
+                                                .turn(Math.toRadians(turnRadians))
+                                                .strafeRight(24)
+                                                .back(72)
                                                 .build());
                                 break;
                             case 3: // RIGHT
@@ -355,35 +353,33 @@ public class MainAutonomous extends LinearOpMode {
                 // Backing up to backboard position
                 startPose = drive.getPoseEstimate();
                 int backboardDrive = 34;
-                if ((alliance == Alliance.BLUE && side == Side.CLOSE) || (alliance == Alliance.RED && side == Side.FAR)){
-                    switch (spikeMark) {
-                        case 1: backboardDrive = 29; break; // LEFT
-                        case 2: backboardDrive = 33; break; // MIDDLE,
-                        case 3: backboardDrive = 37; break; // RIGHT
-                    }
-                } else if ((alliance == Alliance.BLUE && side == Side.FAR) || (alliance == Alliance.RED && side == Side.CLOSE)) {
-                    switch (spikeMark) {
-                        case 1: backboardDrive = 37; break; // LEFT
-                        case 2: backboardDrive = 33; break; // MIDDLE,
-                        case 3: backboardDrive = 29; break; // RIGHT
+                if (side == Side.CLOSE) {
+                    if (alliance == Alliance.BLUE){
+                        switch (spikeMark) {
+                            case 1: backboardDrive = 29; break; // LEFT
+                            case 2: backboardDrive = 33; break; // MIDDLE,
+                            case 3: backboardDrive = 37; break; // RIGHT
+                        }
+                    } else {
+                        switch (spikeMark) {
+                            case 1: backboardDrive = 37; break; // LEFT
+                            case 2: backboardDrive = 33; break; // MIDDLE,
+                            case 3: backboardDrive = 29; break; // RIGHT
+                        }
                     }
                 }
-                if (side == Side.FAR) {
-                    backboardDrive = backboardDrive + 48;
-                }
-
                 drive.followTrajectory(drive.trajectoryBuilder(startPose).back(backboardDrive).build());
 
                 // Scoring on backboard
                 startPose = drive.getPoseEstimate();
                 int scoreStrafe = 0;
-                if (alliance == Alliance.BLUE) {
+                if ((alliance == Alliance.BLUE && side == Side.CLOSE) || (alliance == Alliance.RED && side == Side.FAR)) {
                     switch (spikeMark) {
                         case 1: scoreStrafe = 13; break; // LEFT, close
                         case 2: scoreStrafe = 19; break; // MIDDLE,
                         case 3: scoreStrafe = 25; break; // RIGHT
                     }
-                } else {
+                } else if ((alliance == Alliance.BLUE && side == Side.FAR) || (alliance == Alliance.RED && side == Side.CLOSE)) {
                     switch (spikeMark) {
                         case 1: scoreStrafe = 13; break; // LEFT, close
                         case 2: scoreStrafe = 19; break; // MIDDLE,
