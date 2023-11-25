@@ -252,9 +252,11 @@ public class MainAutonomous extends LinearOpMode {
                         case 1: // LEFT
                             drive.followTrajectorySequence(
                                     drive.trajectorySequenceBuilder(startPose)
-                                            .forward(3)
+                                            .forward(4)
                                             .turn(Math.toRadians(-turnRadians))
+                                            .strafeRight(1)
                                             .forward(22)
+                                            .strafeLeft(1)
                                             .build());
                             break;
                         case 2: // MIDDLE
@@ -266,9 +268,11 @@ public class MainAutonomous extends LinearOpMode {
                         case 3: // RIGHT
                             drive.followTrajectorySequence(
                                     drive.trajectorySequenceBuilder(startPose)
-                                            .forward(3)
+                                            .forward(4)
                                             .turn(Math.toRadians(turnRadians))
+                                            .strafeLeft(1)
                                             .forward(22)
+                                            .strafeRight(1)
                                             .build());
                             break;
                     }
@@ -279,7 +283,9 @@ public class MainAutonomous extends LinearOpMode {
                                     drive.trajectorySequenceBuilder(startPose)
                                             .forward(3)
                                             .turn(Math.toRadians(-turnRadians))
+                                            .strafeRight(1)
                                             .forward(22)
+                                            .strafeLeft(1)
                                             .build());
                             break;
                         case 2: // MIDDLE
@@ -293,7 +299,9 @@ public class MainAutonomous extends LinearOpMode {
                                     drive.trajectorySequenceBuilder(startPose)
                                             .forward(3)
                                             .turn(Math.toRadians(turnRadians))
+                                            .strafeLeft(1)
                                             .forward(22)
+                                            .strafeRight(1)
                                             .build());
                             break;
                     }
@@ -348,7 +356,7 @@ public class MainAutonomous extends LinearOpMode {
                     bot.claw.open();
                     sleep(100);
                     bot.fourbar.bottomPixel();
-                    sleep(800);
+                    sleep(500);
                     bot.claw.close();
                     sleep(800);
                     bot.storage();
@@ -356,8 +364,8 @@ public class MainAutonomous extends LinearOpMode {
                 });
                 pickupYellow.start();
                 drive.followTrajectory(drive.trajectoryBuilder(drive.getPoseEstimate()).back(13).build()); // run into backboard
-                sleep(1900);
-
+                sleep(800);
+                //bot.slides.runTo(200);
                 // Place yellow/bottom pixel on backboard
                 bot.outtakeOut();
                 sleep(500);
@@ -384,13 +392,13 @@ public class MainAutonomous extends LinearOpMode {
                     }
                 }
                 if (park) {
-                    drive.followTrajectory(drive.trajectoryBuilder(startPose).forward(7).build());
+                    drive.followTrajectory(drive.trajectoryBuilder(startPose).forward(9).build());
                     if (alliance == Alliance.BLUE) {
                         drive.followTrajectory(drive.trajectoryBuilder(drive.getPoseEstimate()).strafeRight(parkStrafe).build());
                     } else {
                         drive.followTrajectory(drive.trajectoryBuilder(drive.getPoseEstimate()).strafeLeft(parkStrafe).build());
                     }
-                    drive.followTrajectory(drive.trajectoryBuilder(drive.getPoseEstimate()).back(7).build());
+                    drive.followTrajectory(drive.trajectoryBuilder(drive.getPoseEstimate()).back(9).build());
                 }
             }
 
