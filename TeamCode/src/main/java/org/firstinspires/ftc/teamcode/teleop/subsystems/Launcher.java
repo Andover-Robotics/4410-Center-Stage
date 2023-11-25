@@ -7,11 +7,11 @@ import com.qualcomm.robotcore.hardware.Servo;
 @Config
 public class Launcher {
     private final Servo launcher;
-    public static double initialized = 0.1;
-    public static double launched = 0.7;
+    public static double initialized = 0.6;
+    public static double launched = 1.0;
 
     public Launcher(OpMode opMode){
-        launcher = opMode.hardwareMap.servo.get("claw");
+        launcher = opMode.hardwareMap.servo.get("launcher");
         launcher.setDirection(Servo.Direction.FORWARD);
         reset();
     }
