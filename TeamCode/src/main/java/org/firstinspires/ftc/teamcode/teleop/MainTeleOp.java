@@ -76,7 +76,6 @@ public class MainTeleOp extends LinearOpMode {
 
         waitForStart();
         while (opModeIsActive() && !isStopRequested()) {
-
             gp1.readButtons();
             gp2.readButtons();
 
@@ -168,6 +167,11 @@ public class MainTeleOp extends LinearOpMode {
                 bot.intake(true);
             } else {
                 bot.intake.stopIntake();
+            }
+
+            // LAUNCH DRONE
+            if (gp1.wasJustPressed(GamepadKeys.Button.B)) {
+                bot.launch();
             }
 
             // AUTO ALIGN

@@ -32,6 +32,7 @@ public class Bot {
     public Slides slides;
     public V4B fourbar;
     public Claw claw;
+    public Launcher launcher;
     Thread thread;
 
     // Auto end pose
@@ -70,6 +71,7 @@ public class Bot {
         slides = new Slides(opMode);
         fourbar = new V4B(opMode);
         claw = new Claw(opMode);
+        launcher = new Launcher(opMode);
     }
 
     // BOT STATES
@@ -94,6 +96,10 @@ public class Bot {
         if (!isReverse) {
             intake.runIntake();
         } else intake.runReverseIntake();
+    }
+
+    public void launch() {
+        launcher.launch();
     }
 
     public void fixMotors() {
