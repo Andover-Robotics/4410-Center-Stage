@@ -139,7 +139,7 @@ public class MainAutonomous extends LinearOpMode {
             }
             telemetry.addData("Alliance", alliance);
 
-            // Re grip
+            // Re-grip/pick up pixel
             if (gp1.wasJustPressed(GamepadKeys.Button.START)) {
                 bot.claw.open();
                 sleep(500);

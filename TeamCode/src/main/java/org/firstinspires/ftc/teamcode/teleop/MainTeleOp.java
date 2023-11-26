@@ -31,6 +31,7 @@ public class MainTeleOp extends LinearOpMode {
     private final int manualSlideAmt = 1;
     double leftX, rightX, leftY, rightY;
     Thread thread;
+    private boolean hasPixel = false;
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -83,30 +84,42 @@ public class MainTeleOp extends LinearOpMode {
             if (bot.state == Bot.BotState.STORAGE) { // INITIALIZED
                 // TRANSFER
                 if (gp2.wasJustPressed(GamepadKeys.Button.A)) { // top pixel
-                    thread = new Thread(() -> {
-                        bot.slides.runToBottom();
+                    if (!hasPixel) { // pick up
+                        hasPixel = true;
+                        thread = new Thread(() -> {
+                            bot.slides.runToBottom();
+                            bot.claw.open();
+                            sleep(100);
+                            bot.fourbar.topPixel();
+                            sleep(400);
+                            bot.claw.close();
+                            sleep(300);
+                            bot.storage();
+                        });
+                        thread.start();
+                    } else { // has pixel in claw, drop
+                        hasPixel = false;
                         bot.claw.open();
-                        sleep(100);
-                        bot.fourbar.topPixel();
-                        sleep(400);
-                        bot.claw.close();
-                        sleep(300);
-                        bot.storage();
-                    });
-                    thread.start();
+                    }
                 }
                 if (gp2.wasJustPressed(GamepadKeys.Button.B)) { // bottom pixel
-                    thread = new Thread(() -> {
-                        bot.slides.runToBottom();
+                    if (!hasPixel) { // pick up
+                        hasPixel = true;
+                        thread = new Thread(() -> {
+                            bot.slides.runToBottom();
+                            bot.claw.open();
+                            sleep(100);
+                            bot.fourbar.bottomPixel();
+                            sleep(400);
+                            bot.claw.close();
+                            sleep(300);
+                            bot.storage();
+                        });
+                        thread.start();
+                    } else {
+                        hasPixel = false;
                         bot.claw.open();
-                        sleep(100);
-                        bot.fourbar.bottomPixel();
-                        sleep(400);
-                        bot.claw.close();
-                        sleep(300);
-                        bot.storage();
-                    });
-                    thread.start();
+                    }
                 }
                 if (gp2.wasJustPressed(GamepadKeys.Button.Y)) { // go to outtake out position
                     bot.outtakeOut();
@@ -191,6 +204,7 @@ public class MainTeleOp extends LinearOpMode {
 
     // Drop pixel thread
     private void drop() {
+        hasPixel = false;
         thread = new Thread(() -> {
             bot.claw.open();
             sleep(300);
