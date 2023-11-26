@@ -400,13 +400,13 @@ public class MainAutonomous extends LinearOpMode {
                 if ((alliance == Alliance.BLUE && side == Side.CLOSE) || (alliance == Alliance.RED && side == Side.FAR)) {
                     switch (spikeMark) {
                         case 1: scoreStrafe = 13; break; // LEFT, close
-                        case 2: scoreStrafe = 17; break; // MIDDLE,
+                        case 2: scoreStrafe = 18; break; // MIDDLE,
                         case 3: scoreStrafe = 26; break; // RIGHT
                     }
                 } else if ((alliance == Alliance.BLUE && side == Side.FAR) || (alliance == Alliance.RED && side == Side.CLOSE)) {
                     switch (spikeMark) {
-                        case 1: scoreStrafe = 13; break; // LEFT, close
-                        case 2: scoreStrafe = 18; break; // MIDDLE,
+                        case 1: scoreStrafe = 14; break; // LEFT, close
+                        case 2: scoreStrafe = 19; break; // MIDDLE,
                         case 3: scoreStrafe = 27; break; // RIGHT
                     }
                 }
@@ -442,20 +442,15 @@ public class MainAutonomous extends LinearOpMode {
 
                 // Run into backboard
                 int slowerVelocity = 10; // Slower velocity that is the max constraint when running into backboard (in/s)
-                if (side == Side.FAR) {
-                    drive.followTrajectory(drive.trajectoryBuilder(startPose).back(11,
-                            SampleMecanumDrive.getVelocityConstraint(slowerVelocity, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
-                            SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
-                            .build());
-                } else {
-                    drive.followTrajectory(drive.trajectoryBuilder(startPose).back(13).build());
-                }
-
-                sleep(800);
+                drive.followTrajectory(drive.trajectoryBuilder(startPose).back(13,
+                                SampleMecanumDrive.getVelocityConstraint(slowerVelocity, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
+                                SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
+                        .build());
+                sleep(200);
 
                 // Place yellow/bottom pixel on backboard
                 if (side == Side.FAR) { // Slides up only if far side to avoid de scoring alliance pixel
-                    bot.slides.runTo(-500.0);
+                    bot.slides.runTo(-400.0);
                 } else {
                     bot.slides.runToBottom();
                 }
@@ -487,7 +482,6 @@ public class MainAutonomous extends LinearOpMode {
             }
 
             // Stop op mode
-            bot.setAutoEndPose(drive.getPoseEstimate());
             sleep(800);
             requestOpModeStop();
         }

@@ -57,6 +57,13 @@ public class V4B {
         setArm(armBottomPixel);
     }
 
+    public void dropPixel(int pixel) {
+        switch (pixel) {
+            case 1: setWrist(wristTopPixel);
+            case 2:setWrist(wristBottomPixel);
+        }
+    }
+
     public void runManualOuttake(double fourpos, double clawpos) {
         setArm(fourpos);
         setWrist(clawpos);

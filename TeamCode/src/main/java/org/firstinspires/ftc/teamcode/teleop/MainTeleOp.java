@@ -23,11 +23,10 @@ import java.lang.*;
 public class MainTeleOp extends LinearOpMode {
 
     private Bot bot;
-    private boolean autoAlignForward = false;
     private double driveSpeed = 1;
     private GamepadEx gp1, gp2;
     public static double kp = 0.025, ki = 0, kd = 0;
-    private PIDController headingAligner = new PIDController(kp, ki, kd);
+    //private PIDController headingAligner = new PIDController(kp, ki, kd);
     private final int manualSlideAmt = 1;
     double leftX, rightX, leftY, rightY;
     Thread thread;
@@ -118,7 +117,11 @@ public class MainTeleOp extends LinearOpMode {
                         thread.start();
                     } else {
                         hasPixel = false;
+                        bot.fourbar.dropPixel(2);
+                        sleep(100);
                         bot.claw.open();
+                        sleep(100);
+                        bot.fourbar.storage();
                     }
                 }
                 if (gp2.wasJustPressed(GamepadKeys.Button.Y)) { // go to outtake out position
@@ -131,7 +134,7 @@ public class MainTeleOp extends LinearOpMode {
                 // SCORING BACKBOARD
 
                 bot.slides.runManual(gp2.getLeftY()*-0.5); //pls work
-                bot.fourbar.runAngle(bot.slides.motorLeft.getCurrentPosition());
+                //bot.fourbar.runAngle(bot.slides.motorLeft.getCurrentPosition());
 
                 if (gp2.wasJustPressed(GamepadKeys.Button.Y)) { // drop and return to storage
                     drop();
@@ -192,11 +195,6 @@ public class MainTeleOp extends LinearOpMode {
                 bot.launch();
             }
 
-            // AUTO ALIGN
-            if (gp1.wasJustPressed(GamepadKeys.Button.BACK)) {
-                autoAlignForward = !autoAlignForward;
-            }
-
             // TELEMETRY
             telemetry.addData("Bot State",bot.state);
             telemetry.addData("Intake Power", bot.intake.power +"(running=" + bot.intake.getIsRunning() + ")");
@@ -221,27 +219,17 @@ public class MainTeleOp extends LinearOpMode {
 
     // Driving
     private void gp1drive() { // Driver 1
-        SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
-        drive.setPoseEstimate(bot.getAutoEndPose());
-
         driveSpeed = 1 - 0.8 * gp1.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER);
         driveSpeed = Math.max(0, driveSpeed);
         bot.fixMotors();
 
         Vector2d driveVector = new Vector2d(gp1.getLeftX(), -gp1.getLeftY()),
                 turnVector = new Vector2d(gp1.getRightX(), 0);
-        if (autoAlignForward) { // with auto align
-            double power = headingAligner.calculate(drive.getPoseEstimate().getHeading());
-            bot.drive(driveVector.getX() * driveSpeed,
-                    driveVector.getY() * driveSpeed,
-                    -power
-            );
-        } else { // without auto align
-            bot.drive(driveVector.getX() * driveSpeed,
-                    driveVector.getY() * driveSpeed,
-                    turnVector.getX() * driveSpeed
-            );
-        }
+
+        bot.drive(driveVector.getX() * driveSpeed,
+                driveVector.getY() * driveSpeed,
+                turnVector.getX() * driveSpeed
+        );
     }
 
     private void gp2strafe() { // strafing left/right, no turning or forward/backward

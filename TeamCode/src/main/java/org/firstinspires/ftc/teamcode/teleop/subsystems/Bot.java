@@ -35,15 +35,6 @@ public class Bot {
     public Launcher launcher;
     Thread thread;
 
-    // Auto end pose
-    public static Pose2d autoEndPose = new Pose2d();
-    public void setAutoEndPose(Pose2d pose) {
-        autoEndPose = pose;
-    }
-    public Pose2d getAutoEndPose() {
-        return autoEndPose;
-    }
-
     // get bot instance
     public static Bot getInstance() {
         if (instance == null) {
