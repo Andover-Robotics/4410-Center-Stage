@@ -12,6 +12,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
+import org.firstinspires.ftc.teamcode.auto.drive.DriveConstants;
 import org.firstinspires.ftc.teamcode.auto.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.auto.drive.TwoWheelTrackingLocalizer;
 import org.firstinspires.ftc.teamcode.auto.pipelines.AprilTagDetectionPipeline;
@@ -47,8 +48,10 @@ public class MainAutonomous extends LinearOpMode {
     Alliance alliance = Alliance.BLUE;
 
     // Autonomous config values
-    boolean park = false; // Parking position: false - don't move, true - park in corner
-    boolean toBackboard = true; // Go to backboard: true, false`
+    boolean toPark = false; // Parking position: true - park in corner after, false - don't move after scoring pixel
+    boolean toBackboard = true; // Go to backboard: true - go to backboard and score, false - only score spike and stop
+    // TODO: WRITE SCORE SPIKE CONDITION
+    boolean scoreSpike = true; // Score spike: true - score spike, false - only park
 
     // TODO: TUNE THESE APRIL TAG VALUES TO FIT WITH APRIL TAGS
     static final double FEET_PER_METER = 3.28084;
@@ -155,10 +158,10 @@ public class MainAutonomous extends LinearOpMode {
             if (gp1.wasJustPressed(GamepadKeys.Button.A)) {
                 if (side == Side.CLOSE) {
                     side = Side.FAR;
-                    park = false;
+                    toPark = false;
                 } else {
                     side = Side.CLOSE;
-                    park = true;
+                    toPark = true;
                 }
             }
             telemetry.addData("Side", side);
@@ -167,7 +170,7 @@ public class MainAutonomous extends LinearOpMode {
             if (gp1.wasJustPressed(GamepadKeys.Button.X)) {
                 if (toBackboard) {
                     toBackboard = false;
-                    park = false;
+                    toPark = false;
                 } else {
                     toBackboard = true;
                 }
@@ -176,9 +179,9 @@ public class MainAutonomous extends LinearOpMode {
 
             // Toggle park
             if (gp1.wasJustPressed(GamepadKeys.Button.B)) {
-                park = !park;
+                toPark = !toPark;
             }
-            telemetry.addData("Parking", park);
+            telemetry.addData("Parking", toPark);
 
             // Initiate color detection
             if (alliance == Alliance.RED) {
@@ -436,17 +439,22 @@ public class MainAutonomous extends LinearOpMode {
                 });
                 startPose = drive.getPoseEstimate();
                 pickupYellow.start();
+
                 // Run into backboard
+                int slowerVelocity = 10; // Slower velocity that is the max constraint when running into backboard (in/s)
                 if (side == Side.FAR) {
-                    drive.followTrajectory(drive.trajectoryBuilder(startPose).back(11).build());
+                    drive.followTrajectory(drive.trajectoryBuilder(startPose).back(11,
+                            SampleMecanumDrive.getVelocityConstraint(slowerVelocity, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
+                            SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
+                            .build());
                 } else {
                     drive.followTrajectory(drive.trajectoryBuilder(startPose).back(13).build());
                 }
 
                 sleep(800);
-                //bot.slides.runTo(200);
+
                 // Place yellow/bottom pixel on backboard
-                if (side == Side.FAR) {
+                if (side == Side.FAR) { // Slides up only if far side to avoid de scoring alliance pixel
                     bot.slides.runTo(-500.0);
                 } else {
                     bot.slides.runToBottom();
@@ -467,7 +475,7 @@ public class MainAutonomous extends LinearOpMode {
                     case 2: parkStrafe = 23; break;
                     case 3: parkStrafe = 31; break;
                 }
-                if (park) {
+                if (toPark) {
                     drive.followTrajectory(drive.trajectoryBuilder(startPose).forward(7).build());
                     if (alliance == Alliance.BLUE) {
                         drive.followTrajectory(drive.trajectoryBuilder(drive.getPoseEstimate()).strafeRight(parkStrafe).build());
