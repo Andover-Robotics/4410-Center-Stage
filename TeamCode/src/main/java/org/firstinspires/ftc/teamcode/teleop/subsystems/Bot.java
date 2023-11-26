@@ -177,4 +177,8 @@ public class Bot {
 
 
 
+    //public double calculateArmSlidesAngle(double slidePosition) {
+
+    //}
+
 }
