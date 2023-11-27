@@ -52,6 +52,7 @@ public class MainAutonomous extends LinearOpMode {
     boolean toBackboard = true; // Go to backboard: true - go to backboard and score, false - only score spike and stop
     boolean slidesUp = false; // Slide up: true - move slides up when scoring pixel on backboard, false - don't
     int backboardWait = 0; // How long (milliseconds) to wait before scoring on backboard: 0-5 seconds
+    int dt = 0;
     // TODO: WRITE SCORE SPIKE CONDITION
     boolean scoreSpike = true; // Score spike: true - score spike, false - only park
 
@@ -121,6 +122,11 @@ public class MainAutonomous extends LinearOpMode {
             sleep(200);
         });
         pickup.start();
+
+        Thread update = new Thread(() -> {
+            sleep(1000);
+            dt++;
+        });
 
         int spikeMark = 0;
 
@@ -462,6 +468,7 @@ public class MainAutonomous extends LinearOpMode {
                                 SampleMecanumDrive.getVelocityConstraint(slowerVelocity, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
                                 SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
                         .build());
+
                 sleep(200);
 
                 // Place yellow/bottom pixel on backboard
@@ -501,6 +508,12 @@ public class MainAutonomous extends LinearOpMode {
             sleep(800);
             requestOpModeStop();
         }
+
+        // Run update dt during op mode in the background
+        if (opModeIsActive() && !isStopRequested()) {
+            update.start();
+        }
+
         //periodic.interrupt();
         try {
             camera.stopStreaming();
