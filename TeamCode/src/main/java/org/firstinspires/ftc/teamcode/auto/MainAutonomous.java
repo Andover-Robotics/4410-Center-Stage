@@ -50,6 +50,8 @@ public class MainAutonomous extends LinearOpMode {
     // Autonomous config values
     boolean toPark = false; // Parking position: true - park in corner after, false - don't move after scoring pixel
     boolean toBackboard = true; // Go to backboard: true - go to backboard and score, false - only score spike and stop
+    boolean slidesUp = false; // Slide up: true - move slides up when scoring pixel on backboard, false - don't
+    int backboardWait = 0; // How long (milliseconds) to wait before scoring on backboard: 0-5 seconds
     // TODO: WRITE SCORE SPIKE CONDITION
     boolean scoreSpike = true; // Score spike: true - score spike, false - only park
 
@@ -128,8 +130,10 @@ public class MainAutonomous extends LinearOpMode {
         Driver 1 (gp1):
         Y - change alliance
         A - change side
-        X - toggle run to backboard
-        B - toggle park
+        B - toggle slides up
+        X - toggle park
+        dpad up - change backboard wait time (increment by 1 second)
+        dpad down - toggle to backboard
         START - re-pickup top pixel
          */
         while (!isStarted()) {
@@ -140,7 +144,7 @@ public class MainAutonomous extends LinearOpMode {
                 if (alliance == Alliance.RED) alliance = Alliance.BLUE;
                 else alliance = Alliance.RED;
             }
-            telemetry.addData("Alliance", alliance);
+            telemetry.addData("Alliance (Y)", alliance);
 
             // Re-grip/pick up pixel
             if (gp1.wasJustPressed(GamepadKeys.Button.START)) {
@@ -156,32 +160,42 @@ public class MainAutonomous extends LinearOpMode {
 
             // Change side
             if (gp1.wasJustPressed(GamepadKeys.Button.A)) {
-                if (side == Side.CLOSE) {
+                if (side == Side.CLOSE) { // Rn close, switch to FAR
                     side = Side.FAR;
+                    slidesUp = true;
                     toPark = false;
-                } else {
+                } else { // Rn far, switch to CLOSE
                     side = Side.CLOSE;
+                    slidesUp = false;
                     toPark = true;
                 }
             }
-            telemetry.addData("Side", side);
+            telemetry.addData("Side (A)", side);
 
-            // Toggle run to backboard
-            if (gp1.wasJustPressed(GamepadKeys.Button.X)) {
-                if (toBackboard) {
-                    toBackboard = false;
-                    toPark = false;
-                } else {
-                    toBackboard = true;
-                }
+            // Toggle slides up
+            if (gp1.wasJustPressed(GamepadKeys.Button.B)) {
+                slidesUp = !slidesUp;
             }
-            telemetry.addData("To Backboard", toBackboard);
+            telemetry.addData("Slides Up (B)", slidesUp);
 
             // Toggle park
-            if (gp1.wasJustPressed(GamepadKeys.Button.B)) {
+            if (gp1.wasJustPressed(GamepadKeys.Button.X)) {
                 toPark = !toPark;
             }
-            telemetry.addData("Parking", toPark);
+            telemetry.addData("Parking (X)", toPark);
+
+            // Change backboard wait time
+            if (gp1.wasJustPressed(GamepadKeys.Button.DPAD_UP)) {
+                if (backboardWait < 5000) backboardWait+=1000;
+                else backboardWait = 0;
+            }
+            telemetry.addData("Backboard sleep (DPAD UP)", backboardWait + " milliseconds");
+
+            // Toggle park
+            if (gp1.wasJustPressed(GamepadKeys.Button.DPAD_DOWN)) {
+                toBackboard = !toBackboard;
+            }
+            telemetry.addData("To Backboard (DPAD DOWN)", toBackboard);
 
             // Initiate color detection
             if (alliance == Alliance.RED) {
@@ -394,6 +408,8 @@ public class MainAutonomous extends LinearOpMode {
                     drive.followTrajectory(drive.trajectoryBuilder(startPose).back(backboardDrive).build());
                 }
 
+                sleep(backboardWait); // How long to wait before strafing to score
+
                 // Scoring on backboard
                 startPose = drive.getPoseEstimate();
                 int scoreStrafe = 0;
@@ -449,7 +465,7 @@ public class MainAutonomous extends LinearOpMode {
                 sleep(200);
 
                 // Place yellow/bottom pixel on backboard
-                if (side == Side.FAR) { // Slides up only if far side to avoid de scoring alliance pixel
+                if (slidesUp) { // Slides run up
                     bot.slides.runTo(-400.0);
                 } else {
                     bot.slides.runToBottom();
