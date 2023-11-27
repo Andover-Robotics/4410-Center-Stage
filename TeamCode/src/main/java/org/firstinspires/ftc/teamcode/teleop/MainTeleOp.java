@@ -133,7 +133,7 @@ public class MainTeleOp extends LinearOpMode {
             } else if (bot.state == Bot.BotState.OUTTAKE_OUT) {
                 // SCORING BACKBOARD
 
-                bot.slides.runManual(gp2.getLeftY()*-0.5); //pls work
+                bot.slides.runManual(gp2.getRightY()*-0.5); //pls work
                 //bot.fourbar.runAngle(bot.slides.motorLeft.getCurrentPosition());
 
                 if (gp2.wasJustPressed(GamepadKeys.Button.Y)) { // drop and return to storage
