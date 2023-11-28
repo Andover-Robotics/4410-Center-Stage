@@ -64,8 +64,6 @@ public class MainTeleOp extends LinearOpMode {
         Driver 2 (gp2):
         A - pick up pixel (top)
         B - pick up pixel (bottom)
-        Y - discard pixel
-        X - toggle between claw positions
         dpad up - slides to top
         dpad left - slides to middle
         dpad right - slides to low
@@ -124,8 +122,8 @@ public class MainTeleOp extends LinearOpMode {
                 }
             } else if (bot.state == Bot.BotState.OUTTAKE_OUT) {
                 // SCORING BACKBOARD
-                bot.fourbar.runAngle(bot.slides.motorLeft.getCurrentPosition());
-                bot.slides.runManual(gp2.getRightY()*-0.5); //pls work
+                bot.slides.runManual(gp2.getRightY()*-0.5); // Adjusts slides
+                bot.fourbar.runAngle(bot.slides.motorLeft.getCurrentPosition()); // Calculates arm position
 
                 if (gp2.wasJustPressed(GamepadKeys.Button.Y)) { // drop and return to storage
                     drop();
