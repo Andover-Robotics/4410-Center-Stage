@@ -10,6 +10,7 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
+import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 import org.firstinspires.ftc.teamcode.auto.pipelines.ColorDetectionPipeline;
 
 public class Bot {
@@ -116,6 +117,11 @@ public class Bot {
         bl.set(0.0);
         br.set(0.0);
     }
+
+    public double getMotorCurrent() {
+        return fl.motorEx.getCurrent(CurrentUnit.MILLIAMPS) + fr.motorEx.getCurrent(CurrentUnit.MILLIAMPS) + bl.motorEx.getCurrent(CurrentUnit.MILLIAMPS) + br.motorEx.getCurrent(CurrentUnit.MILLIAMPS);
+    }
+
 
     public void drive(double strafeSpeed, double forwardBackSpeed, double turnSpeed) {
         double[] speeds = {

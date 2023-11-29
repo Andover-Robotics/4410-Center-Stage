@@ -10,7 +10,7 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 public class Intake {
     private final MotorEx noodles;
     private final CRServo counterRoller;
-    public double power = 0.3;
+    public double power = 0.22; // optimal speed for intake
     private double counterPower = 1.0;
     private boolean isRunning = false;
 

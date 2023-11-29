@@ -11,7 +11,7 @@ public class V4B {
     private final Servo armLeft, armRight, wrist;
 
     public static double armOuttake = 0.31, armStorage = 0.76, armGround = 0.08, armTopPixel = 0.88, armBottomPixel = 0.92;
-    public static double wristOuttake = 0.54, wristStorage = 0.3, wristGround = 0.40, wristTopPixel = 0.285, wristBottomPixel = 0.28, wristTransfer = 0.26;
+    public static double wristOuttake = 0.55, wristStorage = 0.26, wristGround = 0.36, wristTopPixel = 0.245, wristBottomPixel = 0.24, wristTransfer = 0.22;
 
     public V4B(OpMode opMode) {
         armLeft = opMode.hardwareMap.servo.get("armLeft");
@@ -70,7 +70,7 @@ public class V4B {
     }
 
     public void runAngle(double slidePosition) {
-        double desiredAngle = 180 - 119.999 - Math.toDegrees(Math.asin((Math.sin(119.999) * 268.754 - (Math.sin(119.999) *slidePosition / 8.558)) / 170.0));
+        double desiredAngle = 180 - 60.001 - Math.toDegrees((Math.sin(60.001) * 268.754 - (slidePosition / 8.558)) / 170.0);
         double newPosition = 0.00333 * desiredAngle;
         setArm(newPosition);
     }
