@@ -9,7 +9,7 @@ public class Claw {
     private final Servo claw;
 
     // TODO: Tune open and close values
-    public static double open = 0.70;
+    public static double open = 0.65;
     public static double close = 0.78;
     public boolean isOpen = true;
 

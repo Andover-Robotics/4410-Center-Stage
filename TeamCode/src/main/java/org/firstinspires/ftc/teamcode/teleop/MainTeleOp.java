@@ -122,8 +122,8 @@ public class MainTeleOp extends LinearOpMode {
                 }
             } else if (bot.state == Bot.BotState.OUTTAKE_OUT) {
                 // SCORING BACKBOARD
-                bot.slides.runManual(gp2.getRightY()*-0.5); // Adjusts slides
-                bot.fourbar.runAngle(bot.slides.motorLeft.getCurrentPosition()); // Calculates arm position
+                //bot.slides.runManual(gp2.getRightY()*-0.5); // Adjusts slides
+                //bot.fourbar.runAngle(bot.slides.motorLeft.getCurrentPosition()); // Calculates arm position
 
                 if (gp2.wasJustPressed(GamepadKeys.Button.Y)) { // drop and return to storage
                     drop();
