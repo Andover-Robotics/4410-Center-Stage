@@ -12,15 +12,14 @@ public class Claw {
     public static double fullOpen = 0.65;
     public static double halfOpen = 0.71;
     public static double fullClose = 0.77;
-    public static double open = 0.65;//old
-    public static double close = 0.77;//old code
-    public boolean isOpen = true, isBottom = false;
-    public enum PixelState{
+//    public static double open = 0.65;//old
+//    public static double close = 0.77;//old code
+    public enum ClawState{
         EMPTY,
-        TOP,
+        ONE,
         BOTH
     }
-    public PixelState pixelState = PixelState.EMPTY;
+    public ClawState clawState = ClawState.EMPTY;
 
     public Claw(OpMode opMode){
         claw = opMode.hardwareMap.servo.get("claw");
@@ -29,27 +28,17 @@ public class Claw {
 
     public void fullOpen(){
         claw.setPosition(fullOpen);
-        pixelState = PixelState.EMPTY;
+        clawState = ClawState.EMPTY;
     }
 
     public void halfOpen(){
         claw.setPosition(halfOpen);
-        pixelState = PixelState.TOP;
+        clawState = ClawState.ONE;
     }
 
     public void fullClose(){
         claw.setPosition(fullClose);
-        pixelState = PixelState.BOTH;
-    }
-
-    public void open(){
-        claw.setPosition(open);
-        isOpen = true;
-    }
-
-    public void close(){
-        claw.setPosition(close);
-        isOpen = false;
+        clawState = ClawState.BOTH;
     }
 
 }

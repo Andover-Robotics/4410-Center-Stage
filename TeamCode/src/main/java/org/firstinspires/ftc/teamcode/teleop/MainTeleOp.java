@@ -30,7 +30,7 @@ public class MainTeleOp extends LinearOpMode {
 
     // PID
     public static double kp = 0.025, ki = 0, kd = 0;
-    private PIDController headingAligner = new PIDController(kp, ki, kd);
+    private final PIDController headingAligner = new PIDController(kp, ki, kd);
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -84,11 +84,11 @@ public class MainTeleOp extends LinearOpMode {
                 if (gp2.wasJustPressed(GamepadKeys.Button.A)) { // top pixel
                     thread = new Thread(() -> {
                         bot.slides.runToBottom();
-                        bot.claw.open();
+                        bot.claw.halfOpen();
                         sleep(100);
                         bot.fourbar.topPixel();
                         sleep(400);
-                        bot.claw.close();
+                        bot.claw.fullClose();
                         sleep(300);
                         bot.storage();
                     });
@@ -97,11 +97,11 @@ public class MainTeleOp extends LinearOpMode {
                 if (gp2.wasJustPressed(GamepadKeys.Button.B)) { // bottom pixel
                     thread = new Thread(() -> {
                         bot.slides.runToBottom();
-                        bot.claw.open();
+                        bot.claw.fullOpen();
                         sleep(100);
                         bot.fourbar.bottomPixel();
                         sleep(400);
-                        bot.claw.close();
+                        bot.claw.fullClose();
                         sleep(300);
                         bot.storage();
                     });
@@ -110,7 +110,7 @@ public class MainTeleOp extends LinearOpMode {
                 if (gp2.wasJustPressed(GamepadKeys.Button.RIGHT_BUMPER)) { // drop pixel
                     //bot.fourbar.dropPixel(2);
                     sleep(100);
-                    bot.claw.open();
+                    bot.claw.halfOpen();
                     sleep(100);
                     bot.fourbar.storage();
                 }
@@ -152,17 +152,17 @@ public class MainTeleOp extends LinearOpMode {
 
             // preset positions
             if (gp2.wasJustPressed(GamepadKeys.Button.DPAD_UP)) { // TOP
-                bot.claw.close();
+                bot.claw.fullClose();
                 bot.slides.runToTop();
                 sleep(400);
                 bot.outtakeOut();
             } else if (gp2.wasJustPressed(GamepadKeys.Button.DPAD_LEFT)) { // MIDDLE
-                bot.claw.close();
+                bot.claw.fullClose();
                 bot.slides.runToMiddle();
                 sleep(200);
                 bot.outtakeOut();
             } else if (gp2.wasJustPressed(GamepadKeys.Button.DPAD_RIGHT)) { // LOW
-                bot.claw.close();
+                bot.claw.fullClose();
                 bot.slides.runToLow();
                 bot.outtakeOut();
             } else if (gp2.wasJustPressed(GamepadKeys.Button.DPAD_DOWN)) { // BOTTOM
@@ -200,10 +200,14 @@ public class MainTeleOp extends LinearOpMode {
     // Drop pixel thread
     private void drop() {
         thread = new Thread(() -> {
-            bot.claw.open();
+            bot.claw.fullOpen();
             sleep(300);
             bot.storage();
-            bot.claw.close();
+            if (bot.state == Bot.BotState.OUTTAKE_OUT) {
+                bot.claw.halfOpen();
+            } else {
+                bot.claw.fullOpen();
+            }
         });
         thread.start();
     }
