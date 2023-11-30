@@ -10,8 +10,8 @@ import com.acmerobotics.dashboard.config.Config;
 public class V4B {
     private final Servo armLeft, armRight, wrist;
 
-    public static double armOuttake = 0.31, armStorage = 0.76, armGround = 0.08, armTopPixel = 0.88, armBottomPixel = 0.91;
-    public static double wristOuttake = 0.49, wristStorage = 0.26, wristGround = 0.36, wristTopPixel = 0.245, wristBottomPixel = 0.24, wristTransfer = 0.22;
+    public static double armOuttake = 0.31, armStorage = 0.76, armGround = 0.08, armTopPixel = 0.88, armBottomPixel = 0.91, armDualPickup = 0.94;
+    public static double wristBottomOuttake = 0.49, wristTopOuttake = 0.52,  wristStorage = 0.26, wristGround = 0.36, wristTopPixel = 0.245, wristBottomPixel = 0.24, wristDualPickup = 0.24, wristTransfer = 0.22;
 
     public V4B(OpMode opMode) {
         armLeft = opMode.hardwareMap.servo.get("armLeft");
@@ -34,7 +34,7 @@ public class V4B {
     public void outtake() {
         setWrist(wristTransfer);
         setArm(armOuttake);
-        setWrist(wristOuttake);
+        setWrist(wristBottomOuttake);
     }
 
     public void ground() {
@@ -59,8 +59,8 @@ public class V4B {
 
     public void dropPixel(int pixel) {
         switch (pixel) {
-            case 1: setWrist(wristTopPixel);
-            case 2:setWrist(wristBottomPixel);
+            case 1: setWrist(wristTopOuttake);
+            case 2:setWrist(wristBottomOuttake);
         }
     }
 

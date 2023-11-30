@@ -77,6 +77,7 @@ public class Bot {
         state = BotState.OUTTAKE_OUT;
     }
 
+
     public void outtakeGround() { // go to outtake ground position
         fourbar.ground();
         slides.runToBottom();
