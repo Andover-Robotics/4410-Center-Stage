@@ -163,7 +163,7 @@ public class Bot {
     }
 
     public void calculateWristPos() {
-        if (claw.clawState == Claw.ClawState.ONE) {
+        if (claw.clawState == Claw.ClawState.SINGLE) {
             this.wristUpPos = 0.03;
         } else {
             this.wristUpPos = 0.0;

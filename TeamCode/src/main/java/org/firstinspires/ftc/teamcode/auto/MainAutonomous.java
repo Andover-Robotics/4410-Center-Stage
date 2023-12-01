@@ -112,11 +112,11 @@ public class MainAutonomous extends LinearOpMode {
         Thread pickup = new Thread(() -> {
             sleep(250);
             bot.slides.runToBottom();
-            bot.claw.halfOpen();
+            bot.claw.open();
             sleep(100);
             bot.fourbar.topPixel();
             sleep(800);
-            bot.claw.fullClose();
+            bot.claw.close();
             bot.calculateWristPos();
             bot.fourbar.wrist.setPosition(bot.fourbar.wrist.getPosition()+ bot.wristUpPos);
             sleep(300);
@@ -156,11 +156,11 @@ public class MainAutonomous extends LinearOpMode {
 
             // Re-grip/pick up pixel
             if (gp1.wasJustPressed(GamepadKeys.Button.START)) {
-                bot.claw.halfOpen();
+                bot.claw.open();
                 sleep(500);
                 bot.fourbar.topPixel();
                 sleep(800);
-                bot.claw.fullClose();
+                bot.claw.close();
                 bot.calculateWristPos();
                 bot.fourbar.wrist.setPosition(bot.fourbar.wrist.getPosition()+ bot.wristUpPos);
                 sleep(300);
@@ -275,10 +275,10 @@ public class MainAutonomous extends LinearOpMode {
             // Outtake purple/top pixel
             bot.outtakeGround();
             sleep(1000);
-            bot.claw.halfOpen();
+            bot.claw.open();
             sleep(600);
             bot.storage();
-            bot.claw.fullClose();
+            bot.claw.close();
             bot.calculateWristPos();
             bot.fourbar.wrist.setPosition(bot.fourbar.wrist.getPosition()+ bot.wristUpPos);
             sleep(200);
@@ -456,11 +456,11 @@ public class MainAutonomous extends LinearOpMode {
                 Thread pickupYellow = new Thread(() ->{
                     // pickup
                     bot.slides.runToBottom();
-                    bot.claw.halfOpen();
+                    bot.claw.open();
                     sleep(100);
                     bot.fourbar.bottomPixel();
                     sleep(500);
-                    bot.claw.fullClose();
+                    bot.claw.close();
                     bot.calculateWristPos();
                     bot.fourbar.wrist.setPosition(bot.fourbar.wrist.getPosition()+ bot.wristUpPos);
                     sleep(800);
@@ -487,10 +487,10 @@ public class MainAutonomous extends LinearOpMode {
                 }
                 bot.outtakeOut();
                 sleep(500);
-                bot.claw.halfOpen();
+                bot.claw.open();
                 sleep(800);
                 bot.storage();
-                bot.claw.fullClose();
+                bot.claw.close();
                 bot.calculateWristPos();
                 bot.fourbar.wrist.setPosition(bot.fourbar.wrist.getPosition()+ bot.wristUpPos);
                 sleep(200);
