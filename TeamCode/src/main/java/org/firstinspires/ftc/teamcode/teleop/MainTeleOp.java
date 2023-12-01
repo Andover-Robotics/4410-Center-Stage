@@ -107,8 +107,7 @@ public class MainTeleOp extends LinearOpMode {
                     });
                     thread.start();
                 }
-                if (gp2.wasJustPressed(GamepadKeys.Button.RIGHT_BUMPER)) { // drop pixel
-                    //bot.fourbar.dropPixel(2);
+                if (gp2.wasJustPressed(GamepadKeys.Button.RIGHT_BUMPER)) { // drop pixel while in storage
                     sleep(100);
                     bot.claw.open();
                     sleep(100);
@@ -120,11 +119,8 @@ public class MainTeleOp extends LinearOpMode {
                 if (gp2.wasJustPressed(GamepadKeys.Button.X)) { // go to outtake ground position
                     bot.outtakeGround();
                 }
-            } else if (bot.state == Bot.BotState.OUTTAKE_OUT) {
-                // SCORING BACKBOARD
-                //bot.slides.runManual(gp2.getRightY()*-0.5); // Adjusts slides
-                //bot.fourbar.runAngle(bot.slides.motorLeft.getCurrentPosition()); // Calculates arm position
-
+            } else if (bot.state == Bot.BotState.OUTTAKE_OUT) { // SCORING BACKBOARD
+                bot.fourbar.runAngle(bot.slides.motorLeft.getCurrentPosition()); // calculate arm angle
                 if (gp2.wasJustPressed(GamepadKeys.Button.Y)) { // drop and return to storage
                     drop();
                 }
@@ -202,7 +198,7 @@ public class MainTeleOp extends LinearOpMode {
         thread = new Thread(() -> {
             bot.claw.open();
             sleep(300);
-            bot.storage();
+            if (bot.claw.getClawState() == 1) bot.storage(); // if there is only a single pixel in claw
             bot.claw.close();
         });
         thread.start();

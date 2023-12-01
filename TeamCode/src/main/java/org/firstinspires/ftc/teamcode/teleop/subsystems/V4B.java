@@ -24,7 +24,7 @@ public class V4B {
 
     private void setArm(double position) {
         armLeft.setPosition(position);
-        armRight.setPosition(0.96 - position);
+        armRight.setPosition(0.95 - position);
     }
 
     private void setWrist(double position) {
@@ -72,7 +72,9 @@ public class V4B {
     public void runAngle(double slidePosition) {
         double desiredAngle = 180 - 60.001 - Math.toDegrees(Math.asin((Math.sin(60.001) * 268.754 - (slidePosition / 8.558)) / 170.0));
         double newPosition = 0.00333 * desiredAngle;
-        setArm(newPosition);
+        if (slidePosition > -1500) {
+            setArm(newPosition);
+        }
 
     }
 

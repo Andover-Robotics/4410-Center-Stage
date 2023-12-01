@@ -11,45 +11,43 @@ public class Claw {
     // TODO: Tune open and close values
     public static double fullOpen = 0.65;
     public static double halfOpen = 0.71;
-    public static double fullClose = 0.77;
-    public static double open = 0.65;//old
-    public static double close = 0.77;//old code
-    public boolean isOpen = true, isBottom = false;
-    public enum PixelState{
-        EMPTY,
-        TOP,
-        BOTH
+    public static double close = 0.77;
+    public enum ClawState{
+        EMPTY, // Has no pixels
+        SINGLE, // Only one pixel (top one)
+        BOTH // Both pixels (top and bottom)
     }
-    public PixelState pixelState = PixelState.EMPTY;
+    public ClawState clawState = ClawState.EMPTY;
 
     public Claw(OpMode opMode){
         claw = opMode.hardwareMap.servo.get("claw");
         claw.setDirection(Servo.Direction.FORWARD);
     }
 
-    public void fullOpen(){
-        claw.setPosition(fullOpen);
-        pixelState = PixelState.EMPTY;
+    // Open methods
+    public void open() { // open full, drop both top and bottom or top
+        if (clawState == ClawState.BOTH) {
+            claw.setPosition(halfOpen);
+            clawState = ClawState.SINGLE;
+        } else {
+            claw.setPosition(fullOpen);
+            clawState = ClawState.EMPTY;
+        }
     }
 
-    public void halfOpen(){
-        claw.setPosition(halfOpen);
-        pixelState = PixelState.TOP;
-    }
-
-    public void fullClose(){
-        claw.setPosition(fullClose);
-        pixelState = PixelState.BOTH;
-    }
-
-    public void open(){
-        claw.setPosition(open);
-        isOpen = true;
-    }
-
-    public void close(){
+    // Close methods
+    public void close() { // close, cover
         claw.setPosition(close);
-        isOpen = false;
+        clawState = ClawState.BOTH;
     }
+
+    public int getClawState() {
+        switch (clawState) {
+            case SINGLE: return 1;
+            case BOTH: return 2;
+            default: return 0; // default or empty
+        }
+    }
+
 
 }
