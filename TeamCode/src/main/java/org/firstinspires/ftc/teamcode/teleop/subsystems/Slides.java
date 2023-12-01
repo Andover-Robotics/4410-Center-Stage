@@ -105,6 +105,7 @@ public class Slides {
     public void runManual(double manual) {
         if (manual > powerMin || manual < -powerMin) {
             manualPower = manual;
+
         } else {
             manualPower = 0;
         }

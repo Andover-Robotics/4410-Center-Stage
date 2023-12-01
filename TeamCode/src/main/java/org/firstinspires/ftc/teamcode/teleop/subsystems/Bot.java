@@ -34,7 +34,6 @@ public class Bot {
     public V4B fourbar;
     public Claw claw;
     public Launcher launcher;
-    Thread thread;
 
     // get bot instance
     public static Bot getInstance() {
@@ -78,6 +77,7 @@ public class Bot {
         state = BotState.OUTTAKE_OUT;
     }
 
+
     public void outtakeGround() { // go to outtake ground position
         fourbar.ground();
         slides.runToBottom();
@@ -95,6 +95,11 @@ public class Bot {
     }
 
     public void fixMotors() {
+        fl.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
+        fr.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
+        bl.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
+        br.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
+
         fl.setInverted(false);
         fr.setInverted(true);
         bl.setInverted(false);
@@ -104,11 +109,6 @@ public class Bot {
         fr.setRunMode(Motor.RunMode.RawPower);
         bl.setRunMode(Motor.RunMode.RawPower);
         br.setRunMode(Motor.RunMode.RawPower);
-
-        fl.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
-        fr.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
-        bl.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
-        br.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
     }
 
     public void stopMotors() {
