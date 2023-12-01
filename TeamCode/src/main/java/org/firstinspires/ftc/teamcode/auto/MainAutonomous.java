@@ -112,11 +112,13 @@ public class MainAutonomous extends LinearOpMode {
         Thread pickup = new Thread(() -> {
             sleep(250);
             bot.slides.runToBottom();
-            bot.claw.open();
+            bot.claw.halfOpen();
             sleep(100);
             bot.fourbar.topPixel();
             sleep(800);
-            bot.claw.close();
+            bot.claw.fullClose();
+            bot.calculateWristPos();
+            bot.fourbar.wrist.setPosition(bot.fourbar.wrist.getPosition()+ bot.wristUpPos);
             sleep(300);
             bot.storage();
             sleep(200);
@@ -154,11 +156,13 @@ public class MainAutonomous extends LinearOpMode {
 
             // Re-grip/pick up pixel
             if (gp1.wasJustPressed(GamepadKeys.Button.START)) {
-                bot.claw.open();
+                bot.claw.halfOpen();
                 sleep(500);
                 bot.fourbar.topPixel();
                 sleep(800);
-                bot.claw.close();
+                bot.claw.fullClose();
+                bot.calculateWristPos();
+                bot.fourbar.wrist.setPosition(bot.fourbar.wrist.getPosition()+ bot.wristUpPos);
                 sleep(300);
                 bot.storage();
                 sleep(200);
@@ -271,10 +275,12 @@ public class MainAutonomous extends LinearOpMode {
             // Outtake purple/top pixel
             bot.outtakeGround();
             sleep(1000);
-            bot.claw.open();
+            bot.claw.halfOpen();
             sleep(600);
             bot.storage();
-            bot.claw.close();
+            bot.claw.fullClose();
+            bot.calculateWristPos();
+            bot.fourbar.wrist.setPosition(bot.fourbar.wrist.getPosition()+ bot.wristUpPos);
             sleep(200);
 
             // Backstage actions
@@ -450,11 +456,13 @@ public class MainAutonomous extends LinearOpMode {
                 Thread pickupYellow = new Thread(() ->{
                     // pickup
                     bot.slides.runToBottom();
-                    bot.claw.open();
+                    bot.claw.halfOpen();
                     sleep(100);
                     bot.fourbar.bottomPixel();
                     sleep(500);
-                    bot.claw.close();
+                    bot.claw.fullClose();
+                    bot.calculateWristPos();
+                    bot.fourbar.wrist.setPosition(bot.fourbar.wrist.getPosition()+ bot.wristUpPos);
                     sleep(800);
                     bot.storage();
                     sleep(200);
@@ -479,10 +487,12 @@ public class MainAutonomous extends LinearOpMode {
                 }
                 bot.outtakeOut();
                 sleep(500);
-                bot.claw.open();
+                bot.claw.halfOpen();
                 sleep(800);
                 bot.storage();
-                bot.claw.close();
+                bot.claw.fullClose();
+                bot.calculateWristPos();
+                bot.fourbar.wrist.setPosition(bot.fourbar.wrist.getPosition()+ bot.wristUpPos);
                 sleep(200);
 
                 // Parking
