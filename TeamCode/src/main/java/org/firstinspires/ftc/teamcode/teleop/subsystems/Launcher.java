@@ -7,8 +7,8 @@ import com.qualcomm.robotcore.hardware.Servo;
 @Config
 public class Launcher {
     private final Servo launcher;
-    public static double initialized = 0.6;
-    public static double launched = 1.0;
+    public static double initialized = 0.4;
+    public static double launched = 0.84;
 
     public Launcher(OpMode opMode){
         launcher = opMode.hardwareMap.servo.get("launcher");
