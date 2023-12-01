@@ -90,6 +90,8 @@ public class MainTeleOp extends LinearOpMode {
                         sleep(400);
                         bot.claw.fullClose();
                         sleep(300);
+                        bot.calculateWristPos();
+                        bot.fourbar.wrist.setPosition(bot.fourbar.wrist.getPosition()+ bot.wristUpPos);
                         bot.storage();
                     });
                     thread.start();
@@ -103,6 +105,8 @@ public class MainTeleOp extends LinearOpMode {
                         sleep(400);
                         bot.claw.fullClose();
                         sleep(300);
+                        bot.calculateWristPos();
+                        bot.fourbar.wrist.setPosition(bot.fourbar.wrist.getPosition()+ bot.wristUpPos);
                         bot.storage();
                     });
                     thread.start();
@@ -111,6 +115,8 @@ public class MainTeleOp extends LinearOpMode {
                     //bot.fourbar.dropPixel(2);
                     sleep(100);
                     bot.claw.halfOpen();
+                    bot.calculateWristPos();
+                    bot.fourbar.wrist.setPosition(bot.fourbar.wrist.getPosition()+ bot.wristUpPos);
                     sleep(100);
                     bot.fourbar.storage();
                 }
@@ -153,16 +159,22 @@ public class MainTeleOp extends LinearOpMode {
             // preset positions
             if (gp2.wasJustPressed(GamepadKeys.Button.DPAD_UP)) { // TOP
                 bot.claw.fullClose();
+                bot.calculateWristPos();
+                bot.fourbar.wrist.setPosition(bot.fourbar.wrist.getPosition()+ bot.wristUpPos);
                 bot.slides.runToTop();
                 sleep(400);
                 bot.outtakeOut();
             } else if (gp2.wasJustPressed(GamepadKeys.Button.DPAD_LEFT)) { // MIDDLE
                 bot.claw.fullClose();
+                bot.calculateWristPos();
+                bot.fourbar.wrist.setPosition(bot.fourbar.wrist.getPosition()+ bot.wristUpPos);
                 bot.slides.runToMiddle();
                 sleep(200);
                 bot.outtakeOut();
             } else if (gp2.wasJustPressed(GamepadKeys.Button.DPAD_RIGHT)) { // LOW
                 bot.claw.fullClose();
+                bot.calculateWristPos();
+                bot.fourbar.wrist.setPosition(bot.fourbar.wrist.getPosition()+ bot.wristUpPos);
                 bot.slides.runToLow();
                 bot.outtakeOut();
             } else if (gp2.wasJustPressed(GamepadKeys.Button.DPAD_DOWN)) { // BOTTOM
@@ -208,6 +220,8 @@ public class MainTeleOp extends LinearOpMode {
             } else {
                 bot.claw.fullOpen();
             }
+            bot.calculateWristPos();
+            bot.fourbar.wrist.setPosition(bot.fourbar.wrist.getPosition()+ bot.wristUpPos);
         });
         thread.start();
     }

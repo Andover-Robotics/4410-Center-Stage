@@ -35,6 +35,8 @@ public class Bot {
     public Claw claw;
     public Launcher launcher;
 
+    public double wristUpPos = 0.0;
+
     // get bot instance
     public static Bot getInstance() {
         if (instance == null) {
@@ -158,6 +160,14 @@ public class Bot {
         ));
         imu0.initialize(parameters);
         resetIMU();
+    }
+
+    public void calculateWristPos() {
+        if (claw.clawState == Claw.ClawState.ONE) {
+            this.wristUpPos = 0.03;
+        } else {
+            this.wristUpPos = 0.0;
+        }
     }
 
     public void resetIMU() {

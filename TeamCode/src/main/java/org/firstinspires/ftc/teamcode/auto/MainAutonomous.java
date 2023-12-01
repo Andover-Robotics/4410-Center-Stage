@@ -117,6 +117,8 @@ public class MainAutonomous extends LinearOpMode {
             bot.fourbar.topPixel();
             sleep(800);
             bot.claw.fullClose();
+            bot.calculateWristPos();
+            bot.fourbar.wrist.setPosition(bot.fourbar.wrist.getPosition()+ bot.wristUpPos);
             sleep(300);
             bot.storage();
             sleep(200);
@@ -159,6 +161,8 @@ public class MainAutonomous extends LinearOpMode {
                 bot.fourbar.topPixel();
                 sleep(800);
                 bot.claw.fullClose();
+                bot.calculateWristPos();
+                bot.fourbar.wrist.setPosition(bot.fourbar.wrist.getPosition()+ bot.wristUpPos);
                 sleep(300);
                 bot.storage();
                 sleep(200);
@@ -275,6 +279,8 @@ public class MainAutonomous extends LinearOpMode {
             sleep(600);
             bot.storage();
             bot.claw.fullClose();
+            bot.calculateWristPos();
+            bot.fourbar.wrist.setPosition(bot.fourbar.wrist.getPosition()+ bot.wristUpPos);
             sleep(200);
 
             // Backstage actions
@@ -455,6 +461,8 @@ public class MainAutonomous extends LinearOpMode {
                     bot.fourbar.bottomPixel();
                     sleep(500);
                     bot.claw.fullClose();
+                    bot.calculateWristPos();
+                    bot.fourbar.wrist.setPosition(bot.fourbar.wrist.getPosition()+ bot.wristUpPos);
                     sleep(800);
                     bot.storage();
                     sleep(200);
@@ -483,6 +491,8 @@ public class MainAutonomous extends LinearOpMode {
                 sleep(800);
                 bot.storage();
                 bot.claw.fullClose();
+                bot.calculateWristPos();
+                bot.fourbar.wrist.setPosition(bot.fourbar.wrist.getPosition()+ bot.wristUpPos);
                 sleep(200);
 
                 // Parking
