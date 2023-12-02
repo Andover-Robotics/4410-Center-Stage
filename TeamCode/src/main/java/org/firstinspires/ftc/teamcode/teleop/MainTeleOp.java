@@ -212,6 +212,8 @@ public class MainTeleOp extends LinearOpMode {
                 } else if (bot.claw.getClawState() == 1) {
                     if (bot.slides.getPosition() > -1850) {
                         bot.slides.runTo(bot.slides.getPosition() - 400);
+                    } else if (bot.slides.getPosition() <=-1850){
+                        bot.slides.runTo(-2300);
                     }
                     bot.fourbar.wristTopOuttake();
                 }
