@@ -11,7 +11,7 @@ public class V4B {
     public final Servo armLeft, armRight, wrist;
 
     public static double armOuttake = 0.31, armStorage = 0.76, armGround = 0.08, armTopPixel = 0.88, armBottomPixel = 0.91, armDualPickup = 0.94;
-    public static double wristBottomOuttake = 0.49, wristTopOuttake = 0.52,  wristStorage = 0.26, wristGround = 0.36, wristTopPixel = 0.245, wristBottomPixel = 0.24, wristDualPickup = 0.24, wristTransfer = 0.22;
+    public static double wristBottomOuttake = 0.49, wristTopOuttake = 0.57,  wristStorage = 0.26, wristGround = 0.36, wristTopPixel = 0.245, wristBottomPixel = 0.24, wristDualPickup = 0.24, wristTransfer = 0.22;
 
     public V4B(OpMode opMode) {
         armLeft = opMode.hardwareMap.servo.get("armLeft");
@@ -31,12 +31,21 @@ public class V4B {
         wrist.setPosition(position);
     }
 
-    public void outtake() {
+//    public void outtake() {
+//        setWrist(wristTransfer);
+//        setArm(armOuttake);
+//        setWrist(wristBottomOuttake);
+//    }
+
+    public void dualOuttake(int pixel) {
         setWrist(wristTransfer);
         setArm(armOuttake);
-        setWrist(wristBottomOuttake);
+        if (pixel == 1){
+            wristTopOuttake();
+        } else {
+            wristBottomOuttake();
+        }
     }
-
     public void ground() {
         setWrist(wristGround);
         setArm(armGround);
@@ -47,23 +56,35 @@ public class V4B {
         setArm(armStorage);
     }
 
-    public void topPixel() {
-        setWrist(wristTopPixel);
-        setArm(armTopPixel);
+//    public void topPixel() {
+//        setWrist(wristTopPixel);
+//        setArm(armTopPixel);
+//    }
+
+//    public void bottomPixel() {
+//        setWrist(wristBottomPixel);
+//        setArm(armBottomPixel);
+//    }
+
+    public void pickup() {
+        setWrist(wristDualPickup);
+        setArm(armDualPickup);
     }
 
-    public void bottomPixel() {
-        setWrist(wristBottomPixel);
-        setArm(armBottomPixel);
-    }
-
-    public void dropPixel(int pixel) {
+    public void dualWristOuttake(int pixel) { //unused not work for some reason idk
         switch (pixel) {
+            case 0: setWrist(wristBottomOuttake);
             case 1: setWrist(wristTopOuttake);
             case 2:setWrist(wristBottomOuttake);
         }
     }
 
+    public void wristTopOuttake(){
+        setWrist(wristTopOuttake);
+    }
+    public void wristBottomOuttake(){
+        setWrist(wristBottomOuttake);
+    }
     public void runManualOuttake(double fourpos, double clawpos) {
         setArm(fourpos);
         setWrist(clawpos);

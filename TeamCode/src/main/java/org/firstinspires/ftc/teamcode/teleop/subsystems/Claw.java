@@ -10,7 +10,7 @@ public class Claw {
 
     // TODO: Tune open and close values
     public static double fullOpen = 0.65;
-    public static double halfOpen = 0.71;
+    public static double halfOpen = 0.70;
     public static double close = 0.77;
     public enum ClawState{
         EMPTY, // Has no pixels
@@ -28,6 +28,7 @@ public class Claw {
     public void open() { // open full, drop both top and bottom or top
         if (clawState == ClawState.BOTH) {
             claw.setPosition(halfOpen);
+
             clawState = ClawState.SINGLE;
         } else {
             claw.setPosition(fullOpen);
@@ -35,10 +36,19 @@ public class Claw {
         }
     }
 
+    public void fullOpen() { // open full, drop both top and bottom or top
+            claw.setPosition(fullOpen);
+            clawState = ClawState.EMPTY;
+    }
+
     // Close methods
-    public void close() { // close, cover
+    public void pickupClose() { // close, cover
         claw.setPosition(close);
         clawState = ClawState.BOTH;
+    }
+
+    public void close() { // close, cover
+        claw.setPosition(close);
     }
 
     public int getClawState() {

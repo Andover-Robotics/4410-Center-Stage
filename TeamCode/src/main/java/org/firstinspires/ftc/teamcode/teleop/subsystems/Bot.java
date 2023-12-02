@@ -74,10 +74,17 @@ public class Bot {
         state = BotState.STORAGE;
     }
 
-    public void outtakeOut() { // go to outtake backboard position
-        fourbar.outtake();
+//    public void outtakeOut() { // go to outtake backboard position
+//        fourbar.outtake();
+//        state = BotState.OUTTAKE_OUT;
+//    }
+
+    public void outtakeOut(int pixel) { // go to outtake backboard position
+        fourbar.dualOuttake(pixel);
         state = BotState.OUTTAKE_OUT;
     }
+
+
 
 
     public void outtakeGround() { // go to outtake ground position
