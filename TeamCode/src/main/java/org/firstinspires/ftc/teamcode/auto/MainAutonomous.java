@@ -27,6 +27,7 @@ import org.openftc.easyopencv.OpenCvCameraRotation;
 
 import java.util.ArrayList;
 
+import java.util.Map;
 import java.util.Objects;
 
 @Config
@@ -51,6 +52,7 @@ public class MainAutonomous extends LinearOpMode {
     boolean toPark = false; // Parking position: true - park in corner after, false - don't move after scoring pixel
     boolean toBackboard = true; // Go to backboard: true - go to backboard and score, false - only score spike and stop
     boolean slidesUp = false; // Slide up: true - move slides up when scoring pixel on backboard, false - don't
+    int newTiles = 0;
     int backboardWait = 0; // How long (milliseconds) to wait before scoring on backboard: 0-5 seconds
     int dt = 0;
     // TODO: WRITE SCORE SPIKE CONDITION
@@ -105,6 +107,15 @@ public class MainAutonomous extends LinearOpMode {
 
         // Initialize bot
         bot.stopMotors();
+        for (Map.Entry<String, DcMotor> entry : hardwareMap.dcMotor.entrySet()) {
+            entry.getValue().setMode(RunMode.STOP_AND_RESET_ENCODER);
+            while (!isStopRequested() && Math.abs(entry.getValue().getCurrentPosition()) > 1) {
+                idle();
+            }
+        }
+        telemetry.addData(entry.getKey(), "Bot is reset");
+        telemetry.update();
+
         bot.state = Bot.BotState.STORAGE;
         bot.storage();
 
@@ -205,6 +216,16 @@ public class MainAutonomous extends LinearOpMode {
                 toBackboard = !toBackboard;
             }
             telemetry.addData("To Backboard (DPAD DOWN)", toBackboard);
+
+            //Toggle Tile Type
+            if (gp1.wasJustPressed(GamepadKeys.Button.DPAD_LEFT)) {
+                if (newTiles == 0) {
+                    newTiles = 1;
+                } else if (newTiles == 1) {
+                    newTiles = 0;
+                }
+            }
+            telemetry.addData("New Tiles? (DPAD LEFT)", newTiles);
 
             // Initiate color detection
             if (alliance == Alliance.RED) {
@@ -317,7 +338,7 @@ public class MainAutonomous extends LinearOpMode {
                                 drive.followTrajectorySequence(
                                         drive.trajectorySequenceBuilder(startPose)
                                                 .strafeLeft(24)
-                                                .back(78)
+                                                .back(78 + newTiles)
                                                 .strafeRight(4)
                                                 .build());
                                 break;
@@ -327,7 +348,7 @@ public class MainAutonomous extends LinearOpMode {
                                                 .strafeLeft(12)
                                                 .back(24)
                                                 .turn(Math.toRadians(turnRadians))
-                                                .back(90)
+                                                .back(90 + newTiles)
                                                 .strafeRight(5)
                                                 .build());
                                 break;
@@ -335,7 +356,7 @@ public class MainAutonomous extends LinearOpMode {
                                 drive.followTrajectorySequence(
                                         drive.trajectorySequenceBuilder(startPose)
                                                 .strafeRight(24)
-                                                .forward(78)
+                                                .forward(78 + newTiles)
                                                 .turn(Math.toRadians((2*turnRadians)))
                                                 .strafeRight(6)
                                                 .build());
@@ -372,7 +393,7 @@ public class MainAutonomous extends LinearOpMode {
                                 drive.followTrajectorySequence(
                                         drive.trajectorySequenceBuilder(startPose)
                                                 .strafeLeft(24)
-                                                .forward(78)
+                                                .forward(78 + newTiles)
                                                 .turn(Math.toRadians(-2*turnRadians))
                                                 .strafeLeft(10)
                                                 .build());
@@ -383,7 +404,7 @@ public class MainAutonomous extends LinearOpMode {
                                                 .strafeRight(12)
                                                 .back(24)
                                                 .turn(Math.toRadians(-turnRadians))
-                                                .back(90)
+                                                .back(90 + newTiles)
                                                 .strafeLeft(10)
                                                 .build());
                                 break;
@@ -391,7 +412,7 @@ public class MainAutonomous extends LinearOpMode {
                                 drive.followTrajectorySequence(
                                         drive.trajectorySequenceBuilder(startPose)
                                                 .strafeRight(24)
-                                                .back(78)
+                                                .back(78 + newTiles)
                                                 .strafeLeft(10)
                                                 .build());
                                 break;

@@ -17,6 +17,7 @@ import org.firstinspires.ftc.teamcode.teleop.subsystems.Bot;
 import org.firstinspires.ftc.teamcode.teleop.subsystems.Slides;
 
 import java.lang.*;
+import java.util.Map;
 
 @Config
 @TeleOp(name = "MainTeleOp")
@@ -49,6 +50,14 @@ public class MainTeleOp extends LinearOpMode {
 
         // Initialize bot
         bot.stopMotors();
+        for (Map.Entry<String, DcMotor> entry : hardwareMap.dcMotor.entrySet()) {
+            entry.getValue().setMode(RunMode.STOP_AND_RESET_ENCODER);
+            while (!isStopRequested() && Math.abs(entry.getValue().getCurrentPosition()) > 1) {
+                idle();
+            }
+            telemetry.addData(entry.getKey(), "is reset");
+            telemetry.update();
+        }
         bot.state = Bot.BotState.STORAGE;
         bot.storage();
         bot.claw.fullOpen();
