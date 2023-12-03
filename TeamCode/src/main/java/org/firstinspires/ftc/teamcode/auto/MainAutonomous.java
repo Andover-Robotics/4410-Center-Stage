@@ -112,11 +112,11 @@ public class MainAutonomous extends LinearOpMode {
         Thread pickup = new Thread(() -> {
             sleep(250);
             bot.slides.runToBottom();
-            bot.claw.halfOpen();
+            bot.claw.fullOpen();
             sleep(100);
-            bot.fourbar.topPixel();
-            sleep(800);
-            bot.claw.fullClose();
+            bot.fourbar.pickup();
+            sleep(400);
+            bot.claw.pickupClose();
             sleep(300);
             bot.storage();
             sleep(200);
@@ -154,11 +154,14 @@ public class MainAutonomous extends LinearOpMode {
 
             // Re-grip/pick up pixel
             if (gp1.wasJustPressed(GamepadKeys.Button.START)) {
-                bot.claw.halfOpen();
-                sleep(500);
-                bot.fourbar.topPixel();
-                sleep(800);
-                bot.claw.fullClose();
+                bot.claw.open();
+                sleep(250);
+                bot.slides.runToBottom();
+                bot.claw.fullOpen();
+                sleep(100);
+                bot.fourbar.pickup();
+                sleep(400);
+                bot.claw.pickupClose();
                 sleep(300);
                 bot.storage();
                 sleep(200);
@@ -254,7 +257,7 @@ public class MainAutonomous extends LinearOpMode {
                     drive.followTrajectorySequence(
                         drive.trajectorySequenceBuilder(startPose)
                             .back(47)
-                            .forward(20)
+                            .forward(21)
                             .build());
                     break;
                 case 3: // RIGHT
@@ -271,10 +274,12 @@ public class MainAutonomous extends LinearOpMode {
             // Outtake purple/top pixel
             bot.outtakeGround();
             sleep(1000);
-            bot.claw.halfOpen();
+            bot.claw.open();
             sleep(600);
             bot.storage();
-            bot.claw.fullClose();
+            bot.claw.close();
+            bot.calculateWristPos();
+            bot.fourbar.wrist.setPosition(bot.fourbar.wrist.getPosition()+ bot.wristUpPos);
             sleep(200);
 
             // Backstage actions
@@ -447,20 +452,22 @@ public class MainAutonomous extends LinearOpMode {
                 }
 
                 // Pickup yellow/bottom pixel
-                Thread pickupYellow = new Thread(() ->{
-                    // pickup
-                    bot.slides.runToBottom();
-                    bot.claw.halfOpen();
-                    sleep(100);
-                    bot.fourbar.bottomPixel();
-                    sleep(500);
-                    bot.claw.fullClose();
-                    sleep(800);
-                    bot.storage();
-                    sleep(200);
-                });
+//                Thread pickupYellow = new Thread(() ->{
+//                    // pickup
+//                    bot.slides.runToBottom();
+//                    bot.claw.open();
+//                    sleep(100);
+//                    bot.fourbar.bottomPixel();
+//                    sleep(500);
+//                    bot.claw.close();
+//                    bot.calculateWristPos();
+//                    bot.fourbar.wrist.setPosition(bot.fourbar.wrist.getPosition()+ bot.wristUpPos);
+//                    sleep(800);
+//                    bot.storage();
+//                    sleep(200);
+//                });
                 startPose = drive.getPoseEstimate();
-                pickupYellow.start();
+                //pickupYellow.start();
 
                 // Run into backboard
                 int slowerVelocity = 10; // Slower velocity that is the max constraint when running into backboard (in/s)
@@ -477,12 +484,14 @@ public class MainAutonomous extends LinearOpMode {
                 } else {
                     bot.slides.runToBottom();
                 }
-                bot.outtakeOut();
+                bot.outtakeOut(bot.claw.getClawState());
                 sleep(500);
-                bot.claw.halfOpen();
+                bot.claw.open();
                 sleep(800);
                 bot.storage();
-                bot.claw.fullClose();
+                bot.claw.close();
+                bot.calculateWristPos();
+                bot.fourbar.wrist.setPosition(bot.fourbar.wrist.getPosition()+ bot.wristUpPos);
                 sleep(200);
 
                 // Parking

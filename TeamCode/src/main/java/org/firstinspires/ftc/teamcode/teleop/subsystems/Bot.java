@@ -35,6 +35,8 @@ public class Bot {
     public Claw claw;
     public Launcher launcher;
 
+    public double wristUpPos = 0.0;
+
     // get bot instance
     public static Bot getInstance() {
         if (instance == null) {
@@ -72,10 +74,17 @@ public class Bot {
         state = BotState.STORAGE;
     }
 
-    public void outtakeOut() { // go to outtake backboard position
-        fourbar.outtake();
+//    public void outtakeOut() { // go to outtake backboard position
+//        fourbar.outtake();
+//        state = BotState.OUTTAKE_OUT;
+//    }
+
+    public void outtakeOut(int pixel) { // go to outtake backboard position
+        fourbar.dualOuttake(pixel);
         state = BotState.OUTTAKE_OUT;
     }
+
+
 
 
     public void outtakeGround() { // go to outtake ground position
@@ -158,6 +167,14 @@ public class Bot {
         ));
         imu0.initialize(parameters);
         resetIMU();
+    }
+
+    public void calculateWristPos() {
+        if (claw.clawState == Claw.ClawState.SINGLE) {
+            this.wristUpPos = 0.03;
+        } else {
+            this.wristUpPos = 0.0;
+        }
     }
 
     public void resetIMU() {

@@ -30,7 +30,7 @@ public class MainTeleOp extends LinearOpMode {
 
     // PID
     public static double kp = 0.025, ki = 0, kd = 0;
-    private final PIDController headingAligner = new PIDController(kp, ki, kd);
+    private PIDController headingAligner = new PIDController(kp, ki, kd);
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -51,6 +51,7 @@ public class MainTeleOp extends LinearOpMode {
         bot.stopMotors();
         bot.state = Bot.BotState.STORAGE;
         bot.storage();
+        bot.claw.fullOpen();
 
         /*
         LIST OF DRIVER CONTROLS (so far) - Zachery:
@@ -81,50 +82,46 @@ public class MainTeleOp extends LinearOpMode {
             // FINITE STATES
             if (bot.state == Bot.BotState.STORAGE) { // INITIALIZED
                 // TRANSFER
-                if (gp2.wasJustPressed(GamepadKeys.Button.A)) { // top pixel
-                    thread = new Thread(() -> {
-                        bot.slides.runToBottom();
-                        bot.claw.halfOpen();
-                        sleep(100);
-                        bot.fourbar.topPixel();
-                        sleep(400);
-                        bot.claw.fullClose();
-                        sleep(300);
-                        bot.storage();
-                    });
-                    thread.start();
-                }
-                if (gp2.wasJustPressed(GamepadKeys.Button.B)) { // bottom pixel
+                if (gp2.wasJustPressed(GamepadKeys.Button.A)) { // pickup pixel
                     thread = new Thread(() -> {
                         bot.slides.runToBottom();
                         bot.claw.fullOpen();
                         sleep(100);
-                        bot.fourbar.bottomPixel();
+                        bot.fourbar.pickup();
                         sleep(400);
-                        bot.claw.fullClose();
+                        bot.claw.pickupClose();
                         sleep(300);
                         bot.storage();
                     });
                     thread.start();
                 }
-                if (gp2.wasJustPressed(GamepadKeys.Button.RIGHT_BUMPER)) { // drop pixel
-                    //bot.fourbar.dropPixel(2);
+                if (gp2.wasJustPressed(GamepadKeys.Button.B)) { // pickup pixel
+                    thread = new Thread(() -> {
+                        bot.slides.runToBottom();
+                        bot.claw.fullOpen();
+                        sleep(100);
+                        bot.fourbar.pickup();
+                        sleep(400);
+                        bot.claw.pickupClose();
+                        sleep(300);
+                        bot.storage();
+                    });
+                    thread.start();
+                }
+                if (gp2.wasJustPressed(GamepadKeys.Button.RIGHT_BUMPER)) { // drop pixel while in storage
                     sleep(100);
-                    bot.claw.halfOpen();
+                    bot.claw.fullOpen();
                     sleep(100);
                     bot.fourbar.storage();
                 }
                 if (gp2.wasJustPressed(GamepadKeys.Button.Y)) { // go to outtake out position
-                    bot.outtakeOut();
+                    bot.outtakeOut(bot.claw.getClawState());
                 }
                 if (gp2.wasJustPressed(GamepadKeys.Button.X)) { // go to outtake ground position
                     bot.outtakeGround();
                 }
-            } else if (bot.state == Bot.BotState.OUTTAKE_OUT) {
-                // SCORING BACKBOARD
-                //bot.slides.runManual(gp2.getRightY()*-0.5); // Adjusts slides
-                //bot.fourbar.runAngle(bot.slides.motorLeft.getCurrentPosition()); // Calculates arm position
-
+            } else if (bot.state == Bot.BotState.OUTTAKE_OUT) { // SCORING BACKBOARD
+                //bot.fourbar.runAngle(bot.slides.motorLeft.getCurrentPosition()); // calculate arm angle
                 if (gp2.wasJustPressed(GamepadKeys.Button.Y)) { // drop and return to storage
                     drop();
                 }
@@ -142,7 +139,7 @@ public class MainTeleOp extends LinearOpMode {
                     bot.storage();
                 }
                 if (gp2.wasJustPressed(GamepadKeys.Button.Y)) { // go to outtake out position
-                    bot.outtakeOut();
+                    bot.outtakeOut(bot.claw.getClawState());
                 }
             }
 
@@ -152,19 +149,25 @@ public class MainTeleOp extends LinearOpMode {
 
             // preset positions
             if (gp2.wasJustPressed(GamepadKeys.Button.DPAD_UP)) { // TOP
-                bot.claw.fullClose();
+                bot.claw.close();
                 bot.slides.runToTop();
-                sleep(400);
-                bot.outtakeOut();
+                thread = new Thread(() -> {
+                    sleep(900);
+                    bot.outtakeOut((bot.claw.getClawState()));
+                });
+                thread.start();
             } else if (gp2.wasJustPressed(GamepadKeys.Button.DPAD_LEFT)) { // MIDDLE
-                bot.claw.fullClose();
+                bot.claw.close();
                 bot.slides.runToMiddle();
-                sleep(200);
-                bot.outtakeOut();
+                thread = new Thread(() -> {
+                    sleep(500);
+                    bot.outtakeOut((bot.claw.getClawState()));
+                });
+                thread.start();
             } else if (gp2.wasJustPressed(GamepadKeys.Button.DPAD_RIGHT)) { // LOW
-                bot.claw.fullClose();
+                bot.claw.close();
                 bot.slides.runToLow();
-                bot.outtakeOut();
+                bot.outtakeOut(bot.claw.getClawState());
             } else if (gp2.wasJustPressed(GamepadKeys.Button.DPAD_DOWN)) { // BOTTOM
                 bot.slides.runToBottom();
                 bot.storage();
@@ -191,6 +194,7 @@ public class MainTeleOp extends LinearOpMode {
             telemetry.addData("Bot State",bot.state);
             telemetry.addData("Intake Power", bot.intake.power +"(running=" + bot.intake.getIsRunning() + ")");
             telemetry.addData("Slides Position", bot.slides.getPosition() + " (pos=" + bot.slides.position + " current=" + bot.slides.getCurrent() + ")");
+            telemetry.addData("Pixels", bot.claw.getClawState());
 
             telemetry.update();
             bot.slides.periodic();
@@ -200,14 +204,23 @@ public class MainTeleOp extends LinearOpMode {
     // Drop pixel thread
     private void drop() {
         thread = new Thread(() -> {
-            bot.claw.fullOpen();
+            bot.claw.open();
             sleep(300);
-            bot.storage();
             if (bot.state == Bot.BotState.OUTTAKE_OUT) {
-                bot.claw.halfOpen();
+                if (bot.claw.getClawState() == 0) {
+                    bot.storage();// if claw is empty go to storage
+                } else if (bot.claw.getClawState() == 1) {
+                    if (bot.slides.getPosition() > -1850) {
+                        bot.slides.runTo(bot.slides.getPosition() - 400);
+                    } else if (bot.slides.getPosition() <=-1850){
+                        bot.slides.runTo(-2300);
+                    }
+                    bot.fourbar.wristTopOuttake();
+                }
             } else {
-                bot.claw.fullOpen();
+                bot.storage();
             }
+            bot.claw.close();
         });
         thread.start();
     }

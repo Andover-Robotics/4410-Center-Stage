@@ -10,14 +10,12 @@ public class Claw {
 
     // TODO: Tune open and close values
     public static double fullOpen = 0.65;
-    public static double halfOpen = 0.71;
-    public static double fullClose = 0.77;
-//    public static double open = 0.65;//old
-//    public static double close = 0.77;//old code
+    public static double halfOpen = 0.70;
+    public static double close = 0.77;
     public enum ClawState{
-        EMPTY,
-        ONE,
-        BOTH
+        EMPTY, // Has no pixels
+        SINGLE, // Only one pixel (top one)
+        BOTH // Both pixels (top and bottom)
     }
     public ClawState clawState = ClawState.EMPTY;
 
@@ -26,19 +24,40 @@ public class Claw {
         claw.setDirection(Servo.Direction.FORWARD);
     }
 
-    public void fullOpen(){
-        claw.setPosition(fullOpen);
-        clawState = ClawState.EMPTY;
+    // Open methods
+    public void open() { // open full, drop both top and bottom or top
+        if (clawState == ClawState.BOTH) {
+            claw.setPosition(halfOpen);
+
+            clawState = ClawState.SINGLE;
+        } else {
+            claw.setPosition(fullOpen);
+            clawState = ClawState.EMPTY;
+        }
     }
 
-    public void halfOpen(){
-        claw.setPosition(halfOpen);
-        clawState = ClawState.ONE;
+    public void fullOpen() { // open full, drop both top and bottom or top
+            claw.setPosition(fullOpen);
+            clawState = ClawState.EMPTY;
     }
 
-    public void fullClose(){
-        claw.setPosition(fullClose);
+    // Close methods
+    public void pickupClose() { // close, cover
+        claw.setPosition(close);
         clawState = ClawState.BOTH;
     }
+
+    public void close() { // close, cover
+        claw.setPosition(close);
+    }
+
+    public int getClawState() {
+        switch (clawState) {
+            case SINGLE: return 1;
+            case BOTH: return 2;
+            default: return 0; // default or empty
+        }
+    }
+
 
 }
