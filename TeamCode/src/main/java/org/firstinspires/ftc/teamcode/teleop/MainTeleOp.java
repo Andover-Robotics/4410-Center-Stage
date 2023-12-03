@@ -130,7 +130,10 @@ public class MainTeleOp extends LinearOpMode {
                     bot.outtakeGround();
                 }
             } else if (bot.state == Bot.BotState.OUTTAKE_OUT) { // SCORING BACKBOARD
-                //bot.fourbar.runAngle(bot.slides.motorLeft.getCurrentPosition()); // calculate arm angle
+                bot.slides.runManual(gp2.getRightY()*-0.5);
+                if (Math.abs(gp2.getRightY() > 0.001)) {
+                    bot.fourbar.runAngle(bot.slides.motorLeft.getCurrentPosition()); // calculate arm angle
+                }
                 if (gp2.wasJustPressed(GamepadKeys.Button.Y)) { // drop and return to storage
                     drop();
                 }
