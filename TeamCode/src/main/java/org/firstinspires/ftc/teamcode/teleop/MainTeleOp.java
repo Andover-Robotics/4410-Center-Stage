@@ -54,7 +54,7 @@ public class MainTeleOp extends LinearOpMode {
         bot.stopMotors();
         bot.state = Bot.BotState.STORAGE;
         bot.storage();
-        bot.claw.fullOpen();
+        bot.claw.open(true);
 
         /*
         LIST OF DRIVER CONTROLS (so far) - Zachery:
@@ -96,11 +96,11 @@ public class MainTeleOp extends LinearOpMode {
                 if (gp2.wasJustPressed(GamepadKeys.Button.A)) { // pickup pixel
                     thread = new Thread(() -> {
                         bot.slides.runToBottom();
-                        bot.claw.fullOpen();
+                        bot.claw.open(true);
                         sleep(100);
                         bot.fourbar.pickup();
                         sleep(400);
-                        bot.claw.pickupClose();
+                        bot.claw.close();
                         sleep(300);
                         bot.storage();
                     });
@@ -109,11 +109,11 @@ public class MainTeleOp extends LinearOpMode {
                 if (gp2.wasJustPressed(GamepadKeys.Button.B)) { // pickup pixel
                     thread = new Thread(() -> {
                         bot.slides.runToBottom();
-                        bot.claw.fullOpen();
+                        bot.claw.open(true);
                         sleep(100);
                         bot.fourbar.pickup();
                         sleep(400);
-                        bot.claw.pickupClose();
+                        bot.claw.close();
                         sleep(300);
                         bot.storage();
                     });
@@ -121,7 +121,7 @@ public class MainTeleOp extends LinearOpMode {
                 }
                 if (gp2.wasJustPressed(GamepadKeys.Button.RIGHT_BUMPER)) { // drop pixel while in storage
                     sleep(100);
-                    bot.claw.fullOpen();
+                    bot.claw.open(true);
                     sleep(100);
                     bot.fourbar.storage();
                 }
@@ -132,10 +132,7 @@ public class MainTeleOp extends LinearOpMode {
                     bot.outtakeGround();
                 }
             } else if (bot.state == Bot.BotState.OUTTAKE_OUT) { // SCORING BACKBOARD
-                bot.slides.runManual(gp2.getRightY()*-0.5);
-//                if (Math.abs(gp2.getRightY()) > 0.001) {
-//                    bot.fourbar.runAngle(bot.slides.motorLeft.getCurrentPosition()); // calculate arm angle
-//                }
+//                bot.fourbar.runAngle(bot.slides.motorLeft.getCurrentPosition()); // calculate arm angle
 
                 if (gp2.wasJustPressed(GamepadKeys.Button.Y)) { // drop and return to storage
                     drop();
@@ -232,7 +229,7 @@ public class MainTeleOp extends LinearOpMode {
                     } else if (bot.slides.getPosition() <=-1850){
                         bot.slides.runTo(-2300);
                     }
-                    bot.fourbar.wristTopOuttake();
+                    bot.fourbar.dualOuttake(1);
                 }
             } else {
                 bot.storage();

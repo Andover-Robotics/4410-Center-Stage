@@ -126,11 +126,11 @@ public class MainAutonomous extends LinearOpMode {
         Thread pickup = new Thread(() -> {
             sleep(250);
             bot.slides.runToBottom();
-            bot.claw.fullOpen();
+            bot.claw.open(true);
             sleep(100);
             bot.fourbar.pickup();
             sleep(400);
-            bot.claw.pickupClose();
+            bot.claw.close();
             sleep(300);
             bot.storage();
             sleep(200);
@@ -168,14 +168,14 @@ public class MainAutonomous extends LinearOpMode {
 
             // Re-grip/pick up pixel
             if (gp1.wasJustPressed(GamepadKeys.Button.START)) {
-                bot.claw.open();
+                bot.claw.open(true);
                 sleep(250);
                 bot.slides.runToBottom();
-                bot.claw.fullOpen();
+                bot.claw.open(true);
                 sleep(100);
                 bot.fourbar.pickup();
                 sleep(400);
-                bot.claw.pickupClose();
+                bot.claw.close();
                 sleep(300);
                 bot.storage();
                 sleep(200);
