@@ -87,7 +87,14 @@ public class Bot {
 
 
 
+    public void ikDemo1() {
+        fourbar.setArm(0.35);
+    }
 
+    public void ikDemo2() {
+        fourbar.setArm(0.18);
+        slides.runTo(slides.getPosition()-300);
+    }
 
     public void outtakeGround() { // go to outtake ground position
         fourbar.ground();

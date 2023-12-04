@@ -22,7 +22,7 @@ public class V4B {
         wrist.setDirection(Servo.Direction.FORWARD);
     }
 
-    private void setArm(double position) {
+    public void setArm(double position) {
         armLeft.setPosition(position);
         armRight.setPosition(0.95 - position);
     }
@@ -73,7 +73,7 @@ public class V4B {
 
     public void runArm(double manual) {
         if (manual > 0.1) {
-            if (armLeft.getPosition() > 0.15 && armLeft.getPosition() < 0.37) {
+            if (armLeft.getPosition() > 0.15 && armLeft.getPosition() < 0.37) {//limit values are different because it usually overshoots by 0.002, if it was equal it would get stuck
                 setArm(armLeft.getPosition() + 0.005);
             }
         } else if (manual < -0.1){
