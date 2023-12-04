@@ -71,6 +71,21 @@ public class V4B {
         setArm(armDualPickup);
     }
 
+    public void runArm(double manual) {
+        if (manual > 0.1) {
+            if (armLeft.getPosition() > 0.15 && armLeft.getPosition() < 0.37) {
+                setArm(armLeft.getPosition() + 0.005);
+            }
+        } else if (manual < -0.1){
+            if (armLeft.getPosition() > 0.16 && armLeft.getPosition() < 0.38) {
+                setArm(armLeft.getPosition() - 0.005);
+            }
+        }
+    }
+
+    public double getArmPosition() {
+        return armLeft.getPosition();
+    }
     public void dualWristOuttake(int pixel) { //unused not work for some reason idk
         switch (pixel) {
             case 0: setWrist(wristBottomOuttake);

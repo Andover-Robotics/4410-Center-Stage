@@ -25,6 +25,9 @@ import org.openftc.easyopencv.OpenCvCameraException;
 import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
 
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotor.RunMode;
+
 import java.util.ArrayList;
 
 import java.util.Map;
@@ -113,7 +116,7 @@ public class MainAutonomous extends LinearOpMode {
                 idle();
             }
         }
-        telemetry.addData(entry.getKey(), "Bot is reset");
+        telemetry.addLine("Bot is reset");
         telemetry.update();
 
         bot.state = Bot.BotState.STORAGE;

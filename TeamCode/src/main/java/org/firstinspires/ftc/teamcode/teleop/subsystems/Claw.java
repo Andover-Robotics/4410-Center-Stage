@@ -36,9 +36,10 @@ public class Claw {
         }
     }
 
+
     public void fullOpen() { // open full, drop both top and bottom or top
-            claw.setPosition(fullOpen);
-            clawState = ClawState.EMPTY;
+        claw.setPosition(fullOpen);
+        clawState = ClawState.EMPTY;
     }
 
     // Close methods

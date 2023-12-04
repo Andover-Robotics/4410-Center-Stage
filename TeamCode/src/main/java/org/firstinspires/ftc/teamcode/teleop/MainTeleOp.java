@@ -29,6 +29,8 @@ public class MainTeleOp extends LinearOpMode {
     double leftX, rightX, leftY, rightY;
     Thread thread;
 
+    double ikCoefficient = 1;
+
     // PID
     public static double kp = 0.025, ki = 0, kd = 0;
     private PIDController headingAligner = new PIDController(kp, ki, kd);
@@ -80,6 +82,14 @@ public class MainTeleOp extends LinearOpMode {
             gp1.readButtons();
             gp2.readButtons();
 
+            if (gp1.wasJustPressed(GamepadKeys.Button.DPAD_UP)){
+                ikCoefficient = ikCoefficient + 0.02;
+            } else if (gp1.wasJustPressed(GamepadKeys.Button.DPAD_DOWN)){
+                ikCoefficient = ikCoefficient - 0.02;
+            }
+
+            inverseKinematics(gp2.getRightY(), ikCoefficient);
+
             // FINITE STATES
             if (bot.state == Bot.BotState.STORAGE) { // INITIALIZED
                 // TRANSFER
@@ -123,9 +133,10 @@ public class MainTeleOp extends LinearOpMode {
                 }
             } else if (bot.state == Bot.BotState.OUTTAKE_OUT) { // SCORING BACKBOARD
                 bot.slides.runManual(gp2.getRightY()*-0.5);
-                if (Math.abs(gp2.getRightY() > 0.001)) {
-                    bot.fourbar.runAngle(bot.slides.motorLeft.getCurrentPosition()); // calculate arm angle
-                }
+//                if (Math.abs(gp2.getRightY()) > 0.001) {
+//                    bot.fourbar.runAngle(bot.slides.motorLeft.getCurrentPosition()); // calculate arm angle
+//                }
+
                 if (gp2.wasJustPressed(GamepadKeys.Button.Y)) { // drop and return to storage
                     drop();
                 }
@@ -199,6 +210,8 @@ public class MainTeleOp extends LinearOpMode {
             telemetry.addData("Intake Power", bot.intake.power +"(running=" + bot.intake.getIsRunning() + ")");
             telemetry.addData("Slides Position", bot.slides.getPosition() + " (pos=" + bot.slides.position + " current=" + bot.slides.getCurrent() + ")");
             telemetry.addData("Pixels", bot.claw.getClawState());
+            telemetry.addData("Arm Position", bot.fourbar.getArmPosition());
+            telemetry.addData("IK Coefficent", ikCoefficient );
 
             telemetry.update();
             bot.slides.periodic();
@@ -227,6 +240,13 @@ public class MainTeleOp extends LinearOpMode {
             bot.claw.close();
         });
         thread.start();
+    }
+
+    public void inverseKinematics(double manual, double ikCoefficient) {
+        if (bot.slides.getPosition() > -1800 && bot.slides.getPosition() < -200 && bot.fourbar.getArmPosition() > 0.15 && bot.fourbar.getArmPosition() < 0.38){
+            bot.slides.runManual(ikCoefficient * -manual * -0.5);//-0.5 and coefficient and - on the manual arent doing anything
+            bot.fourbar.runArm(manual);
+        }
     }
 
     // Driving

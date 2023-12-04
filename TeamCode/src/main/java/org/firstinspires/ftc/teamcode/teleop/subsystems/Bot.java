@@ -37,6 +37,7 @@ public class Bot {
 
     public double wristUpPos = 0.0;
 
+
     // get bot instance
     public static Bot getInstance() {
         if (instance == null) {
@@ -83,6 +84,7 @@ public class Bot {
         fourbar.dualOuttake(pixel);
         state = BotState.OUTTAKE_OUT;
     }
+
 
 
 
