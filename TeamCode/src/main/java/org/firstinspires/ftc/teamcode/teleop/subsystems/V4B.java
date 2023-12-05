@@ -54,15 +54,15 @@ public class V4B {
         setArm(armStorage);
     }
 
-//    public void topPixel() {
-//        setWrist(wristTopPixel);
-//        setArm(armTopPixel);
-//    }
+    public void topPixel() {
+        setWrist(wristTopPixel);
+        setArm(armTopPixel);
+    }
 
-//    public void bottomPixel() {
-//        setWrist(wristBottomPixel);
-//        setArm(armBottomPixel);
-//    }
+    public void bottomPixel() {
+        setWrist(wristBottomPixel);
+        setArm(armBottomPixel);
+    }
 
     public void pickup() {
         setWrist(wristDualPickup);
