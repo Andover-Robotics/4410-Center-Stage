@@ -104,7 +104,7 @@ public class MainTeleOp extends LinearOpMode {
                         bot.slides.runToBottom();
                         bot.claw.fullOpen();
                         sleep(100);
-                        bot.fourbar.topPixel();
+                        bot.fourbar.pickup();
                         sleep(400);
                         bot.claw.pickupClose();
                         sleep(300);
