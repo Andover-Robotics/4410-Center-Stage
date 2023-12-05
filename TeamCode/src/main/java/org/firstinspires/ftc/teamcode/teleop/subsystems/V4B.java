@@ -10,7 +10,7 @@ import com.acmerobotics.dashboard.config.Config;
 public class V4B {
     public final Servo armLeft, armRight, wrist;
 
-    public static double armOuttake = 0.31, armStorage = 0.76, armGround = 0.08, armTopPixel = 0.88, armBottomPixel = 0.91, armDualPickup = 0.94;
+    public static double armOuttake = 0.31, armTopOuttake = 0.35, armStorage = 0.76, armGround = 0.08, armTopPixel = 0.88, armBottomPixel = 0.91, armDualPickup = 0.94;
     public static double wristBottomOuttake = 0.49, wristTopOuttake = 0.57,  wristStorage = 0.26, wristGround = 0.36, wristTopPixel = 0.245, wristBottomPixel = 0.24, wristDualPickup = 0.24, wristTransfer = 0.22;
 
     public V4B(OpMode opMode) {
@@ -56,15 +56,15 @@ public class V4B {
         setArm(armStorage);
     }
 
-//    public void topPixel() {
-//        setWrist(wristTopPixel);
-//        setArm(armTopPixel);
-//    }
+    public void topPixel() {
+        setWrist(wristTopPixel);
+        setArm(armTopPixel);
+    }
 
-//    public void bottomPixel() {
-//        setWrist(wristBottomPixel);
-//        setArm(armBottomPixel);
-//    }
+    public void bottomPixel() {
+        setWrist(wristBottomPixel);
+        setArm(armBottomPixel);
+    }
 
     public void pickup() {
         setWrist(wristDualPickup);
@@ -96,6 +96,12 @@ public class V4B {
 
     public void wristTopOuttake(){
         setWrist(wristTopOuttake);
+    }
+
+    public void topOuttake(){
+
+        setWrist(wristTopOuttake);
+        setArm(armTopOuttake);
     }
     public void wristBottomOuttake(){
         setWrist(wristBottomOuttake);

@@ -10,7 +10,7 @@ public class Claw {
 
     // TODO: Tune open and close values
     public static double fullOpen = 0.65;
-    public static double halfOpen = 0.70;
+    public static double halfOpen = 0.71;
     public static double close = 0.77;
     public enum ClawState{
         EMPTY, // Has no pixels

@@ -108,17 +108,6 @@ public class MainAutonomous extends LinearOpMode {
             }
         });
 
-        // Initialize bot
-        bot.stopMotors();
-        for (Map.Entry<String, DcMotor> entry : hardwareMap.dcMotor.entrySet()) {
-            entry.getValue().setMode(RunMode.STOP_AND_RESET_ENCODER);
-            while (!isStopRequested() && Math.abs(entry.getValue().getCurrentPosition()) > 1) {
-                idle();
-            }
-        }
-        telemetry.addLine("Bot is reset");
-        telemetry.update();
-
         bot.state = Bot.BotState.STORAGE;
         bot.storage();
 
@@ -136,11 +125,6 @@ public class MainAutonomous extends LinearOpMode {
             sleep(200);
         });
         pickup.start();
-
-        Thread update = new Thread(() -> {
-            sleep(1000);
-            dt++;
-        });
 
         int spikeMark = 0;
 
@@ -391,7 +375,7 @@ public class MainAutonomous extends LinearOpMode {
                                 drive.followTrajectorySequence(
                                         drive.trajectorySequenceBuilder(startPose)
                                                 .forward(22)
-                                                .turn(Math.toRadians((turnRadians)))
+                                                .turn(Math.toRadians(-turnRadians))
                                                 .build());
                                 break;
                             case 3: // RIGHT
@@ -467,9 +451,9 @@ public class MainAutonomous extends LinearOpMode {
                     }
                 } else if ((alliance == Alliance.BLUE && side == Side.FAR) || (alliance == Alliance.RED && side == Side.CLOSE)) {
                     switch (spikeMark) {
-                        case 1: scoreStrafe = 14; break; // LEFT, close
+                        case 1: scoreStrafe = 27; break; // LEFT, close
                         case 2: scoreStrafe = 19; break; // MIDDLE,
-                        case 3: scoreStrafe = 27; break; // RIGHT
+                        case 3: scoreStrafe = 14; break; // RIGHT
                     }
                 }
                 if ((alliance == Alliance.BLUE && side == Side.CLOSE) || (alliance == Alliance.RED && side == Side.FAR)) { // BLUE SIDE, strafe right
@@ -550,11 +534,6 @@ public class MainAutonomous extends LinearOpMode {
             // Stop op mode
             sleep(800);
             requestOpModeStop();
-        }
-
-        // Run update dt during op mode in the background
-        if (opModeIsActive() && !isStopRequested()) {
-            update.start();
         }
 
         //periodic.interrupt();

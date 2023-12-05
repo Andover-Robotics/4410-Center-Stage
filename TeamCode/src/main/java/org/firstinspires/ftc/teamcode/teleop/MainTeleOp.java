@@ -87,7 +87,9 @@ public class MainTeleOp extends LinearOpMode {
                     bot.ikDemo1();
                 }
             } else if (gp1.wasJustPressed(GamepadKeys.Button.DPAD_DOWN)){
-                bot.ikDemo2();
+                if (bot.slides.getPosition() > - 1700){
+                    bot.ikDemo2();
+                }
             } else if (gp1.wasJustPressed(GamepadKeys.Button.DPAD_LEFT)){
                 bot.intake.power = bot.intake.power - 0.01;
             } else if (gp1.wasJustPressed(GamepadKeys.Button.DPAD_RIGHT)){
@@ -104,7 +106,7 @@ public class MainTeleOp extends LinearOpMode {
                         bot.slides.runToBottom();
                         bot.claw.fullOpen();
                         sleep(100);
-                        bot.fourbar.pickup();
+                        bot.fourbar.topPixel();
                         sleep(400);
                         bot.claw.pickupClose();
                         sleep(300);
@@ -239,12 +241,12 @@ public class MainTeleOp extends LinearOpMode {
                     } else if (bot.slides.getPosition() <=-1850){
                         bot.slides.runTo(-2300);
                     }
-                    bot.fourbar.wristTopOuttake();
+                    bot.fourbar.topOuttake();
                 }
             } else {
                 bot.storage();
             }
-            bot.claw.close();
+            //bot.claw.close();
         });
         thread.start();
     }
