@@ -40,12 +40,10 @@ public class V4B {
     public void dualOuttake(int pixel) {
         setWrist(wristTransfer);
         setArm(armOuttake);
-        if (pixel == 1){
-            wristTopOuttake();
-        } else {
-            wristBottomOuttake();
-        }
+        if (pixel == 1) setWrist(wristTopOuttake);
+        else setWrist(wristBottomOuttake);
     }
+
     public void ground() {
         setWrist(wristGround);
         setArm(armGround);
@@ -56,15 +54,15 @@ public class V4B {
         setArm(armStorage);
     }
 
-//    public void topPixel() {
-//        setWrist(wristTopPixel);
-//        setArm(armTopPixel);
-//    }
+    public void topPixel() {
+        setWrist(wristTopPixel);
+        setArm(armTopPixel);
+    }
 
-//    public void bottomPixel() {
-//        setWrist(wristBottomPixel);
-//        setArm(armBottomPixel);
-//    }
+    public void bottomPixel() {
+        setWrist(wristBottomPixel);
+        setArm(armBottomPixel);
+    }
 
     public void pickup() {
         setWrist(wristDualPickup);
@@ -92,17 +90,6 @@ public class V4B {
             case 1: setWrist(wristTopOuttake);
             case 2:setWrist(wristBottomOuttake);
         }
-    }
-
-    public void wristTopOuttake(){
-        setWrist(wristTopOuttake);
-    }
-    public void wristBottomOuttake(){
-        setWrist(wristBottomOuttake);
-    }
-    public void runManualOuttake(double fourpos, double clawpos) {
-        setArm(fourpos);
-        setWrist(clawpos);
     }
 
     public void runAngle(double slidePosition) {

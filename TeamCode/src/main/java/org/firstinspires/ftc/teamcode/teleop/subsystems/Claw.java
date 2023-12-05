@@ -25,10 +25,9 @@ public class Claw {
     }
 
     // Open methods
-    public void open() { // open full, drop both top and bottom or top
+    public void open() { // drop bottom or drop top
         if (clawState == ClawState.BOTH) {
             claw.setPosition(halfOpen);
-
             clawState = ClawState.SINGLE;
         } else {
             claw.setPosition(fullOpen);
@@ -36,20 +35,16 @@ public class Claw {
         }
     }
 
-
-    public void fullOpen() { // open full, drop both top and bottom or top
-        claw.setPosition(fullOpen);
-        clawState = ClawState.EMPTY;
+    public void open(boolean full) { // open full, drop both top and bottom or top
+        if (full) {
+            claw.setPosition(fullOpen);
+            clawState = ClawState.EMPTY;
+        }
     }
 
-    // Close methods
-    public void pickupClose() { // close, cover
+    public void close() { // close
         claw.setPosition(close);
         clawState = ClawState.BOTH;
-    }
-
-    public void close() { // close, cover
-        claw.setPosition(close);
     }
 
     public int getClawState() {
