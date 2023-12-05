@@ -83,9 +83,15 @@ public class MainTeleOp extends LinearOpMode {
             gp2.readButtons();
 
             if (gp1.wasJustPressed(GamepadKeys.Button.DPAD_UP)){
-                bot.ikDemo1();
+                if (bot.slides.getPosition() < -630 ){
+                    bot.ikDemo1();
+                }
             } else if (gp1.wasJustPressed(GamepadKeys.Button.DPAD_DOWN)){
                 bot.ikDemo2();
+            } else if (gp1.wasJustPressed(GamepadKeys.Button.DPAD_LEFT)){
+                bot.intake.power = bot.intake.power - 0.01;
+            } else if (gp1.wasJustPressed(GamepadKeys.Button.DPAD_RIGHT)){
+                bot.intake.power = bot.intake.power + 0.01;
             }
 
             inverseKinematics(gp2.getRightY(), ikCoefficient);
@@ -93,15 +99,16 @@ public class MainTeleOp extends LinearOpMode {
             // FINITE STATES
             if (bot.state == Bot.BotState.STORAGE) { // INITIALIZED
                 // TRANSFER
-                if (gp2.wasJustPressed(GamepadKeys.Button.A)) { // pickup pixel
+                if (gp2.wasJustPressed(GamepadKeys.Button.A)) { // fix pixel
                     thread = new Thread(() -> {
                         bot.slides.runToBottom();
                         bot.claw.fullOpen();
                         sleep(100);
-                        bot.fourbar.pickup();
+                        bot.fourbar.topPixel();
                         sleep(400);
                         bot.claw.pickupClose();
                         sleep(300);
+                        bot.claw.fullOpen();
                         bot.storage();
                     });
                     thread.start();
@@ -121,7 +128,7 @@ public class MainTeleOp extends LinearOpMode {
                 }
                 if (gp2.wasJustPressed(GamepadKeys.Button.RIGHT_BUMPER)) { // drop pixel while in storage
                     sleep(100);
-                    bot.claw.fullOpen();
+                    bot.claw.open();
                     sleep(100);
                     bot.fourbar.storage();
                 }

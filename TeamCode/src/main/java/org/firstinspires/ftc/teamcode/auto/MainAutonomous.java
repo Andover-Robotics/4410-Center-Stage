@@ -161,14 +161,17 @@ public class MainAutonomous extends LinearOpMode {
 
             // Change alliance
             if (gp1.wasJustPressed(GamepadKeys.Button.Y)) {
-                if (alliance == Alliance.RED) alliance = Alliance.BLUE;
-                else alliance = Alliance.RED;
+                if (alliance == Alliance.RED)  {
+                    alliance = Alliance.BLUE;
+                } else  {
+                    alliance = Alliance.RED;
+                }
             }
             telemetry.addData("Alliance (Y)", alliance);
 
             // Re-grip/pick up pixel
             if (gp1.wasJustPressed(GamepadKeys.Button.START)) {
-                bot.claw.open();
+                bot.claw.fullOpen();
                 sleep(250);
                 bot.slides.runToBottom();
                 bot.claw.fullOpen();
@@ -279,27 +282,27 @@ public class MainAutonomous extends LinearOpMode {
                 case 1: // LEFT
                     drive.followTrajectorySequence(
                             drive.trajectorySequenceBuilder(startPose)
-                                .back(28)
-                                .turn(Math.toRadians(90))
-                                .back(7)
-                                .forward(7)
-                                .build());
+                                    .back(28)
+                                    .turn(Math.toRadians(90))
+                                    .back(7)
+                                    .forward(7)
+                                    .build());
                     break;
                 case 2: // MIDDLE
                     drive.followTrajectorySequence(
-                        drive.trajectorySequenceBuilder(startPose)
-                            .back(47)
-                            .forward(21)
-                            .build());
+                            drive.trajectorySequenceBuilder(startPose)
+                                    .back(47)
+                                    .forward(21)
+                                    .build());
                     break;
                 case 3: // RIGHT
                     drive.followTrajectorySequence(
-                        drive.trajectorySequenceBuilder(startPose)
-                            .back(27)
-                            .turn(Math.toRadians(-90))
-                            .back(7)
-                            .forward(7)
-                            .build());
+                            drive.trajectorySequenceBuilder(startPose)
+                                    .back(27)
+                                    .turn(Math.toRadians(-90))
+                                    .back(7)
+                                    .forward(7)
+                                    .build());
                     break;
             }
 
