@@ -101,7 +101,20 @@ public class MainTeleOp extends LinearOpMode {
             // FINITE STATES
             if (bot.state == Bot.BotState.STORAGE) { // INITIALIZED
                 // TRANSFER
-                if (gp2.wasJustPressed(GamepadKeys.Button.A)) { // fix pixel
+                if (gp2.wasJustPressed(GamepadKeys.Button.A)) { // fix bottom pixel
+                    thread = new Thread(() -> {
+                        bot.slides.runToBottom();
+                        bot.claw.fullOpen();
+                        sleep(100);
+                        bot.fourbar.bottomPixel();
+                        sleep(400);
+                        bot.claw.pickupClose();
+                        sleep(300);
+                        bot.claw.fullOpen();
+                        bot.storage();
+                    });
+                    thread.start();
+                } else if(gp2.wasJustPressed(GamepadKeys.Button.LEFT_BUMPER)) {
                     thread = new Thread(() -> {
                         bot.slides.runToBottom();
                         bot.claw.fullOpen();
@@ -237,7 +250,7 @@ public class MainTeleOp extends LinearOpMode {
                     bot.storage();// if claw is empty go to storage
                 } else if (bot.claw.getClawState() == 1) {
                     if (bot.slides.getPosition() > -1850) {
-                        bot.slides.runTo(bot.slides.getPosition() - 400);
+                        bot.slides.runTo(bot.slides.getPosition() - 250);
                     } else if (bot.slides.getPosition() <=-1850){
                         bot.slides.runTo(-2300);
                     }
