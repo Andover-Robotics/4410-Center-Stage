@@ -269,7 +269,7 @@ public class MainAutonomous extends LinearOpMode {
                                     .back(28)
                                     .turn(Math.toRadians(90))
                                     .back(7)
-                                    .forward(7)
+                                    .forward(8)
                                     .build());
                     break;
                 case 2: // MIDDLE
@@ -285,7 +285,7 @@ public class MainAutonomous extends LinearOpMode {
                                     .back(27)
                                     .turn(Math.toRadians(-90))
                                     .back(7)
-                                    .forward(7)
+                                    .forward(8)
                                     .build());
                     break;
             }
@@ -451,9 +451,9 @@ public class MainAutonomous extends LinearOpMode {
                     }
                 } else if ((alliance == Alliance.BLUE && side == Side.FAR) || (alliance == Alliance.RED && side == Side.CLOSE)) {
                     switch (spikeMark) {
-                        case 1: scoreStrafe = 27; break; // LEFT, close
+                        case 1: scoreStrafe = 34; break; // LEFT, close
                         case 2: scoreStrafe = 19; break; // MIDDLE,
-                        case 3: scoreStrafe = 14; break; // RIGHT
+                        case 3: scoreStrafe = 15; break; // RIGHT
                     }
                 }
                 if ((alliance == Alliance.BLUE && side == Side.CLOSE) || (alliance == Alliance.RED && side == Side.FAR)) { // BLUE SIDE, strafe right
@@ -504,7 +504,8 @@ public class MainAutonomous extends LinearOpMode {
                     bot.slides.runToBottom();
                 }
                 bot.outtakeOut(bot.claw.getClawState());
-                sleep(500);
+                bot.fourbar.topOuttake();
+                sleep(800);
                 bot.claw.open();
                 sleep(800);
                 bot.storage();
@@ -517,9 +518,9 @@ public class MainAutonomous extends LinearOpMode {
                 startPose = drive.getPoseEstimate();
                 int parkStrafe = 0;
                 switch (spikeMark) {
-                    case 1: parkStrafe = 17; break;
+                    case 1: parkStrafe = 27; break;
                     case 2: parkStrafe = 23; break;
-                    case 3: parkStrafe = 31; break;
+                    case 3: parkStrafe = 17; break;
                 }
                 if (park != 0) {
                     drive.followTrajectory(drive.trajectoryBuilder(startPose).forward(5).build());
