@@ -337,7 +337,7 @@ public class MainAutonomous extends LinearOpMode {
                                         drive.trajectorySequenceBuilder(startPose)
                                                 .strafeLeft(24)
                                                 .back(78 + newTiles)
-                                                .strafeRight(4)
+                                                .strafeRight(5)
                                                 .build());
                                 break;
                             case 2: // MIDDLE
@@ -445,15 +445,15 @@ public class MainAutonomous extends LinearOpMode {
                 int scoreStrafe = 0;
                 if ((alliance == Alliance.BLUE && side == Side.CLOSE) || (alliance == Alliance.RED && side == Side.FAR)) {
                     switch (spikeMark) {
-                        case 1: scoreStrafe = 13; break; // LEFT, close
-                        case 2: scoreStrafe = 18; break; // MIDDLE,
+                        case 1: scoreStrafe = 13; break; // LEFT
+                        case 2: scoreStrafe = 18; break; // MIDDLE
                         case 3: scoreStrafe = 26; break; // RIGHT
                     }
                 } else if ((alliance == Alliance.BLUE && side == Side.FAR) || (alliance == Alliance.RED && side == Side.CLOSE)) {
                     switch (spikeMark) {
-                        case 1: scoreStrafe = 34; break; // LEFT, close
-                        case 2: scoreStrafe = 19; break; // MIDDLE,
-                        case 3: scoreStrafe = 15; break; // RIGHT
+                        case 1: scoreStrafe = 14; break; // LEFT
+                        case 2: scoreStrafe = 19; break; // MIDDLE
+                        case 3: scoreStrafe = 27; break; // RIGHT
                     }
                 }
                 if ((alliance == Alliance.BLUE && side == Side.CLOSE) || (alliance == Alliance.RED && side == Side.FAR)) { // BLUE SIDE, strafe right
@@ -485,11 +485,11 @@ public class MainAutonomous extends LinearOpMode {
 //                    bot.storage();
 //                    sleep(200);
 //                });
-                startPose = drive.getPoseEstimate();
                 //pickupYellow.start();
 
                 // Run into backboard
-                int slowerVelocity = 10; // Slower velocity that is the max constraint when running into backboard (in/s)
+                startPose = drive.getPoseEstimate();
+                int slowerVelocity = 12; // Slower velocity that is the max constraint when running into backboard (in/s)
                 drive.followTrajectory(drive.trajectoryBuilder(startPose).back(13,
                                 SampleMecanumDrive.getVelocityConstraint(slowerVelocity, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
                                 SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
@@ -517,10 +517,18 @@ public class MainAutonomous extends LinearOpMode {
                 // Parking
                 startPose = drive.getPoseEstimate();
                 int parkStrafe = 0;
-                switch (spikeMark) {
-                    case 1: parkStrafe = 27; break;
-                    case 2: parkStrafe = 23; break;
-                    case 3: parkStrafe = 17; break;
+                if (park == 1) { // Left park
+                    switch (spikeMark) {
+                        case 1: parkStrafe = 17; break;
+                        case 2: parkStrafe = 23; break;
+                        case 3: parkStrafe = 31; break;
+                    }
+                } else if (park == 2) { // Right park
+                    switch (spikeMark) {
+                        case 1: parkStrafe = 31; break;
+                        case 2: parkStrafe = 23; break;
+                        case 3: parkStrafe = 17; break;
+                    }
                 }
                 if (park != 0) {
                     drive.followTrajectory(drive.trajectoryBuilder(startPose).forward(5).build());
