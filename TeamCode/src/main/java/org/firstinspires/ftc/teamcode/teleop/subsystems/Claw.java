@@ -59,6 +59,4 @@ public class Claw {
             default: return 0; // default or empty
         }
     }
-
-
 }

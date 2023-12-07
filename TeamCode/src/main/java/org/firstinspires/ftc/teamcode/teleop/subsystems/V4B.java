@@ -41,9 +41,9 @@ public class V4B {
         setWrist(wristTransfer);
         setArm(armOuttake);
         if (pixel == 1){
-            wristTopOuttake();
+            setWrist(wristTopOuttake);
         } else {
-            wristBottomOuttake();
+            setWrist(wristBottomOuttake);
         }
     }
     public void ground() {
@@ -86,26 +86,12 @@ public class V4B {
     public double getArmPosition() {
         return armLeft.getPosition();
     }
-    public void dualWristOuttake(int pixel) { //unused not work for some reason idk
-        switch (pixel) {
-            case 0: setWrist(wristBottomOuttake);
-            case 1: setWrist(wristTopOuttake);
-            case 2:setWrist(wristBottomOuttake);
-        }
-    }
-
-    public void wristTopOuttake(){
-        setWrist(wristTopOuttake);
-    }
 
     public void topOuttake(){
-
         setWrist(wristTopOuttake);
         setArm(armTopOuttake);
     }
-    public void wristBottomOuttake(){
-        setWrist(wristBottomOuttake);
-    }
+
     public void runManualOuttake(double fourpos, double clawpos) {
         setArm(fourpos);
         setWrist(clawpos);
@@ -117,7 +103,6 @@ public class V4B {
         if (slidePosition > -1500) {
             setArm(newPosition);
         }
-
     }
 
 }
