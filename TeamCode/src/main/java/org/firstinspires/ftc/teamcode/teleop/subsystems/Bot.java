@@ -200,10 +200,4 @@ public class Bot {
         return angle;
     }
 
-
-
-    //public double calculateArmSlidesAngle(double slidePosition) {
-
-    //}
-
 }

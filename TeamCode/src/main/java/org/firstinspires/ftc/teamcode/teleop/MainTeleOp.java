@@ -32,8 +32,8 @@ public class MainTeleOp extends LinearOpMode {
     double ikCoefficient = 1;
 
     // PID
-    public static double kp = 0.025, ki = 0, kd = 0;
-    private PIDController headingAligner = new PIDController(kp, ki, kd);
+    //public static double kp = 0.025, ki = 0, kd = 0;
+    //private PIDController headingAligner = new PIDController(kp, ki, kd);
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -66,13 +66,18 @@ public class MainTeleOp extends LinearOpMode {
         right bumper - run reverse intake
 
         Driver 2 (gp2):
-        A - pick up pixel (top)
-        B - pick up pixel (bottom)
+        B - pick up pixels, cancel outtake out
+        A - tap pixel bottom, cancel outtake ground
+        Y - outtake out
+        X - outtake ground
+
         dpad up - slides to top
         dpad left - slides to middle
         dpad right - slides to low
         dpad down - slides to bottom
+
         right bumper - drop pixel
+        left bumper - tap pixel top
         left joystick - slides up/down
         right joystick - arm in/out
         */

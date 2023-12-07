@@ -135,10 +135,10 @@ public class MainAutonomous extends LinearOpMode {
         Y - change alliance
         A - change side
         B - toggle slides up
-        X - toggle park
+        X - change park
         dpad up - change backboard wait time (increment by 1 second)
         dpad down - toggle to backboard
-        START - re-pickup top pixel
+        START - re-pickup pixel
          */
         while (!isStarted()) {
             gp1.readButtons();
@@ -207,7 +207,7 @@ public class MainAutonomous extends LinearOpMode {
                 if (backboardWait < 5000) backboardWait+=1000;
                 else backboardWait = 0;
             }
-            telemetry.addData("Backboard sleep (DPAD UP)", backboardWait + " milliseconds");
+            telemetry.addData("Backboard sleep (DPAD UP)", backboardWait / 1000 + " seconds, " + backboardWait + " milliseconds");
 
             // Toggle park
             if (gp1.wasJustPressed(GamepadKeys.Button.DPAD_DOWN)) {
@@ -217,13 +217,10 @@ public class MainAutonomous extends LinearOpMode {
 
             //Toggle Tile Type
             if (gp1.wasJustPressed(GamepadKeys.Button.DPAD_LEFT)) {
-                if (newTiles == 0) {
-                    newTiles = 1;
-                } else if (newTiles == 1) {
-                    newTiles = 0;
-                }
+                if (newTiles == 0) newTiles = 1;
+                else if (newTiles == 1) newTiles = 0;
             }
-            telemetry.addData("New Tiles? (DPAD LEFT)", newTiles);
+            telemetry.addData("New Tiles (DPAD LEFT)", newTiles);
 
             // Initiate color detection
             if (alliance == Alliance.RED) {
