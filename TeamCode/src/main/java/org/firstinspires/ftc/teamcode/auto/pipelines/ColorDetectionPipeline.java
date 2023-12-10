@@ -46,14 +46,14 @@ public class ColorDetectionPipeline extends OpenCvPipeline{
     int alliance = 0;
 
     // Red HSV Values
-    public static double redLH = 0, redLS = 56, redLV = 50, redHH = 5, redHS = 255, redHV = 255, redLH2 = 165, redHH2 = 180;
+    public static double redLH = 0, redLS = 0, redLV = 35, redHH = 2, redHS = 360, redHV = 255;
     public static Scalar redLowHSV= new Scalar(redLH,redLS,redLV);
     public static Scalar redHighHSV = new Scalar(redHH,redHS,redHV);
-    public static Scalar redLowHSV2= new Scalar(redLH2,redLS,redLV);
-    public static Scalar redHighHSV2 = new Scalar(redHH2,redHS,redHV);
+//    public static Scalar redLowHSV2= new Scalar(redLH2,redLS,redLV);
+//    public static Scalar redHighHSV2 = new Scalar(redHH2,redHS,redHV);
 
     // Blue HSV Values
-    public static double blueLH = 90, blueLS = 56, blueLV = 50, blueHH = 117, blueHS = 255, blueHV = 255;
+    public static double blueLH = 90, blueLS = 56, blueLV = 35, blueHH = 117, blueHS = 255, blueHV = 255;
     public static Scalar blueLowHSV= new Scalar(blueLH,blueLS,blueLV);
     public static Scalar blueHighHSV = new Scalar(blueHH,blueHS,blueHV);
 
@@ -122,7 +122,7 @@ public class ColorDetectionPipeline extends OpenCvPipeline{
             }
 
             // Draw rectangle on screen
-            Imgproc.rectangle(HSV, rect.tl(), rect.br(), new Scalar(0, 255, 0), 6); // puts border around contours with a green shade
+            Imgproc.rectangle(input, rect.tl(), rect.br(), new Scalar(0, 255, 0), 6); // puts border around contours with a green shade
 
             // Check which zone it is in (left or right)
             if (midpointrect > leftrect.tl().x && midpointrect < leftrect.br().x) { // LEFT SPIKE
@@ -132,13 +132,13 @@ public class ColorDetectionPipeline extends OpenCvPipeline{
                     spikeMark = SpikeMark.LEFT;
                 }
             } else if (midpointrect > rightrect.tl().x && midpointrect < leftrect.br().x) {
-                if (height > 50) {
+                if (height > 20) {
                     spikeMark = SpikeMark.MIDDLE;
                 } else {
                     spikeMark = SpikeMark.RIGHT;
                 }
             } else {
-                if (height > 50) {
+                if (height > 20) {
                     spikeMark = SpikeMark.MIDDLE;
                 } else {
                     spikeMark = SpikeMark.RIGHT;
@@ -151,7 +151,7 @@ public class ColorDetectionPipeline extends OpenCvPipeline{
         //telemetry.addData("contours: ", contours.size());
         // telemetry.addData("Spikemark status: ",spikeMark);
         // Releasing all our mats for the next iteration
-        //HSV.release();
-        return HSV; // return end frame with rectangles drawn
+        HSV.release();
+        return input; // return end frame with rectangles drawn
     }
 }

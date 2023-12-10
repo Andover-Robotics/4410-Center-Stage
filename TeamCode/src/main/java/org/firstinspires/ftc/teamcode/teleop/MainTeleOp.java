@@ -270,10 +270,9 @@ public class MainTeleOp extends LinearOpMode {
     }
 
     public void inverseKinematics(double manual, double ikCoefficient) {
-        if (bot.slides.getPosition() > -2000 && bot.slides.getPosition() < -200 && bot.fourbar.getArmPosition() > 0.15 && bot.fourbar.getArmPosition() < 0.38){
-            //bot.slides.runManual(ikCoefficient * -manual * -0.5);//-0.5 and coefficient and - on the manual arent doing anything
+        //bot.slides.runManual(ikCoefficient * -manual * -0.5);//-0.5 and coefficient and - on the manual arent doing anything
             bot.fourbar.runArm(manual);
-        }
+
     }
 
     // Driving

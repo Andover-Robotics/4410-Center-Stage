@@ -7,7 +7,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 @Config
 public class Launcher {
     private final Servo launcher;
-    public static double initialized = 0.4;
+    public static double initialized = 0.5;
     public static double launched = 0.95;
 
     public Launcher(OpMode opMode){
