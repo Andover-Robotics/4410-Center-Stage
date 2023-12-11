@@ -175,7 +175,7 @@ public class MainTeleOp extends LinearOpMode {
                 }
             } else if (bot.state == Bot.BotState.OUTTAKE_DOWN) { // SCORING GROUND
                 if (gp2.wasJustPressed(GamepadKeys.Button.X)) {
-                    drop();
+                    dropGround();
                 }
                 if (gp2.wasJustPressed(GamepadKeys.Button.A)) { // cancel and return to storage
                     bot.storage();
@@ -260,6 +260,24 @@ public class MainTeleOp extends LinearOpMode {
                         bot.slides.runTo(-2300);
                     }
                     bot.fourbar.topOuttake();
+                }
+            } else {
+                bot.storage();
+            }
+            //bot.claw.close();
+        });
+        thread.start();
+    }
+
+    private void dropGround() {
+        thread = new Thread(() -> {
+            bot.claw.open();
+            sleep(300);
+            if (bot.state == Bot.BotState.OUTTAKE_DOWN) {
+                if (bot.claw.getClawState() == 0) {
+                    bot.storage();// if claw is empty go to storage
+                } else if (bot.claw.getClawState() == 1) {
+                    bot.fourbar.ground();
                 }
             } else {
                 bot.storage();
