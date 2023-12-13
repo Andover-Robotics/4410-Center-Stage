@@ -57,6 +57,10 @@ public class ColorDetectionPipeline extends OpenCvPipeline{
     public static Scalar blueLowHSV= new Scalar(blueLH,blueLS,blueLV);
     public static Scalar blueHighHSV = new Scalar(blueHH,blueHS,blueHV);
 
+    public Scalar currentHighHSV;
+    public Scalar currentLowHSV;
+    private int count = 0;
+
     public ColorDetectionPipeline(Telemetry telemetry){ // CONSTRUCTOR :D
         spikeMark = SpikeMark.NOTDETECTED;
         this.telemetry = telemetry;
@@ -87,10 +91,29 @@ public class ColorDetectionPipeline extends OpenCvPipeline{
 
         // filters HSV mat into image with black being the lowest red/blue HSV and white being the highest red/blue HSV
         if (alliance == 1) {
+            if (count == 0) {
+                currentLowHSV = redLowHSV;
+                currentHighHSV = redHighHSV;
+            } else {
+                redLowHSV = currentLowHSV;
+                redHighHSV = currentHighHSV;
+            }
+
             Core.inRange(HSV, redLowHSV, redHighHSV, HSV);
+
+
             //Core.inRange(HSV, redLowHSV2, redHighHSV2, HSV);
         } else {
+            if (count == 0) {
+                currentLowHSV = blueLowHSV;
+                currentHighHSV = blueHighHSV;
+            } else {
+                blueLowHSV = currentLowHSV;
+                blueHighHSV = currentHighHSV;
+            }
+
             Core.inRange(HSV, blueLowHSV, blueHighHSV, HSV);
+
         }
 
         List<MatOfPoint> contours = new ArrayList<>();
@@ -152,6 +175,7 @@ public class ColorDetectionPipeline extends OpenCvPipeline{
         // telemetry.addData("Spikemark status: ",spikeMark);
         // Releasing all our mats for the next iteration
         HSV.release();
+        count++;
         return input; // return end frame with rectangles drawn
     }
 }

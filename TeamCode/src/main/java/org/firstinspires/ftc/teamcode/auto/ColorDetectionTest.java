@@ -59,6 +59,26 @@ public class ColorDetectionTest extends LinearOpMode {
                 choice = !choice;
             }
 
+            //dpad up down does H high
+            //left right does s high
+            //bumper/trigger does v
+
+//            if (gp1.wasJustPressed(GamepadKeys.Button.DPAD_UP)) {
+//                colorDetect
+//            } else if (gp1.wasJustPressed(GamepadKeys.Button.DPAD_DOWN))  {
+//
+//            } if (gp1.wasJustPressed(GamepadKeys.Button.DPAD_LEFT)) {
+//
+//            } else if (gp1.wasJustPressed(GamepadKeys.Button.DPAD_RIGHT)) {
+//
+//            } if (gp1.wasJustPressed(GamepadKeys.Button.RIGHT_BUMPER)) {
+//
+//            } else if (gp1.wasJustPressed(GamepadKeys.Button.LEFT_BUMPER)) {
+//
+//            }
+
+
+
             telemetry.addLine("Press A to toggle pipeline");
             telemetry.addLine("");
             if (choice) {
