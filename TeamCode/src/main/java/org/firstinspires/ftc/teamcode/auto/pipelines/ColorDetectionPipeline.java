@@ -43,7 +43,7 @@ public class ColorDetectionPipeline extends OpenCvPipeline{
     public static SpikeMark spikeMark = SpikeMark.NOTDETECTED;
 
     // Alliance: 0 - NONE, 1 - RED, 2 - BLUE
-    int alliance = 0;
+    public static int alliance = 0;
 
     // Red HSV Values
     public static double redLH = 0, redLS = 0, redLV = 35, redHH = 2, redHS = 360, redHV = 255;
