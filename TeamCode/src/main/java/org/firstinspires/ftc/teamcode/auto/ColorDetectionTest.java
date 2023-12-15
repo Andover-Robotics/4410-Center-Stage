@@ -16,12 +16,14 @@ import org.openftc.easyopencv.OpenCvCameraException;
 import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
 
+import java.util.Arrays;
+
 @Autonomous(name = "Test Color Detection", group = "Test")
 public class ColorDetectionTest extends LinearOpMode {
 
     private Bot bot;
     private double cycleTime = 1;
-    private Scalar HSV;
+    private Scalar HSV = ColorDetectionPipeline.currentHighHSV;
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -29,7 +31,7 @@ public class ColorDetectionTest extends LinearOpMode {
         GamepadEx gp1 = new GamepadEx(gamepad1);
         WebcamName camName = hardwareMap.get(WebcamName.class, "Webcam 1");
         OpenCvCamera camera = OpenCvCameraFactory.getInstance().createWebcam(camName);
-        ColorDetectionPipeline colorPipeline = null;
+        ColorDetectionPipeline colorPipeline = new ColorDetectionPipeline(telemetry);
 
 
         camera.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
@@ -43,7 +45,7 @@ public class ColorDetectionTest extends LinearOpMode {
                 telemetry.addData("Error code:", errorCode);
             }
         });
-        camera.setPipeline(new ColorDetectionPipeline(telemetry));
+        camera.setPipeline(colorPipeline);
 
 
         bot = Bot.getInstance(this);
@@ -52,16 +54,6 @@ public class ColorDetectionTest extends LinearOpMode {
         int highOrLow = 0;
         while (!isStarted()) {
             gp1.readButtons();
-            if (gp1.wasJustPressed(GamepadKeys.Button.A)) {
-                if (choice) {
-                    ColorDetectionTryPipeline colorDetectionPipeline = new ColorDetectionTryPipeline(telemetry);
-                    camera.setPipeline(colorDetectionPipeline);
-                } else {
-                    colorPipeline = new ColorDetectionPipeline(telemetry);
-                    camera.setPipeline(colorPipeline);
-                }
-                choice = !choice;
-            }
 
             if (gp1.wasJustPressed(GamepadKeys.Button.BACK)) {
                 highOrLow = (highOrLow ==0) ? 1 : 0;
@@ -70,59 +62,56 @@ public class ColorDetectionTest extends LinearOpMode {
             //dpad up down does H high
             //left right does s high
             //bumper/trigger does v
-            try {
                 if (gp1.wasJustPressed(GamepadKeys.Button.START)) {
                     switch (ColorDetectionPipeline.alliance) {
-                        case 0:
                         case 1:
                             colorPipeline.setAlliance(2);
+                            ColorDetectionPipeline.count = 0;
                             break;
-                        case 2:
+                        default:
                             colorPipeline.setAlliance(1);
+                            ColorDetectionPipeline.count = 0;
                             break;
                     }
                 }
 
                 int inc = 1;
+
                 if (highOrLow == 1) {
-                    HSV = colorPipeline.currentHighHSV;
+                    HSV = ColorDetectionPipeline.currentHighHSV;
                     if (gp1.wasJustPressed(GamepadKeys.Button.DPAD_UP)) {
-                        colorPipeline.currentHighHSV.set(new double[]{HSV.val[0]+ inc, HSV.val[1], HSV.val[2]});
+                        ColorDetectionPipeline.currentHighHSV.set(new double[]{HSV.val[0]+ inc, HSV.val[1], HSV.val[2]});
                     } else if (gp1.wasJustPressed(GamepadKeys.Button.DPAD_DOWN)) {
-                        colorPipeline.currentHighHSV.set(new double[]{HSV.val[0]- inc, HSV.val[1], HSV.val[2]});
+                        ColorDetectionPipeline.currentHighHSV.set(new double[]{HSV.val[0]- inc, HSV.val[1], HSV.val[2]});
                     }
                     if (gp1.wasJustPressed(GamepadKeys.Button.DPAD_LEFT)) {
-                        colorPipeline.currentHighHSV.set(new double[]{HSV.val[0], HSV.val[1]+ inc, HSV.val[2]});
+                        ColorDetectionPipeline.currentHighHSV.set(new double[]{HSV.val[0], HSV.val[1]+ inc, HSV.val[2]});
                     } else if (gp1.wasJustPressed(GamepadKeys.Button.DPAD_RIGHT)) {
-                        colorPipeline.currentHighHSV.set(new double[]{HSV.val[0], HSV.val[1]- inc, HSV.val[2]});
+                        ColorDetectionPipeline.currentHighHSV.set(new double[]{HSV.val[0], HSV.val[1]- inc, HSV.val[2]});
                     }
                     if (gp1.wasJustPressed(GamepadKeys.Button.RIGHT_BUMPER)) {
-                        colorPipeline.currentHighHSV.set(new double[]{HSV.val[0], HSV.val[1], HSV.val[2]+ inc});
+                        ColorDetectionPipeline.currentHighHSV.set(new double[]{HSV.val[0], HSV.val[1], HSV.val[2]+ inc});
                     } else if (gp1.wasJustPressed(GamepadKeys.Button.LEFT_BUMPER)) {
-                        colorPipeline.currentHighHSV.set(new double[]{HSV.val[0], HSV.val[1], HSV.val[2]- inc});
+                        ColorDetectionPipeline.currentHighHSV.set(new double[]{HSV.val[0], HSV.val[1], HSV.val[2]- inc});
                     }
                 } else {
-                    HSV = colorPipeline.currentLowHSV;
+                    HSV = ColorDetectionPipeline.currentLowHSV;
                     if (gp1.wasJustPressed(GamepadKeys.Button.DPAD_UP)) {
-                        colorPipeline.currentLowHSV.set(new double[]{HSV.val[0]+ inc, HSV.val[1], HSV.val[2]});
+                        ColorDetectionPipeline.currentLowHSV.set(new double[]{HSV.val[0]+ inc, HSV.val[1], HSV.val[2]});
                     } else if (gp1.wasJustPressed(GamepadKeys.Button.DPAD_DOWN)) {
-                        colorPipeline.currentLowHSV.set(new double[]{HSV.val[0]- inc, HSV.val[1], HSV.val[2]});
+                        ColorDetectionPipeline.currentLowHSV.set(new double[]{HSV.val[0]- inc, HSV.val[1], HSV.val[2]});
                     }
                     if (gp1.wasJustPressed(GamepadKeys.Button.DPAD_RIGHT)) {
-                        colorPipeline.currentLowHSV.set(new double[]{HSV.val[0], HSV.val[1]+ inc, HSV.val[2]});
+                        ColorDetectionPipeline.currentLowHSV.set(new double[]{HSV.val[0], HSV.val[1]+ inc, HSV.val[2]});
                     } else if (gp1.wasJustPressed(GamepadKeys.Button.DPAD_LEFT)) {
-                        colorPipeline.currentLowHSV.set(new double[]{HSV.val[0], HSV.val[1]- inc, HSV.val[2]});
+                        ColorDetectionPipeline.currentLowHSV.set(new double[]{HSV.val[0], HSV.val[1]- inc, HSV.val[2]});
                     }
                     if (gp1.wasJustPressed(GamepadKeys.Button.RIGHT_BUMPER)) {
-                        colorPipeline.currentLowHSV.set(new double[]{HSV.val[0], HSV.val[1], HSV.val[2]+ inc});
+                        ColorDetectionPipeline.currentLowHSV.set(new double[]{HSV.val[0], HSV.val[1], HSV.val[2]+ inc});
                     } else if (gp1.wasJustPressed(GamepadKeys.Button.LEFT_BUMPER)) {
-                        colorPipeline.currentLowHSV.set(new double[]{HSV.val[0], HSV.val[1], HSV.val[2]- inc});
+                        ColorDetectionPipeline.currentLowHSV.set(new double[]{HSV.val[0], HSV.val[1], HSV.val[2]- inc});
                     }
                 }
-
-            } catch(Exception e) {
-                telemetry.addLine("Cannot change HSV due to test pipeline not configured ...");
-            }
 
 
 
@@ -139,6 +128,7 @@ public class ColorDetectionTest extends LinearOpMode {
                 telemetry.addData("width", ColorDetectionPipeline.width);
                 telemetry.addData("Alliance(Toggle with START)", ColorDetectionPipeline.alliance);
                 telemetry.addData("High or Low(Toggle with BACK)", (highOrLow == 0) ? "HIGH" : "LOW");
+                telemetry.addData("HSV RAW", Arrays.toString(HSV.val));
                 telemetry.addData("H value (Up - Dpad UP, Down - Dpad DOWN)", HSV.val[0]);
                 telemetry.addData("S value (Up - Dpad RIGHT, Down - Dpad LEFT)", HSV.val[1]);
                 telemetry.addData("V value (Up - RIGHT Bumper, Down - LEFT Bumper)", HSV.val[2]);

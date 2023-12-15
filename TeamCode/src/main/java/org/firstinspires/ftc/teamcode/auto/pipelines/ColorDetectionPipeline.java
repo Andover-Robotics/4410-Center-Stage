@@ -57,9 +57,9 @@ public class ColorDetectionPipeline extends OpenCvPipeline{
     public static Scalar blueLowHSV= new Scalar(blueLH,blueLS,blueLV);
     public static Scalar blueHighHSV = new Scalar(blueHH,blueHS,blueHV);
 
-    public Scalar currentHighHSV;
-    public Scalar currentLowHSV;
-    private int count = 0;
+    public static Scalar currentHighHSV = redHighHSV;
+    public static Scalar currentLowHSV = redLowHSV;
+    public static int count = 0;
 
     public ColorDetectionPipeline(Telemetry telemetry){ // CONSTRUCTOR :D
         spikeMark = SpikeMark.NOTDETECTED;
@@ -67,7 +67,14 @@ public class ColorDetectionPipeline extends OpenCvPipeline{
     }
 
     public void setAlliance(int alliance) {
-        this.alliance = alliance;
+        ColorDetectionPipeline.alliance = alliance;
+        if (alliance == 1) {
+            currentHighHSV = redHighHSV;
+            currentLowHSV = redLowHSV;
+        } else {
+            currentHighHSV = blueHighHSV;
+            currentLowHSV = blueLowHSV;
+        }
     }
 
     public int getSpikeMark() {
@@ -89,32 +96,43 @@ public class ColorDetectionPipeline extends OpenCvPipeline{
         Imgproc.rectangle(input, leftrect, new Scalar(0, 255, 0), 5); //displays rectangles with red color
         Imgproc.rectangle(input, rightrect, new Scalar(0, 255, 0), 5);
 
-        // filters HSV mat into image with black being the lowest red/blue HSV and white being the highest red/blue HSV
         if (alliance == 1) {
-            if (count == 0) {
-                currentLowHSV = redLowHSV;
-                currentHighHSV = redHighHSV;
-            } else {
-                redLowHSV = currentLowHSV;
-                redHighHSV = currentHighHSV;
-            }
-
             Core.inRange(HSV, redLowHSV, redHighHSV, HSV);
-
-
+            redHighHSV = currentHighHSV;
+            redLowHSV = currentLowHSV;
             //Core.inRange(HSV, redLowHSV2, redHighHSV2, HSV);
         } else {
-            if (count == 0) {
-                currentLowHSV = blueLowHSV;
-                currentHighHSV = blueHighHSV;
-            } else {
-                blueLowHSV = currentLowHSV;
-                blueHighHSV = currentHighHSV;
-            }
-
             Core.inRange(HSV, blueLowHSV, blueHighHSV, HSV);
-
+            blueHighHSV = currentHighHSV;
+            redLowHSV = currentLowHSV;
         }
+
+        // filters HSV mat into image with black being the lowest red/blue HSV and white being the highest red/blue HSV
+//        if (alliance == 1) {
+//            if (count == 0) {
+//                currentLowHSV = redLowHSV;
+//                currentHighHSV = redHighHSV;
+//            } else {
+//                redLowHSV = currentLowHSV;
+//                redHighHSV = currentHighHSV;
+//            }
+//
+//            Core.inRange(HSV, redLowHSV, redHighHSV, HSV);
+//
+//
+//            //Core.inRange(HSV, redLowHSV2, redHighHSV2, HSV);
+//        } else {
+//            if (count == 0) {
+//                currentLowHSV = blueLowHSV;
+//                currentHighHSV = blueHighHSV;
+//            } else {
+//                blueLowHSV = currentLowHSV;
+//                blueHighHSV = currentHighHSV;
+//            }
+//
+//            Core.inRange(HSV, blueLowHSV, blueHighHSV, HSV);
+//
+//        }
 
         List<MatOfPoint> contours = new ArrayList<>();
         Imgproc.findContours(HSV, contours, new Mat(), 0,1); // finds contours in HSV mat
