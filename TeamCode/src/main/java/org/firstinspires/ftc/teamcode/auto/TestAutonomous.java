@@ -27,6 +27,7 @@ import org.openftc.easyopencv.OpenCvCameraRotation;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotor.RunMode;
+import com.qualcomm.robotcore.hardware.Gamepad;
 
 import java.util.ArrayList;
 
@@ -54,6 +55,7 @@ public class TestAutonomous extends LinearOpMode {
     // Autonomous config values
     boolean toBackboard = true; // Go to backboard: true - go to backboard and score, false - only score spike and stop
     boolean slidesUp = false; // Slide up: true - move slides up when scoring pixel on backboard, false - don't
+    boolean pixelStack = true; // Go to pixel stack: true - do 2+2, false - park/or stop after scoring yellow pixel
     int park = 0; // Parking position: 0 - don't park, 1 - left, 2 - right
     int newTiles = 0;
     int backboardWait = 0; // How long (milliseconds) to wait before scoring on backboard: 0-5 seconds
@@ -139,6 +141,7 @@ public class TestAutonomous extends LinearOpMode {
         dpad up - change backboard wait time (increment by 1 second)
         dpad down - toggle to backboard
         START - re-pickup pixel
+        BACK - toggle go to pixel stack
          */
         while (!isStarted()) {
             gp1.readButtons();
@@ -167,6 +170,12 @@ public class TestAutonomous extends LinearOpMode {
                 bot.storage();
                 sleep(200);
             }
+
+            // Toggle to pixel stack
+            if (gp1.wasJustPressed(GamepadKeys.Button.BACK)) {
+                pixelStack = !pixelStack;
+            }
+            telemetry.addData("Pixel stack (BACK)", pixelStack);
 
             // Change side
             if (gp1.wasJustPressed(GamepadKeys.Button.A)) {
@@ -258,14 +267,13 @@ public class TestAutonomous extends LinearOpMode {
             periodic.start();
             startPose = drive.getPoseEstimate();
 
-            // Spike mark trajectory
-            drive.followTrajectorySequence(
-                    drive.trajectorySequenceBuilder(startPose)
-                            .back(40)
-                            .forward(14)
-                            .build());
+            // Go to spike mark
+            drive.followTrajectorySequence(drive.trajectorySequenceBuilder(startPose)
+                    .back(36)
+                    .forward(12) // Distance away from spike mark when scoring
+                    .build());
 
-            // Outtake purple/top pixel
+            // Score purple/top pixel
             bot.outtakeGround();
             sleep(1000);
             bot.claw.open();
@@ -279,37 +287,16 @@ public class TestAutonomous extends LinearOpMode {
             // Backstage actions
             if (toBackboard) {
 
-                // Spline
+                // Spline to backboard
                 startPose = drive.getPoseEstimate();
-                drive.followTrajectorySequence(
-                        drive.trajectorySequenceBuilder(startPose)
-                                .splineTo(new Vector2d(-42, 30), Math.toRadians(90))
-                                .build()
+                drive.followTrajectorySequence(drive.trajectorySequenceBuilder(startPose)
+                        .splineToLinearHeading(new Pose2d(42, 35, Math.toRadians(180)), Math.toRadians(180)) // Spline to backboard
+                        .back(10) // Back into backboard
+                        .build()
                 );
 
-//                // Strafe to backboard
-//                startPose = drive.getPoseEstimate();
-//                drive.followTrajectory(drive.trajectoryBuilder(startPose).strafeRight(34).build());
-//
-//                // Turn
-//                startPose = drive.getPoseEstimate();
-//                drive.followTrajectorySequence(
-//                        drive.trajectorySequenceBuilder(startPose)
-//                                .turn(Math.toRadians((90)))
-//                                .build());
-
-                // Run into backboard
-                startPose = drive.getPoseEstimate();
-                int slowerVelocity = 10; // Slower velocity that is the max constraint when running into backboard (in/s)
-                drive.followTrajectory(drive.trajectoryBuilder(startPose).back(10,
-                                SampleMecanumDrive.getVelocityConstraint(slowerVelocity, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
-                                SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
-                        .build());
-
-                sleep(200);
-
-                // Place yellow/bottom pixel on backboard
-                if (slidesUp) { // Slides run up
+                // Score yellow/bottom pixel on backboard
+                if (slidesUp) {
                     bot.slides.runTo(-400.0);
                 } else {
                     bot.slides.runToBottom();
@@ -325,23 +312,76 @@ public class TestAutonomous extends LinearOpMode {
                 bot.fourbar.wrist.setPosition(bot.fourbar.wrist.getPosition()+ bot.wristUpPos);
                 sleep(200);
 
-                // Parking
-                startPose = drive.getPoseEstimate();
-                int parkStrafe = 0;
-                if (park == 1) { // Left park
-                    switch (spikeMark) {
-                        case 1: parkStrafe = 17; break;
-                        case 2: parkStrafe = 23; break;
-                        case 3: parkStrafe = 31; break;
-                    }
-                } else if (park == 2) { // Right park
-                    switch (spikeMark) {
-                        case 1: parkStrafe = 31; break;
-                        case 2: parkStrafe = 23; break;
-                        case 3: parkStrafe = 17; break;
-                    }
+                // PIXEL STACK TRAJECTORY STARTS HERE
+                if (pixelStack) {
+                    Thread reverseIntake = new Thread(() -> {
+                        bot.intake(false); // Intake stack
+                    });
+                    reverseIntake.start();
+
+                    // Drive across field
+                    // Through middle truss
+                    startPose = drive.getPoseEstimate();
+                    drive.followTrajectorySequence(drive.trajectorySequenceBuilder(startPose)
+                            .strafeLeft(23)
+                            .forward(100)
+                            .build()
+                    );
+
+                    // Intake pixels
+                    sleep(500); // Wait to knock over pixels?
+                    reverseIntake.stop();
+                    Thread intake = new Thread(() -> {
+                        bot.intake(false); // Intake stack
+                    });
+                    intake.start();
+                    sleep(300); // Wait for intake
+                    intake.stop();
+
+                    // Return to backboard
+                    // Through middle truss
+                    startPose = drive.getPoseEstimate();
+                    drive.followTrajectorySequence(drive.trajectorySequenceBuilder(startPose)
+                            .back(100) // Drive across field
+                            .strafeRight(23) // Strafe to center of backboard
+                            .back(10) // Back into backboard
+                            .build()
+                    );
+
+                    // Score pixels on backboard
+                    bot.slides.runTo(-700.0); // Slides up
+                    // First pixel
+                    bot.outtakeOut(2);
+                    sleep(1000);
+                    bot.claw.open();
+                    sleep(200);
+                    // Second pixel
+                    bot.claw.open();
+                    sleep(800);
+                    bot.storage();
+                    bot.claw.close();
+                    bot.calculateWristPos();
+                    bot.fourbar.wrist.setPosition(bot.fourbar.wrist.getPosition()+ bot.wristUpPos);
+                    sleep(200);
                 }
+
+                // Parking
                 if (park != 0) {
+                    startPose = drive.getPoseEstimate();
+                    int parkStrafe = 0;
+                    if (park == 1) { // Left park
+                        switch (spikeMark) {
+                            case 1: parkStrafe = 17; break;
+                            case 2: parkStrafe = 23; break;
+                            case 3: parkStrafe = 31; break;
+                        }
+                    } else if (park == 2) { // Right park
+                        switch (spikeMark) {
+                            case 1: parkStrafe = 31; break;
+                            case 2: parkStrafe = 23; break;
+                            case 3: parkStrafe = 17; break;
+                        }
+                    }
                     drive.followTrajectory(drive.trajectoryBuilder(startPose).forward(5).build());
                     if (park == 1) { // Left park
                         drive.followTrajectory(drive.trajectoryBuilder(drive.getPoseEstimate()).strafeRight(parkStrafe).build());

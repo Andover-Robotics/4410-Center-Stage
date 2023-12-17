@@ -14,81 +14,47 @@ public class MeepMeepTesting {
         System.setProperty("sun.java2d.opengl", "true");
         MeepMeep meepMeep = new MeepMeep(800);
 
-        Pose2d startPoseBlueFar = new Pose2d(-36, 60, -90);
-        Pose2d startPoseBlueClose = new Pose2d(12, 60, -90);
-        Pose2d startPoseRedClose = new Pose2d(12, -60, 90);
-        Pose2d startPoseRedFar = new Pose2d(-36, -60, 90);
-
-        Vector2d parkingPosBlue = new Vector2d(56,56);
-        Vector2d parkingPosRed = new Vector2d(56,-56);
-        Vector2d scoreBlue = new Vector2d(42,30);
-        Vector2d scoreRed = new Vector2d(42,-30);
-
-        RoadRunnerBotEntity redCloseBot = new DefaultBotBuilder(meepMeep)
-                // Set bot constraints: maxVel, maxAccel, maxAngVel, maxAngAccel, track width
-                .setColorScheme(new ColorSchemeRedDark())
-                .setConstraints(60, 60, Math.toRadians(180), Math.toRadians(180), 15)
-                .followTrajectorySequence(drive ->
-                        drive.trajectorySequenceBuilder(startPoseRedClose)
-                                .splineTo(scoreRed,Math.toRadians(0))
-                                .waitSeconds(1.5)
-                                .strafeRight(26)
-                                .splineTo(parkingPosRed,Math.toRadians(0))
-                                .build()
-                );
-        RoadRunnerBotEntity blueCloseBot = new DefaultBotBuilder(meepMeep)
+        RoadRunnerBotEntity blueClose = new DefaultBotBuilder(meepMeep)
                 // Set bot constraints: maxVel, maxAccel, maxAngVel, maxAngAccel, track width
                 .setColorScheme(new ColorSchemeBlueDark())
                 .setConstraints(60, 60, Math.toRadians(180), Math.toRadians(180), 15)
                 .followTrajectorySequence(drive ->
-                        drive.trajectorySequenceBuilder(startPoseBlueClose)
-                                .splineTo(new Vector2d(12,36),-Math.toRadians(90))
-                                .waitSeconds(1.5)
-                                .splineTo(scoreBlue,Math.toRadians(0))
-                                .waitSeconds(1.5)
-                                .strafeLeft(26)
-                                .splineTo(parkingPosBlue,Math.toRadians(0))
-                                .build()
-                );
-        RoadRunnerBotEntity redFarBot = new DefaultBotBuilder(meepMeep)
-                // Set bot constraints: maxVel, maxAccel, maxAngVel, maxAngAccel, track width
-                .setColorScheme(new ColorSchemeRedLight())
-                .setConstraints(60, 60, Math.toRadians(180), Math.toRadians(180), 15)
-                .followTrajectorySequence(drive ->
-                        drive.trajectorySequenceBuilder(startPoseRedFar)
-                                .splineTo(new Vector2d(-36,-36),Math.toRadians(90))
-                                .waitSeconds(1.5)
-                                .splineTo(scoreRed,Math.toRadians(0))
-                                .waitSeconds(1.5)
-                                .strafeRight(26)
-                                .splineTo(parkingPosRed,Math.toRadians(0))
-                                .build()
-                );
-        RoadRunnerBotEntity blueFarBot = new DefaultBotBuilder(meepMeep)
-                // Set bot constraints: maxVel, maxAccel, maxAngVel, maxAngAccel, track width
-                .setColorScheme(new ColorSchemeBlueLight())
-                .setConstraints(60, 60, Math.toRadians(180), Math.toRadians(180), 15)
-                .followTrajectorySequence(drive ->
-                        drive.trajectorySequenceBuilder(startPoseBlueFar)
-                                .splineTo(new Vector2d(-36,36),-Math.toRadians(90))
-                                .waitSeconds(1.5)
-                                .splineTo(scoreBlue,Math.toRadians(0))
-                                .waitSeconds(1.5)
-                                .strafeLeft(26)
-                                .splineTo(parkingPosBlue,Math.toRadians(0))
-                                .build()
-                );
+                        drive.trajectorySequenceBuilder(new Pose2d(12, 60, Math.toRadians(90))) // Starting position
+                                .back(36)
+                                .forward(12) // Distance away from spike mark when scoring
+                                .waitSeconds(0.5) // Wait to score
+                                .splineToLinearHeading(new Pose2d(42, 35, Math.toRadians(180)), Math.toRadians(180)) // Spline to backboard
+                                .back(10) // Back into backboard
+                                .waitSeconds(0.5) // Wait to score
+                                .forward(10) // Back up
 
-        //red close is done
-        // blue close is done
-        // blue far is done
-        //red far is done
+                                // GO THROUGH SIDE TRUSS
+//                                .forward(100) // Drive across field
+//                                .waitSeconds(5) // Wait for intake from stack
+//                                .back(100)
+//                                .splineToConstantHeading(new Vector2d(50,42), Math.toRadians(180))
+//                                .waitSeconds(0.5) // Wait to score
+//                                .forward(5) // Back up
+//                                .strafeRight(16) // Park on side
+
+
+                                // GO THROUGH MIDDLE TRUSS
+                                .strafeLeft(23) // Start pixel stack trajectory
+                                .forward(100) // Drive across field
+                                .waitSeconds(3) // Wait for intake from stack
+                                .back(100)
+                                .strafeRight(23) // Strafe to center of backboard
+                                .back(10) // Back into backboard
+                                .waitSeconds(0.5) // Wait to score
+                                .forward(5) // Back up
+                                .strafeLeft(23) // Park on side
+
+                                .waitSeconds(2)
+                                .build()
+                );
 
         meepMeep.setBackground(MeepMeep.Background.FIELD_CENTERSTAGE_OFFICIAL)
-                .addEntity(blueCloseBot)
-                .addEntity(redCloseBot)
-                .addEntity(redFarBot)
-                .addEntity(blueFarBot)
+                .addEntity(blueClose)
                 .start();
     }
 }
