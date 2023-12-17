@@ -56,6 +56,7 @@ public class TestAutonomous extends LinearOpMode {
     boolean toBackboard = true; // Go to backboard: true - go to backboard and score, false - only score spike and stop
     boolean slidesUp = false; // Slide up: true - move slides up when scoring pixel on backboard, false - don't
     boolean pixelStack = true; // Go to pixel stack: true - do 2+2, false - park/or stop after scoring yellow pixel
+    boolean centerTruss = true; // Middle truss go under: true - center truss, false - side truss
     int park = 0; // Parking position: 0 - don't park, 1 - left, 2 - right
     int newTiles = 0;
     int backboardWait = 0; // How long (milliseconds) to wait before scoring on backboard: 0-5 seconds
@@ -141,7 +142,7 @@ public class TestAutonomous extends LinearOpMode {
         dpad up - change backboard wait time (increment by 1 second)
         dpad down - toggle to backboard
         START - re-pickup pixel
-        BACK - toggle go to pixel stack
+        BACK - change pixel stack parameters
          */
         while (!isStarted()) {
             gp1.readButtons();
@@ -172,10 +173,17 @@ public class TestAutonomous extends LinearOpMode {
             }
 
             // Toggle to pixel stack
+            int backIncrement = 0;
             if (gp1.wasJustPressed(GamepadKeys.Button.BACK)) {
-                pixelStack = !pixelStack;
+                switch (backIncrement) {
+                    case 1: pixelStack = false; centerTruss = false; break;
+                    case 2: pixelStack = true; centerTruss = true; break;
+                    case 3: pixelStack = true; centerTruss = false; backIncrement = 0; break;
+                    default: pixelStack = false; centerTruss = true; break;
+                }
+                backIncrement++;
             }
-            telemetry.addData("Pixel stack (BACK)", pixelStack);
+            telemetry.addData("Pixel stack (BACK)", pixelStack + "Center truss: " + centerTruss);
 
             // Change side
             if (gp1.wasJustPressed(GamepadKeys.Button.A)) {
@@ -286,7 +294,6 @@ public class TestAutonomous extends LinearOpMode {
 
             // Backstage actions
             if (toBackboard) {
-
                 // Spline to backboard
                 startPose = drive.getPoseEstimate();
                 drive.followTrajectorySequence(drive.trajectorySequenceBuilder(startPose)
@@ -320,13 +327,19 @@ public class TestAutonomous extends LinearOpMode {
                     reverseIntake.start();
 
                     // Drive across field
-                    // Through middle truss
                     startPose = drive.getPoseEstimate();
-                    drive.followTrajectorySequence(drive.trajectorySequenceBuilder(startPose)
-                            .strafeLeft(23)
-                            .forward(100)
-                            .build()
-                    );
+                    if (centerTruss) { // Through center truss
+                        drive.followTrajectorySequence(drive.trajectorySequenceBuilder(startPose)
+                                .strafeLeft(23)
+                                .forward(100)
+                                .build()
+                        );
+                    } else { // Through side truss
+                        drive.followTrajectorySequence(drive.trajectorySequenceBuilder(startPose)
+                                .forward(100)
+                                .build()
+                        );
+                    }
 
                     // Intake pixels
                     sleep(500); // Wait to knock over pixels?
@@ -339,14 +352,20 @@ public class TestAutonomous extends LinearOpMode {
                     intake.stop();
 
                     // Return to backboard
-                    // Through middle truss
                     startPose = drive.getPoseEstimate();
-                    drive.followTrajectorySequence(drive.trajectorySequenceBuilder(startPose)
-                            .back(100) // Drive across field
-                            .strafeRight(23) // Strafe to center of backboard
-                            .back(10) // Back into backboard
-                            .build()
-                    );
+                    if (centerTruss) { // Through center truss
+                        drive.followTrajectorySequence(drive.trajectorySequenceBuilder(startPose)
+                                .back(100) // Drive across field
+                                .strafeRight(23) // Strafe to center of backboard
+                                .back(10) // Back into backboard
+                                .build()
+                        );
+                    } else { // Through side truss
+                        drive.followTrajectorySequence(drive.trajectorySequenceBuilder(startPose)
+                                .back(110) // Drive across field
+                                .build()
+                        );
+                    }
 
                     // Score pixels on backboard
                     bot.slides.runTo(-700.0); // Slides up
@@ -382,7 +401,7 @@ public class TestAutonomous extends LinearOpMode {
                             case 3: parkStrafe = 17; break;
                         }
                     }
-                    drive.followTrajectory(drive.trajectoryBuilder(startPose).forward(5).build());
+                    drive.followTrajectory(drive.trajectoryBuilder(startPose).forward(5).build()); // Back away from backboard
                     if (park == 1) { // Left park
                         drive.followTrajectory(drive.trajectoryBuilder(drive.getPoseEstimate()).strafeRight(parkStrafe).build());
                     } else { // Right park

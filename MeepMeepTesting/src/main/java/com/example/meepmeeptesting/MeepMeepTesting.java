@@ -29,25 +29,24 @@ public class MeepMeepTesting {
                                 .forward(10) // Back up
 
                                 // GO THROUGH SIDE TRUSS
-//                                .forward(100) // Drive across field
-//                                .waitSeconds(5) // Wait for intake from stack
-//                                .back(100)
-//                                .splineToConstantHeading(new Vector2d(50,42), Math.toRadians(180))
-//                                .waitSeconds(0.5) // Wait to score
-//                                .forward(5) // Back up
-//                                .strafeRight(16) // Park on side
+                                .forward(100) // Drive across field
+                                .waitSeconds(3) // Wait for intake from stack
+                                .back(110)
+                                .waitSeconds(0.5) // Wait to score
+                                .forward(5) // Back up
+                                .strafeRight(23) // Park on side
 
 
                                 // GO THROUGH MIDDLE TRUSS
-                                .strafeLeft(23) // Start pixel stack trajectory
-                                .forward(100) // Drive across field
-                                .waitSeconds(3) // Wait for intake from stack
-                                .back(100)
-                                .strafeRight(23) // Strafe to center of backboard
-                                .back(10) // Back into backboard
-                                .waitSeconds(0.5) // Wait to score
-                                .forward(5) // Back up
-                                .strafeLeft(23) // Park on side
+//                                .strafeLeft(23) // Start pixel stack trajectory
+//                                .forward(100) // Drive across field
+//                                .waitSeconds(3) // Wait for intake from stack
+//                                .back(100)
+//                                .strafeRight(23) // Strafe to center of backboard
+//                                .back(10) // Back into backboard
+//                                .waitSeconds(0.5) // Wait to score
+//                                .forward(5) // Back up
+//                                .strafeLeft(23) // Park on side
 
                                 .waitSeconds(2)
                                 .build()
