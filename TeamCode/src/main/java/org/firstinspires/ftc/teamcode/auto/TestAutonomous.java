@@ -269,7 +269,6 @@ public class TestAutonomous extends LinearOpMode {
 
         waitForStart();
 
-        // TODO: TUNE/ADJUST TRAJECTORY PATHS (i definitely know what i'm doing)
         // Auto start
         if (opModeIsActive() && !isStopRequested()) {
             periodic.start();
@@ -297,6 +296,27 @@ public class TestAutonomous extends LinearOpMode {
                             break;
                     }
                 }
+            } else if (alliance == Alliance.RED) {
+                if (side == Side.CLOSE) {
+                    switch (spikeMark) {
+                        case 1: // LEFT
+                            drive.followTrajectorySequence(drive.trajectorySequenceBuilder(startPose)
+                                    .lineToLinearHeading(new Pose2d(35, -30, Math.toRadians(0))) // Line to spike mark
+                                    .build());
+                            break;
+                        case 2: // CENTER
+                            drive.followTrajectorySequence(drive.trajectorySequenceBuilder(startPose)
+                                    .back(36)
+                                    .forward(12) // Distance away from spike mark when scoring
+                                    .build());
+                            break;
+                        case 3: // RIGHT
+                            drive.followTrajectorySequence(drive.trajectorySequenceBuilder(startPose)
+                                    .lineToLinearHeading(new Pose2d(13, -30, Math.toRadians(0))) // Line to spike mark
+                                    .build());
+                            break;
+                    }
+                }
             }
 
             // Score purple/top pixel
@@ -313,27 +333,25 @@ public class TestAutonomous extends LinearOpMode {
             // Backstage actions
             if (toBackboard) {
                 // To backboard
+                int backboardY = 0;
+                switch (spikeMark) {
+                    case 1: backboardY = 40; break; // LEFT
+                    case 2: backboardY = 35; break; // CENTER
+                    case 3: backboardY = 30; break; // RIGHT
+                }
+                if (alliance == Alliance.RED) backboardY*=-1; // Flip sign if red alliance
+
                 startPose = drive.getPoseEstimate();
-                if (alliance == Alliance.BLUE) {
-                    if (side == Side.CLOSE) {
-                        switch (spikeMark) {
-                            case 1: // LEFT
-                                drive.followTrajectorySequence(drive.trajectorySequenceBuilder(startPose)
-                                        .lineToLinearHeading(new Pose2d(50, 40, Math.toRadians(180)))
-                                        .build());
-                                break;
-                            case 2: // CENTER
-                                drive.followTrajectorySequence(drive.trajectorySequenceBuilder(startPose)
-                                        .splineToLinearHeading(new Pose2d(42, 35, Math.toRadians(180)), Math.toRadians(180))
-                                        .back(10) // Back into backboard
-                                        .build());
-                                break;
-                            case 3: // RIGHT
-                                drive.followTrajectorySequence(drive.trajectorySequenceBuilder(startPose)
-                                        .lineToLinearHeading(new Pose2d(50, 30, Math.toRadians(180)))
-                                        .build());
-                                break;
-                        }
+                if (side == Side.CLOSE) {
+                    if (spikeMark == 2) {
+                        drive.followTrajectorySequence(drive.trajectorySequenceBuilder(startPose)
+                                .splineToLinearHeading(new Pose2d(42, backboardY, Math.toRadians(180)), Math.toRadians(180))
+                                .back(10) // Back into backboard
+                                .build());
+                    } else {
+                        drive.followTrajectorySequence(drive.trajectorySequenceBuilder(startPose)
+                                .lineToLinearHeading(new Pose2d(50, backboardY, Math.toRadians(180)))
+                                .build());
                     }
                 }
 
@@ -363,7 +381,7 @@ public class TestAutonomous extends LinearOpMode {
                 }
 
                 // PIXEL STACK TRAJECTORY STARTS HERE
-                if (pixelStack) {
+                if (side == Side.CLOSE && pixelStack) {
                     Thread reverseIntake = new Thread(() -> {
                         bot.intake(false); // Intake stack
                     });
@@ -372,59 +390,53 @@ public class TestAutonomous extends LinearOpMode {
                     // Drive across field
                     startPose = drive.getPoseEstimate();
                     if (centerTruss) { // Through center truss
+                        int strafeAmount = 0;
+                        switch (spikeMark) {
+                            case 1: strafeAmount = 28; break;
+                            case 2: strafeAmount = 23; break;
+                            case 3: strafeAmount = 18; break;
+                        }
                         if (alliance == Alliance.BLUE) {
-                            switch (spikeMark) {
-                                case 1: // LEFT
-                                    drive.followTrajectorySequence(drive.trajectorySequenceBuilder(startPose)
-                                            .strafeLeft(28)
-                                            .forward(100)
-                                            .build()
-                                    );
-                                    break;
-                                case 2: // CENTER
-                                    drive.followTrajectorySequence(drive.trajectorySequenceBuilder(startPose)
-                                            .strafeLeft(23)
-                                            .forward(100)
-                                            .build()
-                                    );
-                                    break;
-                                case 3: // RIGHT
-                                    drive.followTrajectorySequence(drive.trajectorySequenceBuilder(startPose)
-                                            .strafeLeft(18) // Start pixel stack trajectory
-                                            .forward(100) // Drive across field
-                                            .build()
-                                    );
-                                    break;
-                            }
+                            drive.followTrajectorySequence(drive.trajectorySequenceBuilder(startPose)
+                                    .strafeLeft(strafeAmount)
+                                    .forward(100)
+                                    .build()
+                            );
+                        } else if (alliance == Alliance.RED) {
+                            drive.followTrajectorySequence(drive.trajectorySequenceBuilder(startPose)
+                                    .strafeRight(strafeAmount)
+                                    .forward(100)
+                                    .build()
+                            );
                         }
                     } else { // Through side truss
+                        int strafeAmount = 0;
+                        switch (spikeMark) {
+                            case 1: strafeAmount = 18; break;
+                            case 3: strafeAmount = 28; break;
+                        }
+                        if (spikeMark == 2) {
+                            drive.followTrajectorySequence(drive.trajectorySequenceBuilder(startPose)
+                                    .forward(100)
+                                    .build()
+                            );
+                        }
                         if (alliance == Alliance.BLUE) {
-                            switch (spikeMark) {
-                                case 1: // LEFT
-                                    drive.followTrajectorySequence(drive.trajectorySequenceBuilder(startPose)
-                                            .strafeRight(18)
-                                            .forward(90) // Drive across field
-                                            .strafeLeft(22)
-                                            .forward(10)
-                                            .build()
-                                    );
-                                    break;
-                                case 2: // CENTER
-                                    drive.followTrajectorySequence(drive.trajectorySequenceBuilder(startPose)
-                                            .forward(100)
-                                            .build()
-                                    );
-                                    break;
-                                case 3: // RIGHT
-                                    drive.followTrajectorySequence(drive.trajectorySequenceBuilder(startPose)
-                                            .strafeRight(28)
-                                            .forward(90) // Drive across field
-                                            .strafeLeft(22)
-                                            .forward(10)
-                                            .build()
-                                    );
-                                    break;
-                            }
+                            drive.followTrajectorySequence(drive.trajectorySequenceBuilder(startPose)
+                                    .strafeRight(strafeAmount)
+                                    .forward(90) // Drive across field
+                                    .strafeLeft(22)
+                                    .forward(10)
+                                    .build()
+                            );
+                        } else if (alliance == Alliance.RED) {
+                            drive.followTrajectorySequence(drive.trajectorySequenceBuilder(startPose)
+                                    .strafeLeft(18)
+                                    .forward(90) // Drive across field
+                                    .strafeRight(22)
+                                    .forward(10)
+                                    .build()
+                            );
                         }
                     }
 
@@ -441,21 +453,30 @@ public class TestAutonomous extends LinearOpMode {
                     // Return to backboard
                     startPose = drive.getPoseEstimate();
                     if (centerTruss) { // Through center truss
-                        drive.followTrajectorySequence(drive.trajectorySequenceBuilder(startPose)
-                                .back(100) // Drive across field
-                                .strafeRight(23) // Strafe to center of backboard
-                                .back(10) // Back into backboard
-                                .build()
-                        );
+                        if (alliance == Alliance.BLUE) {
+                            drive.followTrajectorySequence(drive.trajectorySequenceBuilder(startPose)
+                                    .back(100) // Drive across field
+                                    .strafeRight(23) // Strafe to center of backboard
+                                    .back(10) // Back into backboard
+                                    .build()
+                            );
+                        } else if (alliance == Alliance.RED) {
+                            drive.followTrajectorySequence(drive.trajectorySequenceBuilder(startPose)
+                                    .back(100) // Drive across field
+                                    .strafeLeft(23) // Strafe to center of backboard
+                                    .back(10) // Back into backboard
+                                    .build()
+                            );
+                        }
                     } else { // Through side truss
-                        switch (spikeMark) {
-                            case 2: // CENTER
-                                drive.followTrajectorySequence(drive.trajectorySequenceBuilder(startPose)
-                                        .back(110) // Drive across field
-                                        .build()
-                                );
-                                break;
-                            default: // LEFT AND RIGHT
+                        // LEFT AND RIGHT
+                        if (spikeMark == 2) { // CENTER
+                            drive.followTrajectorySequence(drive.trajectorySequenceBuilder(startPose)
+                                    .back(110) // Drive across field
+                                    .build()
+                            );
+                        } else {
+                            if (alliance == Alliance.BLUE) {
                                 drive.followTrajectorySequence(drive.trajectorySequenceBuilder(startPose)
                                         .lineToLinearHeading(new Pose2d(-50, 11, Math.toRadians(180)))
                                         .back(90)
@@ -463,7 +484,15 @@ public class TestAutonomous extends LinearOpMode {
                                         .back(10)
                                         .build()
                                 );
-                                break;
+                            } else if (alliance == Alliance.RED) {
+                                drive.followTrajectorySequence(drive.trajectorySequenceBuilder(startPose)
+                                        .lineToLinearHeading(new Pose2d(-50, -11, Math.toRadians(180)))
+                                        .back(90)
+                                        .strafeLeft(23)
+                                        .back(10)
+                                        .build()
+                                );
+                            }
                         }
                     }
 
