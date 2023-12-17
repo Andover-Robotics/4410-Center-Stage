@@ -14,8 +14,41 @@ public class MeepMeepTesting {
         System.setProperty("sun.java2d.opengl", "true");
         MeepMeep meepMeep = new MeepMeep(800);
 
-        RoadRunnerBotEntity blueClose = new DefaultBotBuilder(meepMeep)
-                // Set bot constraints: maxVel, maxAccel, maxAngVel, maxAngAccel, track width
+        RoadRunnerBotEntity blueCloseLeft = new DefaultBotBuilder(meepMeep)
+                .setColorScheme(new ColorSchemeBlueDark())
+                .setConstraints(60, 60, Math.toRadians(180), Math.toRadians(180), 15)
+                .followTrajectorySequence(drive ->
+                        drive.trajectorySequenceBuilder(new Pose2d(12, 60, Math.toRadians(90))) // Starting position
+                                .lineToLinearHeading(new Pose2d(35, 30, Math.toRadians(0))) // Line to spike mark
+                                .waitSeconds(0.5) // Wait for score
+                                .lineToLinearHeading(new Pose2d(50, 35, Math.toRadians(180))) // To backboard
+                                .waitSeconds(0.5) // Wait for score
+                                .forward(8)
+
+                                // GO THROUGH SIDE TRUSS
+                                .forward(100) // Drive across field
+                                .waitSeconds(3) // Wait for intake from stack
+                                .back(110)
+                                .waitSeconds(0.5) // Wait to score
+                                .forward(5) // Back up
+                                .strafeRight(23) // Park on left side
+
+//                                // GO THROUGH MIDDLE TRUSS
+//                                .strafeLeft(23) // Start pixel stack trajectory
+//                                .forward(100) // Drive across field
+//                                .waitSeconds(3) // Wait for intake from stack
+//                                .back(100)
+//                                .strafeRight(23) // Strafe to center of backboard
+//                                .back(10) // Back into backboard
+//                                .waitSeconds(0.5) // Wait to score
+//                                .forward(5) // Back up
+//                                .strafeLeft(23) // Park on right side
+
+                                .waitSeconds(2)
+                                .build()
+                );
+
+        RoadRunnerBotEntity blueCloseCenter = new DefaultBotBuilder(meepMeep)
                 .setColorScheme(new ColorSchemeBlueDark())
                 .setConstraints(60, 60, Math.toRadians(180), Math.toRadians(180), 15)
                 .followTrajectorySequence(drive ->
@@ -34,7 +67,7 @@ public class MeepMeepTesting {
                                 .back(110)
                                 .waitSeconds(0.5) // Wait to score
                                 .forward(5) // Back up
-                                .strafeRight(23) // Park on side
+                                .strafeRight(23) // Park on left side
 
 
                                 // GO THROUGH MIDDLE TRUSS
@@ -46,14 +79,14 @@ public class MeepMeepTesting {
 //                                .back(10) // Back into backboard
 //                                .waitSeconds(0.5) // Wait to score
 //                                .forward(5) // Back up
-//                                .strafeLeft(23) // Park on side
+//                                .strafeLeft(23) // Park on right side
 
                                 .waitSeconds(2)
                                 .build()
                 );
 
         meepMeep.setBackground(MeepMeep.Background.FIELD_CENTERSTAGE_OFFICIAL)
-                .addEntity(blueClose)
+                .addEntity(blueCloseLeft)
                 .start();
     }
 }
