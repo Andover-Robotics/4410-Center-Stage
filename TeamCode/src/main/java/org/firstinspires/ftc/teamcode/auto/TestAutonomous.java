@@ -291,6 +291,10 @@ public class TestAutonomous extends LinearOpMode {
                                     .build());
                             break;
                         case 3: // RIGHT
+                            drive.followTrajectorySequence(drive.trajectorySequenceBuilder(startPose)
+                                    .lineToLinearHeading(new Pose2d(13, 30, Math.toRadians(0))) // Line to spike mark
+                                    .build());
+                            break;
                     }
                 }
             }
@@ -325,6 +329,10 @@ public class TestAutonomous extends LinearOpMode {
                                         .build());
                                 break;
                             case 3: // RIGHT
+                                drive.followTrajectorySequence(drive.trajectorySequenceBuilder(startPose)
+                                        .lineToLinearHeading(new Pose2d(50, 30, Math.toRadians(180)))
+                                        .build());
+                                break;
                         }
                     }
                 }
@@ -347,8 +355,8 @@ public class TestAutonomous extends LinearOpMode {
                 bot.fourbar.wrist.setPosition(bot.fourbar.wrist.getPosition()+ bot.wristUpPos);
                 sleep(200);
 
-                // Adjust left close blue
-                if (alliance == Alliance.BLUE && side == Side.CLOSE && spikeMark == 1) {
+                // Adjust left/right close blue
+                if ((alliance == Alliance.BLUE && side == Side.CLOSE) && (spikeMark == 1 || spikeMark == 3)) {
                     drive.followTrajectorySequence(drive.trajectorySequenceBuilder(startPose)
                             .forward(8)
                             .build());
@@ -380,6 +388,13 @@ public class TestAutonomous extends LinearOpMode {
                                             .build()
                                     );
                                     break;
+                                case 3: // RIGHT
+                                    drive.followTrajectorySequence(drive.trajectorySequenceBuilder(startPose)
+                                            .strafeLeft(18) // Start pixel stack trajectory
+                                            .forward(100) // Drive across field
+                                            .build()
+                                    );
+                                    break;
                             }
                         }
                     } else { // Through side truss
@@ -397,6 +412,15 @@ public class TestAutonomous extends LinearOpMode {
                                 case 2: // CENTER
                                     drive.followTrajectorySequence(drive.trajectorySequenceBuilder(startPose)
                                             .forward(100)
+                                            .build()
+                                    );
+                                    break;
+                                case 3: // RIGHT
+                                    drive.followTrajectorySequence(drive.trajectorySequenceBuilder(startPose)
+                                            .strafeRight(28)
+                                            .forward(90) // Drive across field
+                                            .strafeLeft(22)
+                                            .forward(10)
                                             .build()
                                     );
                                     break;
@@ -425,7 +449,13 @@ public class TestAutonomous extends LinearOpMode {
                         );
                     } else { // Through side truss
                         switch (spikeMark) {
-                            case 1: // LEFT
+                            case 2: // CENTER
+                                drive.followTrajectorySequence(drive.trajectorySequenceBuilder(startPose)
+                                        .back(110) // Drive across field
+                                        .build()
+                                );
+                                break;
+                            default: // LEFT AND RIGHT
                                 drive.followTrajectorySequence(drive.trajectorySequenceBuilder(startPose)
                                         .lineToLinearHeading(new Pose2d(-50, 11, Math.toRadians(180)))
                                         .back(90)
@@ -433,11 +463,7 @@ public class TestAutonomous extends LinearOpMode {
                                         .back(10)
                                         .build()
                                 );
-                            case 2: // CENTER
-                                drive.followTrajectorySequence(drive.trajectorySequenceBuilder(startPose)
-                                        .back(110) // Drive across field
-                                        .build()
-                                );
+                                break;
                         }
                     }
 
@@ -464,17 +490,21 @@ public class TestAutonomous extends LinearOpMode {
                 if (park != 0) {
                     startPose = drive.getPoseEstimate();
                     int parkStrafe = 0;
-                    if (park == 1) { // Left park
-                        switch (spikeMark) {
-                            case 1: parkStrafe = 17; break;
-                            case 2: parkStrafe = 23; break;
-                            case 3: parkStrafe = 31; break;
-                        }
-                    } else if (park == 2) { // Right park
-                        switch (spikeMark) {
-                            case 1: parkStrafe = 31; break;
-                            case 2: parkStrafe = 23; break;
-                            case 3: parkStrafe = 17; break;
+                    if (pixelStack) { // Pixel stack pixels are always scored on center
+                        parkStrafe = 23;
+                    } else {
+                        if (park == 1) { // Left park
+                            switch (spikeMark) {
+                                case 1: parkStrafe = 17; break;
+                                case 2: parkStrafe = 23; break;
+                                case 3: parkStrafe = 31; break;
+                            }
+                        } else if (park == 2) { // Right park
+                            switch (spikeMark) {
+                                case 1: parkStrafe = 31; break;
+                                case 2: parkStrafe = 23; break;
+                                case 3: parkStrafe = 17; break;
+                            }
                         }
                     }
                     if (park == 1) { // Left park
