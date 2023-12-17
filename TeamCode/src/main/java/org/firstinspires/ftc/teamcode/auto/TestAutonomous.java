@@ -60,8 +60,7 @@ public class TestAutonomous extends LinearOpMode {
     int park = 0; // Parking position: 0 - don't park, 1 - left, 2 - right
     int newTiles = 0;
     double  backboardWait = 0; // How long (seconds) to wait before scoring on backboard: 0-10 seconds
-    int dt = 0;
-    // TODO: WRITE SCORE SPIKE CONDITION
+    int backIncrement = 0;
     boolean scoreSpike = true; // Score spike: true - score spike, false - only park
 
     // TODO: TUNE THESE APRIL TAG VALUES TO FIT WITH APRIL TAGS
@@ -173,7 +172,6 @@ public class TestAutonomous extends LinearOpMode {
             }
 
             // Toggle to pixel stack
-            int backIncrement = 0;
             if (gp1.wasJustPressed(GamepadKeys.Button.BACK)) {
                 switch (backIncrement) {
                     case 1: pixelStack = false; centerTruss = false; break;
