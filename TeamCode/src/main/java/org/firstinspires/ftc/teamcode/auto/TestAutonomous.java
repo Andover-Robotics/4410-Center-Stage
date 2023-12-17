@@ -59,7 +59,7 @@ public class TestAutonomous extends LinearOpMode {
     boolean centerTruss = true; // Middle truss go under: true - center truss, false - side truss
     int park = 0; // Parking position: 0 - don't park, 1 - left, 2 - right
     int newTiles = 0;
-    int backboardWait = 0; // How long (milliseconds) to wait before scoring on backboard: 0-5 seconds
+    double  backboardWait = 0; // How long (seconds) to wait before scoring on backboard: 0-10 seconds
     int dt = 0;
     // TODO: WRITE SCORE SPIKE CONDITION
     boolean scoreSpike = true; // Score spike: true - score spike, false - only park
@@ -221,10 +221,10 @@ public class TestAutonomous extends LinearOpMode {
 
             // Change backboard wait time
             if (gp1.wasJustPressed(GamepadKeys.Button.DPAD_UP)) {
-                if (backboardWait < 5000) backboardWait+=1000;
-                else backboardWait = 0;
+                if (backboardWait < 10.0) backboardWait+=0.25;
+                else backboardWait = 0.0;
             }
-            telemetry.addData("Backboard sleep (DPAD UP)", backboardWait / 1000 + " seconds, " + backboardWait + " milliseconds");
+            telemetry.addData("Backboard sleep (DPAD UP)", backboardWait + " seconds");
 
             // Toggle park
             if (gp1.wasJustPressed(GamepadKeys.Button.DPAD_DOWN)) {
@@ -456,6 +456,7 @@ public class TestAutonomous extends LinearOpMode {
                         if (alliance == Alliance.BLUE) {
                             drive.followTrajectorySequence(drive.trajectorySequenceBuilder(startPose)
                                     .back(100) // Drive across field
+                                    .waitSeconds(backboardWait)
                                     .strafeRight(23) // Strafe to center of backboard
                                     .back(10) // Back into backboard
                                     .build()
@@ -463,6 +464,7 @@ public class TestAutonomous extends LinearOpMode {
                         } else if (alliance == Alliance.RED) {
                             drive.followTrajectorySequence(drive.trajectorySequenceBuilder(startPose)
                                     .back(100) // Drive across field
+                                    .waitSeconds(backboardWait)
                                     .strafeLeft(23) // Strafe to center of backboard
                                     .back(10) // Back into backboard
                                     .build()
@@ -473,6 +475,7 @@ public class TestAutonomous extends LinearOpMode {
                         if (spikeMark == 2) { // CENTER
                             drive.followTrajectorySequence(drive.trajectorySequenceBuilder(startPose)
                                     .back(110) // Drive across field
+                                    .waitSeconds(backboardWait)
                                     .build()
                             );
                         } else {
@@ -480,6 +483,7 @@ public class TestAutonomous extends LinearOpMode {
                                 drive.followTrajectorySequence(drive.trajectorySequenceBuilder(startPose)
                                         .lineToLinearHeading(new Pose2d(-50, 11, Math.toRadians(180)))
                                         .back(90)
+                                        .waitSeconds(backboardWait)
                                         .strafeRight(23)
                                         .back(10)
                                         .build()
@@ -488,6 +492,7 @@ public class TestAutonomous extends LinearOpMode {
                                 drive.followTrajectorySequence(drive.trajectorySequenceBuilder(startPose)
                                         .lineToLinearHeading(new Pose2d(-50, -11, Math.toRadians(180)))
                                         .back(90)
+                                        .waitSeconds(backboardWait)
                                         .strafeLeft(23)
                                         .back(10)
                                         .build()
