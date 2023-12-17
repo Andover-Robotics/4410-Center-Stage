@@ -54,12 +54,12 @@ public class TestAutonomous extends LinearOpMode {
 
     // Autonomous config values
     boolean toBackboard = true; // Go to backboard: true - go to backboard and score, false - only score spike and stop
-    boolean slidesUp = false; // Slide up: true - move slides up when scoring pixel on backboard, false - don't
     boolean pixelStack = true; // Go to pixel stack: true - do 2+2, false - park/or stop after scoring yellow pixel
     boolean centerTruss = true; // Middle truss go under: true - center truss, false - side truss
+    int slidesPos = 0; // Slide up: 0-1000, increment by 200
     int park = 0; // Parking position: 0 - don't park, 1 - left, 2 - right
     int newTiles = 0;
-    double  backboardWait = 0; // How long (seconds) to wait before scoring on backboard: 0-10 seconds
+    double  backboardWait = 0; // How long (seconds) to wait before scoring on backboard: 0-15 seconds, increment by 0.5
     int backIncrement = 0;
     boolean scoreSpike = true; // Score spike: true - score spike, false - only park
 
@@ -136,12 +136,14 @@ public class TestAutonomous extends LinearOpMode {
         Driver 1 (gp1):
         Y - change alliance
         A - change side
-        B - toggle slides up
         X - change park
-        dpad up - change backboard wait time (increment by 1 second)
-        dpad down - toggle to backboard
+        B - change pixel stack parameters
+
+        left bumper - change backboard wait time
+        right bumper - change slides height
+
         START - re-pickup pixel
-        BACK - change pixel stack parameters
+        BACK - toggle to backboard
          */
         while (!isStarted()) {
             gp1.readButtons();
@@ -172,7 +174,7 @@ public class TestAutonomous extends LinearOpMode {
             }
 
             // Toggle to pixel stack
-            if (gp1.wasJustPressed(GamepadKeys.Button.BACK)) {
+            if (gp1.wasJustPressed(GamepadKeys.Button.B)) {
                 switch (backIncrement) {
                     case 1: pixelStack = false; centerTruss = false; break;
                     case 2: pixelStack = true; centerTruss = true; break;
@@ -181,27 +183,28 @@ public class TestAutonomous extends LinearOpMode {
                 }
                 backIncrement++;
             }
-            telemetry.addData("Pixel stack (BACK)", pixelStack + "Center truss: " + centerTruss);
+            telemetry.addData("Pixel stack (B)", pixelStack + " Center truss: " + centerTruss);
 
             // Change side
             if (gp1.wasJustPressed(GamepadKeys.Button.A)) {
                 if (side == Side.CLOSE) { // Rn close, switch to FAR
                     side = Side.FAR;
-                    slidesUp = true;
+                    slidesPos = 400;
                 } else { // Rn far, switch to CLOSE
                     side = Side.CLOSE;
-                    slidesUp = false;
+                    slidesPos = 0;
                 }
             }
             telemetry.addData("Side (A)", side);
 
-            // Toggle slides up
-            if (gp1.wasJustPressed(GamepadKeys.Button.B)) {
-                slidesUp = !slidesUp;
+            // Change slide height
+            if (gp1.wasJustPressed(GamepadKeys.Button.RIGHT_BUMPER)) {
+                if (slidesPos < 1000) slidesPos += 200;
+                else backboardWait = 0;
             }
-            telemetry.addData("Slides Up (B)", slidesUp);
+            telemetry.addData("Slides (R-BUMPER)", slidesPos);
 
-            // Toggle park
+            // Switch park
             if (gp1.wasJustPressed(GamepadKeys.Button.X)) {
                 switch (park) {
                     case 0: park = 1; break;
@@ -218,24 +221,17 @@ public class TestAutonomous extends LinearOpMode {
             telemetry.addData("Parking (X)", parkSpot);
 
             // Change backboard wait time
-            if (gp1.wasJustPressed(GamepadKeys.Button.DPAD_UP)) {
-                if (backboardWait < 10.0) backboardWait+=0.25;
+            if (gp1.wasJustPressed(GamepadKeys.Button.LEFT_BUMPER)) {
+                if (backboardWait < 15.0) backboardWait+=0.5;
                 else backboardWait = 0.0;
             }
-            telemetry.addData("Backboard sleep (DPAD UP)", backboardWait + " seconds");
+            telemetry.addData("Backboard sleep (L-BUMPER)", backboardWait + " seconds");
 
-            // Toggle park
-            if (gp1.wasJustPressed(GamepadKeys.Button.DPAD_DOWN)) {
+            // Toggle to backboard
+            if (gp1.wasJustPressed(GamepadKeys.Button.BACK)) {
                 toBackboard = !toBackboard;
             }
-            telemetry.addData("To Backboard (DPAD DOWN)", toBackboard);
-
-            //Toggle Tile Type
-            if (gp1.wasJustPressed(GamepadKeys.Button.DPAD_LEFT)) {
-                if (newTiles == 0) newTiles = 1;
-                else if (newTiles == 1) newTiles = 0;
-            }
-            telemetry.addData("New Tiles (DPAD LEFT)", newTiles);
+            telemetry.addData("ToBackboard (BACK)", toBackboard);
 
             // Initiate color detection
             if (alliance == Alliance.RED) {
@@ -354,11 +350,8 @@ public class TestAutonomous extends LinearOpMode {
                 }
 
                 // Score yellow/bottom pixel on backboard
-                if (slidesUp) {
-                    bot.slides.runTo(-400.0);
-                } else {
-                    bot.slides.runToBottom();
-                }
+                if (slidesPos != 0) bot.slides.runTo(-slidesPos);
+                else bot.slides.runToBottom();
                 bot.outtakeOut(bot.claw.getClawState());
                 bot.fourbar.topOuttake();
                 sleep(800);
@@ -500,7 +493,7 @@ public class TestAutonomous extends LinearOpMode {
                     }
 
                     // Score pixels on backboard
-                    bot.slides.runTo(-700.0); // Slides up
+                    bot.slides.runTo(-600.0); // Slides up
                     // First pixel
                     bot.outtakeOut(2);
                     sleep(1000);
