@@ -61,7 +61,6 @@ public class TestAutonomous extends LinearOpMode {
     int newTiles = 0;
     double  backboardWait = 0; // How long (seconds) to wait before scoring on backboard: 0-15 seconds, increment by 0.5
     int backIncrement = 0;
-    boolean scoreSpike = true; // Score spike: true - score spike, false - only park
 
     // TODO: TUNE THESE APRIL TAG VALUES TO FIT WITH APRIL TAGS
     static final double FEET_PER_METER = 3.28084;
@@ -189,6 +188,7 @@ public class TestAutonomous extends LinearOpMode {
             if (gp1.wasJustPressed(GamepadKeys.Button.A)) {
                 if (side == Side.CLOSE) { // Rn close, switch to FAR
                     side = Side.FAR;
+                    pixelStack = false;
                     slidesPos = 400;
                 } else { // Rn far, switch to CLOSE
                     side = Side.CLOSE;
@@ -269,48 +269,43 @@ public class TestAutonomous extends LinearOpMode {
 
             // Drive to spike mark
             startPose = drive.getPoseEstimate();
+            Pose2d spikePose = new Pose2d();
             if (alliance == Alliance.BLUE) {
                 if (side == Side.CLOSE) {
                     switch (spikeMark) {
-                        case 1: // LEFT
-                            drive.followTrajectorySequence(drive.trajectorySequenceBuilder(startPose)
-                                    .lineToLinearHeading(new Pose2d(35, 30, Math.toRadians(0))) // Line to spike mark
-                                    .build());
-                            break;
-                        case 2: // CENTER
-                            drive.followTrajectorySequence(drive.trajectorySequenceBuilder(startPose)
-                                    .back(36)
-                                    .forward(12) // Distance away from spike mark when scoring
-                                    .build());
-                            break;
-                        case 3: // RIGHT
-                            drive.followTrajectorySequence(drive.trajectorySequenceBuilder(startPose)
-                                    .lineToLinearHeading(new Pose2d(13, 30, Math.toRadians(0))) // Line to spike mark
-                                    .build());
-                            break;
+                        case 1: spikePose = new Pose2d(35, 30, Math.toRadians(0)); break;
+                        case 3: spikePose = new Pose2d(13, 30, Math.toRadians(0)); break;
+                    }
+                } else if (side == Side.FAR) {
+                    switch (spikeMark) {
+                        case 1: spikePose = new Pose2d(35, 30, Math.toRadians(0)); break;
+                        case 2: spikePose = new Pose2d(-50, 25, Math.toRadians(180)); break;
+                        case 3: spikePose = new Pose2d(13, 30, Math.toRadians(0)); break;
                     }
                 }
             } else if (alliance == Alliance.RED) {
                 if (side == Side.CLOSE) {
                     switch (spikeMark) {
-                        case 1: // LEFT
-                            drive.followTrajectorySequence(drive.trajectorySequenceBuilder(startPose)
-                                    .lineToLinearHeading(new Pose2d(35, -30, Math.toRadians(0))) // Line to spike mark
-                                    .build());
-                            break;
-                        case 2: // CENTER
-                            drive.followTrajectorySequence(drive.trajectorySequenceBuilder(startPose)
-                                    .back(36)
-                                    .forward(12) // Distance away from spike mark when scoring
-                                    .build());
-                            break;
-                        case 3: // RIGHT
-                            drive.followTrajectorySequence(drive.trajectorySequenceBuilder(startPose)
-                                    .lineToLinearHeading(new Pose2d(13, -30, Math.toRadians(0))) // Line to spike mark
-                                    .build());
-                            break;
+                        case 1: spikePose = new Pose2d(35, -30, Math.toRadians(0)); break;
+                        case 3: spikePose = new Pose2d(13, -30, Math.toRadians(0)); break;
+                    }
+                } else if (side == Side.FAR) {
+                    switch (spikeMark) {
+                        case 1: spikePose = new Pose2d(35, -30, Math.toRadians(0)); break;
+                        case 2: spikePose = new Pose2d(-50, -25, Math.toRadians(180)); break;
+                        case 3: spikePose = new Pose2d(13, -30, Math.toRadians(0)); break;
                     }
                 }
+            }
+            if (side == Side.CLOSE && spikeMark == 2) { // Center
+                drive.followTrajectorySequence(drive.trajectorySequenceBuilder(startPose)
+                        .back(36)
+                        .forward(12) // Distance away from spike mark when scoring
+                        .build());
+            } else {
+                drive.followTrajectorySequence(drive.trajectorySequenceBuilder(startPose)
+                        .lineToLinearHeading(spikePose) // Line to spike mark
+                        .build());
             }
 
             // Score purple/top pixel
@@ -347,7 +342,69 @@ public class TestAutonomous extends LinearOpMode {
                                 .lineToLinearHeading(new Pose2d(50, backboardY, Math.toRadians(180)))
                                 .build());
                     }
+                } else if (side == Side.FAR) {
+                    if (alliance == Alliance.BLUE) {
+                        switch (spikeMark) {
+                            case 1: // LEFT
+                                drive.followTrajectorySequence(drive.trajectorySequenceBuilder(startPose)
+                                        .strafeLeft(17) // Strafe to center truss
+                                        .back(78) // Drive to backboard
+                                        .waitSeconds(backboardWait)
+                                        .strafeRight(27) // Strafe to center
+                                        .build());
+                                break;
+                            case 2: // CENTER
+                                drive.followTrajectorySequence(drive.trajectorySequenceBuilder(startPose)
+                                        .strafeLeft(12) // Strafe to center truss
+                                        .back(90) // Drive to backboard
+                                        .waitSeconds(backboardWait) // Wait for close auto to finish
+                                        .strafeRight(22) // Strafe to center
+                                        .build());
+                                break;
+                            case 3: // RIGHT
+                                drive.followTrajectorySequence(drive.trajectorySequenceBuilder(startPose)
+                                        .strafeRight(18) // Strafe to center truss
+                                        .forward(60) // Drive across field
+                                        .splineToLinearHeading(new Pose2d(40, 28, Math.toRadians(180)), Math.toRadians(180)) // Spline to backboard
+                                        .build());
+                                break;
+                        }
+                    } else if (alliance == Alliance.RED) {
+                        switch (spikeMark) {
+                            case 1: // LEFT
+                                drive.followTrajectorySequence(drive.trajectorySequenceBuilder(startPose)
+                                        .strafeRight(17) // Strafe to center truss
+                                        .back(78) // Drive to backboard
+                                        .waitSeconds(backboardWait)
+                                        .strafeLeft(27) // Strafe to center
+                                        .build());
+                                break;
+                            case 2: // CENTER
+                                drive.followTrajectorySequence(drive.trajectorySequenceBuilder(startPose)
+                                        .strafeRight(12) // Strafe to center truss
+                                        .back(90) // Drive to backboard
+                                        .waitSeconds(backboardWait) // Wait for close auto to finish
+                                        .strafeLeft(22) // Strafe to center
+                                        .build());
+                                break;
+                            case 3: // RIGHT
+                                drive.followTrajectorySequence(drive.trajectorySequenceBuilder(startPose)
+                                        .strafeLeft(18) // Strafe to center truss
+                                        .forward(60) // Drive across field
+                                        .splineToLinearHeading(new Pose2d(40, -28, Math.toRadians(180)), Math.toRadians(180)) // Spline to backboard
+                                        .build());
+                                break;
+                        }
+                    }
                 }
+
+                // Run into backboard
+                startPose = drive.getPoseEstimate();
+                int slowerVelocity = 8; // Slower velocity that is the max constraint when running into backboard (in/s)
+                drive.followTrajectory(drive.trajectoryBuilder(startPose).back(10,
+                                SampleMecanumDrive.getVelocityConstraint(slowerVelocity, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
+                                SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
+                        .build());
 
                 // Score yellow/bottom pixel on backboard
                 if (slidesPos != 0) bot.slides.runTo(-slidesPos);
