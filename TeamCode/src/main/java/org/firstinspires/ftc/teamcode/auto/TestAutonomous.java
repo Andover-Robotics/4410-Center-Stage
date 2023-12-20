@@ -98,10 +98,6 @@ public class TestAutonomous extends LinearOpMode {
         });
         camera.setPipeline(colorDetection);
 
-        // Define starting pose for robot
-        Pose2d startPose = new Pose2d(0, 0, Math.toRadians(0));
-        drive.setPoseEstimate(startPose);
-
         // Threads
         Thread periodic = new Thread(() -> {
             while (opModeIsActive() && !isStopRequested()) {
@@ -169,7 +165,6 @@ public class TestAutonomous extends LinearOpMode {
                 bot.claw.pickupClose();
                 sleep(300);
                 bot.storage();
-                sleep(200);
             }
 
             // Toggle to pixel stack
@@ -265,10 +260,25 @@ public class TestAutonomous extends LinearOpMode {
 
         // Auto start
         if (opModeIsActive() && !isStopRequested()) {
+            // Set starting poses
+            Pose2d blueCloseStart = new Pose2d(12,60,Math.toRadians(90));
+            Pose2d blueFarStart = new Pose2d(-35,60,Math.toRadians(90));
+            Pose2d redCloseStart = new Pose2d(12,-60,Math.toRadians(-90));
+            Pose2d redFarStart = new Pose2d(-35,-60,Math.toRadians(-90));
+            if (alliance == Alliance.BLUE && side == Side.CLOSE) {
+                drive.setPoseEstimate(blueCloseStart);
+            } else if (alliance == Alliance.BLUE && side == Side.FAR) {
+                drive.setPoseEstimate(blueFarStart);
+            } else if (alliance == Alliance.RED && side == Side.CLOSE) {
+                drive.setPoseEstimate(redCloseStart);
+            } else if (alliance == Alliance.RED && side == Side.FAR) {
+                drive.setPoseEstimate(redFarStart);
+            }
+
             periodic.start();
 
             // Drive to spike mark
-            startPose = drive.getPoseEstimate();
+            Pose2d startPose = drive.getPoseEstimate();
             Pose2d spikePose = new Pose2d();
             if (alliance == Alliance.BLUE) {
                 if (side == Side.CLOSE) {
@@ -300,7 +310,7 @@ public class TestAutonomous extends LinearOpMode {
             if (side == Side.CLOSE && spikeMark == 2) { // Center
                 drive.followTrajectorySequence(drive.trajectorySequenceBuilder(startPose)
                         .back(36)
-                        .forward(12) // Distance away from spike mark when scoring
+                        .forward(14) // Distance away from spike mark when scoring
                         .build());
             } else {
                 drive.followTrajectorySequence(drive.trajectorySequenceBuilder(startPose)
@@ -401,7 +411,7 @@ public class TestAutonomous extends LinearOpMode {
                 // Run into backboard
                 startPose = drive.getPoseEstimate();
                 int slowerVelocity = 8; // Slower velocity that is the max constraint when running into backboard (in/s)
-                drive.followTrajectory(drive.trajectoryBuilder(startPose).back(10,
+                drive.followTrajectory(drive.trajectoryBuilder(startPose).back(5,
                                 SampleMecanumDrive.getVelocityConstraint(slowerVelocity, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
                                 SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
                         .build());
@@ -422,7 +432,7 @@ public class TestAutonomous extends LinearOpMode {
                 sleep(200);
 
                 // Adjust left/right close blue
-                if ((alliance == Alliance.BLUE && side == Side.CLOSE) && (spikeMark == 1 || spikeMark == 3)) {
+                if ((alliance == Alliance.BLUE && side == Side.CLOSE)) {
                     drive.followTrajectorySequence(drive.trajectorySequenceBuilder(startPose)
                             .forward(8)
                             .build());
@@ -431,7 +441,7 @@ public class TestAutonomous extends LinearOpMode {
                 // PIXEL STACK TRAJECTORY STARTS HERE
                 if (side == Side.CLOSE && pixelStack) {
                     Thread reverseIntake = new Thread(() -> {
-                        bot.intake(false); // Intake stack
+                        bot.intake(true); // Run reverse
                     });
                     reverseIntake.start();
 
@@ -441,13 +451,13 @@ public class TestAutonomous extends LinearOpMode {
                         int strafeAmount = 0;
                         switch (spikeMark) {
                             case 1: strafeAmount = 28; break;
-                            case 2: strafeAmount = 23; break;
+                            case 2: strafeAmount = 25; break;
                             case 3: strafeAmount = 18; break;
                         }
                         if (alliance == Alliance.BLUE) {
                             drive.followTrajectorySequence(drive.trajectorySequenceBuilder(startPose)
                                     .strafeLeft(strafeAmount)
-                                    .forward(100)
+                                    .forward(103)
                                     .build()
                             );
                         } else if (alliance == Alliance.RED) {
@@ -490,13 +500,15 @@ public class TestAutonomous extends LinearOpMode {
 
                     // Intake pixels
                     sleep(500); // Wait to knock over pixels?
-                    reverseIntake.stop();
+                    reverseIntake.interrupt();
+                    bot.intake.stopIntake();
                     Thread intake = new Thread(() -> {
                         bot.intake(false); // Intake stack
                     });
                     intake.start();
                     sleep(300); // Wait for intake
-                    intake.stop();
+                    intake.interrupt();
+                    bot.intake.stopIntake();
 
                     // Return to backboard
                     startPose = drive.getPoseEstimate();
@@ -568,9 +580,9 @@ public class TestAutonomous extends LinearOpMode {
                 }
 
                 // Parking
+                startPose = drive.getPoseEstimate();
                 drive.followTrajectory(drive.trajectoryBuilder(startPose).forward(5).build()); // Back away from backboard
                 if (park != 0) {
-                    startPose = drive.getPoseEstimate();
                     int parkStrafe = 0;
                     if (pixelStack) { // Pixel stack pixels are always scored on center
                         parkStrafe = 23;

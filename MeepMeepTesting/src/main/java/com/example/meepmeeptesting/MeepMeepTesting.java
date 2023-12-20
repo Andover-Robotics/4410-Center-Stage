@@ -71,25 +71,25 @@ public class MeepMeepTesting {
                                 .waitSeconds(0.5) // Wait to score
                                 .forward(10) // Back up
 
-                                // GO THROUGH SIDE TRUSS
-                                .forward(100) // Drive across field
-                                .waitSeconds(3) // Wait for intake from stack
-                                .back(110)
-                                .waitSeconds(0.5) // Wait to score
-                                .forward(5) // Back up
-                                .strafeRight(23) // Park on left side
-
-//
-//                                // GO THROUGH MIDDLE TRUSS
-//                                .strafeLeft(23) // Start pixel stack trajectory
+//                                // GO THROUGH SIDE TRUSS
 //                                .forward(100) // Drive across field
 //                                .waitSeconds(3) // Wait for intake from stack
-//                                .back(100)
-//                                .strafeRight(23) // Strafe to center of backboard
-//                                .back(10) // Back into backboard
+//                                .back(110)
 //                                .waitSeconds(0.5) // Wait to score
 //                                .forward(5) // Back up
-//                                .strafeLeft(23) // Park on right side
+//                                .strafeRight(23) // Park on left side
+
+//
+                                // GO THROUGH MIDDLE TRUSS
+                                .strafeLeft(23) // Start pixel stack trajectory
+                                .forward(100) // Drive across field
+                                .waitSeconds(3) // Wait for intake from stack
+                                .back(100)
+                                .strafeRight(23) // Strafe to center of backboard
+                                .back(10) // Back into backboard
+                                .waitSeconds(0.5) // Wait to score
+                                .forward(5) // Back up
+                                .strafeLeft(23) // Park on right side
 
                                 .waitSeconds(2)
                                 .build()
@@ -185,6 +185,7 @@ public class MeepMeepTesting {
                                 .forward(60) // Drive across field
                                 .splineToLinearHeading(new Pose2d(40, 28, Math.toRadians(180)), Math.toRadians(180)) // Spline to backboard
                                 .back(10) // Drive into backboard
+                                .forward(5)
                                 .strafeRight(31)
                                 .waitSeconds(0.5) // Wait to score
 
@@ -232,8 +233,7 @@ public class MeepMeepTesting {
                 );
 
         meepMeep.setBackground(MeepMeep.Background.FIELD_CENTERSTAGE_OFFICIAL)
-                .addEntity(blueFarCenter)
-                .addEntity(blueCloseCenter)
+                .addEntity(blueCloseLeft)
                 .start();
     }
 }
