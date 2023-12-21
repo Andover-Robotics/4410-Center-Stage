@@ -284,6 +284,7 @@ public class TestAutonomous extends LinearOpMode {
                 if (side == Side.CLOSE) {
                     switch (spikeMark) {
                         case 1: spikePose = new Pose2d(35, 30, Math.toRadians(0)); break;
+                        case 2: spikePose = new Pose2d(30, 25, Math.toRadians(0)); break;
                         case 3: spikePose = new Pose2d(13, 30, Math.toRadians(0)); break;
                     }
                 } else if (side == Side.FAR) {
@@ -297,6 +298,7 @@ public class TestAutonomous extends LinearOpMode {
                 if (side == Side.CLOSE) {
                     switch (spikeMark) {
                         case 1: spikePose = new Pose2d(35, -30, Math.toRadians(0)); break;
+                        case 2: spikePose = new Pose2d(30, -25, Math.toRadians(0)); break;
                         case 3: spikePose = new Pose2d(13, -30, Math.toRadians(0)); break;
                     }
                 } else if (side == Side.FAR) {
@@ -307,16 +309,9 @@ public class TestAutonomous extends LinearOpMode {
                     }
                 }
             }
-            if (side == Side.CLOSE && spikeMark == 2) { // Center
-                drive.followTrajectorySequence(drive.trajectorySequenceBuilder(startPose)
-                        .back(36)
-                        .forward(14) // Distance away from spike mark when scoring
-                        .build());
-            } else {
-                drive.followTrajectorySequence(drive.trajectorySequenceBuilder(startPose)
-                        .lineToLinearHeading(spikePose) // Line to spike mark
-                        .build());
-            }
+            drive.followTrajectorySequence(drive.trajectorySequenceBuilder(startPose)
+                    .lineToLinearHeading(spikePose) // Line to spike mark
+                    .build());
 
             // Score purple/top pixel
             bot.outtakeGround();
