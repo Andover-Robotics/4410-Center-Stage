@@ -417,8 +417,11 @@ public class TestAutonomous extends LinearOpMode {
                         .build());
 
                 // Score yellow/bottom pixel on backboard
-                if (slidesPos != 0) bot.slides.runTo(-slidesPos);
-                else bot.slides.runToBottom();
+                if (slidesPos != 0) {
+                    bot.slides.runTo(-slidesPos);
+                } else {
+                    bot.slides.runToBottom();
+                }
                 bot.outtakeOut(bot.claw.getClawState());
                 bot.fourbar.topOuttake();
                 sleep(800);
@@ -457,7 +460,7 @@ public class TestAutonomous extends LinearOpMode {
                         if (alliance == Alliance.BLUE) {
                             drive.followTrajectorySequence(drive.trajectorySequenceBuilder(startPose)
                                     .strafeLeft(strafeAmount)
-                                    .forward(103)
+                                    .forward(100)
                                     .build()
                             );
                         } else if (alliance == Alliance.RED) {
@@ -506,7 +509,7 @@ public class TestAutonomous extends LinearOpMode {
                         bot.intake(false); // Intake stack
                     });
                     intake.start();
-                    sleep(300); // Wait for intake
+                    sleep(3000); // Wait for intake
                     intake.interrupt();
                     bot.intake.stopIntake();
 

@@ -10,13 +10,9 @@ public class Claw {
 
     // TODO: Tune open and close values
     public static double fullOpen = 0.68;
-    // Big men are my favorite type
     public static double halfOpen = 0.71;
-    // BBC all day
     public static double close = 0.77;
-    // I love raahil :))
     public enum ClawState{
-        // Intake my balls
         EMPTY, // Has no pixels
         SINGLE, // Only one pixel (top one)
         BOTH // Both pixels (top and bottom)
