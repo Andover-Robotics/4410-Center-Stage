@@ -313,9 +313,9 @@ public class TestAutonomous extends LinearOpMode {
                     .lineToLinearHeading(spikePose) // Line to spike mark
                     .build());
 
-            // Score purple/top pixel
+            // Score purple pixel
             bot.outtakeGround();
-            sleep(1000);
+            sleep(1100);
             bot.claw.open();
             sleep(600);
             bot.storage();
@@ -411,7 +411,7 @@ public class TestAutonomous extends LinearOpMode {
                                 SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
                         .build());
 
-                // Score yellow/bottom pixel on backboard
+                // Score yellow pixel on backboard
                 if (slidesPos != 0) {
                     bot.slides.runTo(-slidesPos);
                 } else {
@@ -429,7 +429,7 @@ public class TestAutonomous extends LinearOpMode {
                 bot.fourbar.wrist.setPosition(bot.fourbar.wrist.getPosition()+ bot.wristUpPos);
                 sleep(200);
 
-                // Adjust left/right close blue
+                // Back away from backboard after scoring
                 if ((alliance == Alliance.BLUE && side == Side.CLOSE)) {
                     drive.followTrajectorySequence(drive.trajectorySequenceBuilder(startPose)
                             .forward(8)
@@ -438,13 +438,11 @@ public class TestAutonomous extends LinearOpMode {
 
                 // PIXEL STACK TRAJECTORY STARTS HERE
                 if (side == Side.CLOSE && pixelStack) {
-                    Thread reverseIntake = new Thread(() -> {
-                        bot.intake(true); // Run reverse
-                    });
-                    reverseIntake.start();
+                    bot.intake(true); // Run reverse
 
                     // Drive across field
                     startPose = drive.getPoseEstimate();
+                    int acrossDistance = 100;
                     if (centerTruss) { // Through center truss
                         int strafeAmount = 0;
                         switch (spikeMark) {
@@ -455,13 +453,13 @@ public class TestAutonomous extends LinearOpMode {
                         if (alliance == Alliance.BLUE) {
                             drive.followTrajectorySequence(drive.trajectorySequenceBuilder(startPose)
                                     .strafeLeft(strafeAmount)
-                                    .forward(100)
+                                    .forward(acrossDistance)
                                     .build()
                             );
                         } else if (alliance == Alliance.RED) {
                             drive.followTrajectorySequence(drive.trajectorySequenceBuilder(startPose)
                                     .strafeRight(strafeAmount)
-                                    .forward(100)
+                                    .forward(acrossDistance)
                                     .build()
                             );
                         }
@@ -473,14 +471,14 @@ public class TestAutonomous extends LinearOpMode {
                         }
                         if (spikeMark == 2) {
                             drive.followTrajectorySequence(drive.trajectorySequenceBuilder(startPose)
-                                    .forward(100)
+                                    .forward(acrossDistance)
                                     .build()
                             );
                         }
                         if (alliance == Alliance.BLUE) {
                             drive.followTrajectorySequence(drive.trajectorySequenceBuilder(startPose)
                                     .strafeRight(strafeAmount)
-                                    .forward(90) // Drive across field
+                                    .forward(acrossDistance - 10) // Drive across field
                                     .strafeLeft(22)
                                     .forward(10)
                                     .build()
@@ -488,7 +486,7 @@ public class TestAutonomous extends LinearOpMode {
                         } else if (alliance == Alliance.RED) {
                             drive.followTrajectorySequence(drive.trajectorySequenceBuilder(startPose)
                                     .strafeLeft(18)
-                                    .forward(90) // Drive across field
+                                    .forward(acrossDistance - 10) // Drive across field
                                     .strafeRight(22)
                                     .forward(10)
                                     .build()
@@ -498,22 +496,23 @@ public class TestAutonomous extends LinearOpMode {
 
                     // Intake pixels
                     sleep(500); // Wait to knock over pixels?
-                    reverseIntake.interrupt();
                     bot.intake.stopIntake();
-                    Thread intake = new Thread(() -> {
-                        bot.intake(false); // Intake stack
-                    });
-                    intake.start();
+                    drive.followTrajectorySequence(drive.trajectorySequenceBuilder(startPose) // Drive back
+                            .back(5)
+                            .build());
+                    bot.intake(false); // Start intaking
+                    drive.followTrajectorySequence(drive.trajectorySequenceBuilder(startPose) // Drive forward
+                            .forward(5)
+                            .build());
                     sleep(3000); // Wait for intake
-                    intake.interrupt();
-                    bot.intake.stopIntake();
+                    bot.intake.stopIntake(); // Stop intake
 
                     // Return to backboard
                     startPose = drive.getPoseEstimate();
                     if (centerTruss) { // Through center truss
                         if (alliance == Alliance.BLUE) {
                             drive.followTrajectorySequence(drive.trajectorySequenceBuilder(startPose)
-                                    .back(100) // Drive across field
+                                    .back(acrossDistance) // Drive across field
                                     .waitSeconds(backboardWait)
                                     .strafeRight(23) // Strafe to center of backboard
                                     .back(10) // Back into backboard
@@ -521,7 +520,7 @@ public class TestAutonomous extends LinearOpMode {
                             );
                         } else if (alliance == Alliance.RED) {
                             drive.followTrajectorySequence(drive.trajectorySequenceBuilder(startPose)
-                                    .back(100) // Drive across field
+                                    .back(acrossDistance) // Drive across field
                                     .waitSeconds(backboardWait)
                                     .strafeLeft(23) // Strafe to center of backboard
                                     .back(10) // Back into backboard
@@ -532,7 +531,7 @@ public class TestAutonomous extends LinearOpMode {
                         // LEFT AND RIGHT
                         if (spikeMark == 2) { // CENTER
                             drive.followTrajectorySequence(drive.trajectorySequenceBuilder(startPose)
-                                    .back(110) // Drive across field
+                                    .back(acrossDistance + 10) // Drive across field
                                     .waitSeconds(backboardWait)
                                     .build()
                             );
@@ -540,7 +539,7 @@ public class TestAutonomous extends LinearOpMode {
                             if (alliance == Alliance.BLUE) {
                                 drive.followTrajectorySequence(drive.trajectorySequenceBuilder(startPose)
                                         .lineToLinearHeading(new Pose2d(-50, 11, Math.toRadians(180)))
-                                        .back(90)
+                                        .back(acrossDistance - 10)
                                         .waitSeconds(backboardWait)
                                         .strafeRight(23)
                                         .back(10)
@@ -549,7 +548,7 @@ public class TestAutonomous extends LinearOpMode {
                             } else if (alliance == Alliance.RED) {
                                 drive.followTrajectorySequence(drive.trajectorySequenceBuilder(startPose)
                                         .lineToLinearHeading(new Pose2d(-50, -11, Math.toRadians(180)))
-                                        .back(90)
+                                        .back(acrossDistance - 10)
                                         .waitSeconds(backboardWait)
                                         .strafeLeft(23)
                                         .back(10)
