@@ -336,6 +336,17 @@ public class TestAutonomous extends LinearOpMode {
                 if (alliance == Alliance.RED) backboardY*=-1; // Flip sign if red alliance
 
                 startPose = drive.getPoseEstimate();
+                if (side == Side.CLOSE && spikeMark == 1) { // Extra movement for close left trajectories to avoid hitting backboard
+                    if (alliance == Alliance.BLUE) {
+                        drive.followTrajectorySequence(drive.trajectorySequenceBuilder(startPose)
+                                .lineToLinearHeading(new Pose2d(35, 55, Math.toRadians(180)))
+                                .build());
+                    } else if (alliance == Alliance.RED) {
+                        drive.followTrajectorySequence(drive.trajectorySequenceBuilder(startPose)
+                                .lineToLinearHeading(new Pose2d(35, -55, Math.toRadians(180)))
+                                .build());
+                    }
+                }
                 if (side == Side.CLOSE) {
                     if (spikeMark == 2) {
                         drive.followTrajectorySequence(drive.trajectorySequenceBuilder(startPose)
@@ -515,7 +526,6 @@ public class TestAutonomous extends LinearOpMode {
                                     .back(acrossDistance) // Drive across field
                                     .waitSeconds(backboardWait)
                                     .strafeRight(23) // Strafe to center of backboard
-                                    .back(10) // Back into backboard
                                     .build()
                             );
                         } else if (alliance == Alliance.RED) {
@@ -523,7 +533,6 @@ public class TestAutonomous extends LinearOpMode {
                                     .back(acrossDistance) // Drive across field
                                     .waitSeconds(backboardWait)
                                     .strafeLeft(23) // Strafe to center of backboard
-                                    .back(10) // Back into backboard
                                     .build()
                             );
                         }
@@ -542,7 +551,6 @@ public class TestAutonomous extends LinearOpMode {
                                         .back(acrossDistance - 10)
                                         .waitSeconds(backboardWait)
                                         .strafeRight(23)
-                                        .back(10)
                                         .build()
                                 );
                             } else if (alliance == Alliance.RED) {
@@ -551,12 +559,18 @@ public class TestAutonomous extends LinearOpMode {
                                         .back(acrossDistance - 10)
                                         .waitSeconds(backboardWait)
                                         .strafeLeft(23)
-                                        .back(10)
                                         .build()
                                 );
                             }
                         }
                     }
+
+                    // Run into backboard
+                    startPose = drive.getPoseEstimate();
+                    drive.followTrajectory(drive.trajectoryBuilder(startPose).back(5,
+                                    SampleMecanumDrive.getVelocityConstraint(slowerVelocity, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
+                                    SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
+                            .build());
 
                     // Score pixels on backboard
                     bot.slides.runTo(-600.0); // Slides up
