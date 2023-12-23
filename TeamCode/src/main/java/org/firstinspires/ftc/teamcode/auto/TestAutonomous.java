@@ -610,13 +610,14 @@ public class TestAutonomous extends LinearOpMode {
                         drive.followTrajectory(drive.trajectoryBuilder(drive.getPoseEstimate()).strafeLeft(parkStrafe).build());
                     }
                     if (side == Side.CLOSE && !pixelStack) {
-                        drive.followTrajectory(drive.trajectoryBuilder(startPose).back(3).build()); // Back away from backboard
+                        drive.followTrajectory(drive.trajectoryBuilder(drive.getPoseEstimate()).back(3).build()); // Back away from backboard
                     }
                 }
             }
 
             // Stop op mode
             sleep(800);
+            bot.setAutoEndPose(drive.getPoseEstimate());
             requestOpModeStop();
         }
 

@@ -16,6 +16,10 @@ import org.firstinspires.ftc.teamcode.auto.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.teleop.subsystems.Bot;
 import org.firstinspires.ftc.teamcode.teleop.subsystems.Slides;
 
+import com.acmerobotics.roadrunner.geometry.Pose2d;
+import com.acmerobotics.roadrunner.trajectory.Trajectory;
+import com.acmerobotics.roadrunner.util.Angle;
+
 import java.lang.*;
 import java.util.Map;
 
@@ -37,6 +41,9 @@ public class MainTeleOp extends LinearOpMode {
 
     @Override
     public void runOpMode() throws InterruptedException {
+
+        SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
+        drive.setPoseEstimate(bot.getAutoEndPose());
 
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
 
@@ -64,6 +71,7 @@ public class MainTeleOp extends LinearOpMode {
         right trigger - slow down
         left bumper - run intake
         right bumper - run reverse intake
+        start - align robot
 
         Driver 2 (gp2):
         B - pick up pixels, cancel outtake out
@@ -84,24 +92,11 @@ public class MainTeleOp extends LinearOpMode {
 
         waitForStart();
         while (opModeIsActive() && !isStopRequested()) {
+            drive.update();
+            Pose2d poseEstimate = drive.getPoseEstimate();
+
             gp1.readButtons();
             gp2.readButtons();
-
-            if (gp1.wasJustPressed(GamepadKeys.Button.DPAD_UP)){
-                if (bot.slides.getPosition() < -630 ){
-                    bot.ikDemo1();
-                }
-            } else if (gp1.wasJustPressed(GamepadKeys.Button.DPAD_DOWN)){
-                if (bot.slides.getPosition() > - 1700){
-                    bot.ikDemo2();
-                }
-            } else if (gp1.wasJustPressed(GamepadKeys.Button.DPAD_LEFT)){
-                bot.intake.power = bot.intake.power - 0.01;
-            } else if (gp1.wasJustPressed(GamepadKeys.Button.DPAD_RIGHT)){
-                bot.intake.power = bot.intake.power + 0.01;
-            }
-
-            inverseKinematics(gp2.getRightY(), ikCoefficient);
 
             // FINITE STATES
             if (bot.state == Bot.BotState.STORAGE) { // INITIALIZED
@@ -230,6 +225,28 @@ public class MainTeleOp extends LinearOpMode {
             // LAUNCH DRONE
             if (gp1.wasJustPressed(GamepadKeys.Button.B)) {
                 bot.launch();
+            }
+
+            // Fourbar/arm kinematics
+            if (gp1.wasJustPressed(GamepadKeys.Button.DPAD_UP)){
+                if (bot.slides.getPosition() < -630 ){
+                    bot.ikDemo1();
+                }
+            } else if (gp1.wasJustPressed(GamepadKeys.Button.DPAD_DOWN)){
+                if (bot.slides.getPosition() > - 1700){
+                    bot.ikDemo2();
+                }
+            } else if (gp1.wasJustPressed(GamepadKeys.Button.DPAD_LEFT)){
+                bot.intake.power = bot.intake.power - 0.01;
+            } else if (gp1.wasJustPressed(GamepadKeys.Button.DPAD_RIGHT)){
+                bot.intake.power = bot.intake.power + 0.01;
+            }
+            inverseKinematics(gp2.getRightY(), ikCoefficient);
+
+            // Alignment
+            if (gp1.wasJustPressed(GamepadKeys.Button.START)) {
+                double angle = Math.toRadians(90);
+                drive.turnAsync(Angle.normDelta(angle - poseEstimate.getHeading()));
             }
 
             // TELEMETRY

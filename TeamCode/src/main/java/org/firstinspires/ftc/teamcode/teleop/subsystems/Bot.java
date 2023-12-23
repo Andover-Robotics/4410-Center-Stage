@@ -27,6 +27,7 @@ public class Bot {
     public OpMode opMode;
     public BHI260IMU imu0;
     private double imuOffset = 0;
+    private static Pose2d autoEndPose;
 
     // Define subsystem objects
     public Intake intake;
@@ -199,5 +200,15 @@ public class Bot {
         }
         return angle;
     }
+
+    public void setAutoEndPose(Pose2d pose) {
+        autoEndPose = pose;
+    }
+
+    public Pose2d getAutoEndPose() {
+        return autoEndPose;
+    }
+
+
 
 }
