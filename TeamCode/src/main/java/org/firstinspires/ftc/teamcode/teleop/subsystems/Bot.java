@@ -27,7 +27,7 @@ public class Bot {
     public OpMode opMode;
     public BHI260IMU imu0;
     private double imuOffset = 0;
-    private static Pose2d autoEndPose;
+    private static Pose2d autoEndPose = new Pose2d(12,60,Math.toRadians(90));
 
     // Define subsystem objects
     public Intake intake;
