@@ -65,32 +65,32 @@ public class MeepMeepTesting {
                 .setConstraints(60, 60, Math.toRadians(180), Math.toRadians(180), 15)
                 .followTrajectorySequence(drive ->
                         drive.trajectorySequenceBuilder(blueCloseStart) // Starting position
-                                .lineToLinearHeading(new Pose2d(30, 25, Math.toRadians(0)))
+                                .lineToLinearHeading(new Pose2d(18, 38, Math.toRadians(90)))
                                 .waitSeconds(0.5) // Wait to score
                                 .splineToLinearHeading(new Pose2d(42, 35, Math.toRadians(180)), Math.toRadians(180)) // Spline to backboard
                                 .back(10) // Back into backboard
                                 .waitSeconds(0.5) // Wait to score
                                 .forward(8) // Back up
 
-//                                // GO THROUGH SIDE TRUSS
-//                                .forward(100) // Drive across field
-//                                .waitSeconds(3) // Wait for intake from stack
-//                                .back(110)
-//                                .waitSeconds(0.5) // Wait to score
-//                                .forward(5) // Back up
-//                                .strafeRight(23) // Park on left side
-
-//
-                                // GO THROUGH MIDDLE TRUSS
-                                .strafeLeft(25) // Start pixel stack trajectory
-                                .forward(103) // Drive across field
+                                // GO THROUGH SIDE TRUSS
+                                .forward(100) // Drive across field
                                 .waitSeconds(3) // Wait for intake from stack
-                                .back(100)
-                                .strafeRight(23) // Strafe to center of backboard
-                                .back(10) // Back into backboard
+                                .back(110)
                                 .waitSeconds(0.5) // Wait to score
                                 .forward(5) // Back up
-                                .strafeLeft(23) // Park on right side
+                                .strafeRight(23) // Park on left side
+
+////
+//                                // GO THROUGH MIDDLE TRUSS
+//                                .strafeLeft(25) // Start pixel stack trajectory
+//                                .forward(103) // Drive across field
+//                                .waitSeconds(3) // Wait for intake from stack
+//                                .back(100)
+//                                .strafeRight(23) // Strafe to center of backboard
+//                                .back(10) // Back into backboard
+//                                .waitSeconds(0.5) // Wait to score
+//                                .forward(5) // Back up
+//                                .strafeLeft(23) // Park on right side
 
                                 .waitSeconds(2)
                                 .build()
@@ -202,8 +202,9 @@ public class MeepMeepTesting {
                 .setConstraints(60, 60, Math.toRadians(180), Math.toRadians(180), 15)
                 .followTrajectorySequence(drive ->
                         drive.trajectorySequenceBuilder(redCloseStart) // Starting position
-                                .back(36)
-                                .forward(12) // Distance away from spike mark when scoring
+//                                .back(36)
+//                                .forward(12) // Distance away from spike mark when scoring
+                                .lineToLinearHeading(new Pose2d(20, -40, Math.toRadians(-90)))
                                 .waitSeconds(0.5) // Wait to score
                                 .splineToLinearHeading(new Pose2d(42, -35, Math.toRadians(180)), Math.toRadians(180)) // Spline to backboard
                                 .back(10) // Back into backboard
@@ -235,7 +236,8 @@ public class MeepMeepTesting {
                 );
 
         meepMeep.setBackground(MeepMeep.Background.FIELD_CENTERSTAGE_OFFICIAL)
-                .addEntity(blueCloseLeft)
+                .addEntity(blueCloseCenter)
+                .addEntity(blueFarCenter)
                 .start();
     }
 }

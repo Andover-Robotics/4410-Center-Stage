@@ -62,13 +62,6 @@ public class TestAutonomous extends LinearOpMode {
     double  backboardWait = 0; // How long (seconds) to wait before scoring on backboard: 0-15 seconds, increment by 0.5
     int backIncrement = 0;
 
-    // TODO: TUNE THESE APRIL TAG VALUES TO FIT WITH APRIL TAGS
-    static final double FEET_PER_METER = 3.28084;
-    double fx = 1078.03779, fy = 1084.50988, cx = 580.850545, cy = 245.959325;
-    double tagsize = 0.032; // UNITS ARE METERS //ONLY FOR TESTIN
-    int ID_ONE = 1, ID_TWO = 2, ID_THREE = 3; // Tag ID 1,2,3 from the 36h11 family
-    AprilTagDetection tagOfInterest = null;
-
     @Override
     public void runOpMode() throws InterruptedException {
 
@@ -82,7 +75,6 @@ public class TestAutonomous extends LinearOpMode {
         // Define camera values
         WebcamName camName = hardwareMap.get(WebcamName.class, "Webcam 1");
         OpenCvCamera camera = OpenCvCameraFactory.getInstance().createWebcam(camName);
-        AprilTagDetectionPipeline aprilTagDetectionPipeline = new AprilTagDetectionPipeline(tagsize, fx, fy, cx, cy);
         ColorDetectionPipeline colorDetection = new ColorDetectionPipeline(telemetry);
 
         // Start camera
@@ -284,28 +276,28 @@ public class TestAutonomous extends LinearOpMode {
                 if (side == Side.CLOSE) {
                     switch (spikeMark) {
                         case 1: spikePose = new Pose2d(35, 30, Math.toRadians(0)); break;
-                        case 2: spikePose = new Pose2d(30, 25, Math.toRadians(0)); break;
+                        case 2: spikePose = new Pose2d(18, 38, Math.toRadians(90)); break;
                         case 3: spikePose = new Pose2d(13, 30, Math.toRadians(0)); break;
                     }
                 } else if (side == Side.FAR) {
                     switch (spikeMark) {
-                        case 1: spikePose = new Pose2d(35, 30, Math.toRadians(0)); break;
-                        case 2: spikePose = new Pose2d(-50, 25, Math.toRadians(180)); break;
-                        case 3: spikePose = new Pose2d(13, 30, Math.toRadians(0)); break;
+                        case 1: spikePose = new Pose2d(-35, 30, Math.toRadians(0)); break;
+                        case 2: spikePose = new Pose2d(-50, 23, Math.toRadians(180)); break;
+                        case 3: spikePose = new Pose2d(-13, 30, Math.toRadians(0)); break;
                     }
                 }
             } else if (alliance == Alliance.RED) {
                 if (side == Side.CLOSE) {
                     switch (spikeMark) {
                         case 1: spikePose = new Pose2d(35, -30, Math.toRadians(0)); break;
-                        case 2: spikePose = new Pose2d(30, -25, Math.toRadians(0)); break;
+                        case 2: spikePose = new Pose2d(18, 38, Math.toRadians(-90)); break;
                         case 3: spikePose = new Pose2d(13, -30, Math.toRadians(0)); break;
                     }
                 } else if (side == Side.FAR) {
                     switch (spikeMark) {
-                        case 1: spikePose = new Pose2d(35, -30, Math.toRadians(0)); break;
+                        case 1: spikePose = new Pose2d(-35, -30, Math.toRadians(0)); break;
                         case 2: spikePose = new Pose2d(-50, -25, Math.toRadians(180)); break;
-                        case 3: spikePose = new Pose2d(13, -30, Math.toRadians(0)); break;
+                        case 3: spikePose = new Pose2d(-13, -30, Math.toRadians(0)); break;
                     }
                 }
             }
@@ -371,8 +363,8 @@ public class TestAutonomous extends LinearOpMode {
                                 break;
                             case 2: // CENTER
                                 drive.followTrajectorySequence(drive.trajectorySequenceBuilder(startPose)
-                                        .strafeLeft(12) // Strafe to center truss
-                                        .back(90) // Drive to backboard
+                                        .strafeLeft(15) // Strafe to center truss
+                                        .back(100) // Drive to backboard
                                         .waitSeconds(backboardWait) // Wait for close auto to finish
                                         .strafeRight(22) // Strafe to center
                                         .build());
@@ -380,7 +372,7 @@ public class TestAutonomous extends LinearOpMode {
                             case 3: // RIGHT
                                 drive.followTrajectorySequence(drive.trajectorySequenceBuilder(startPose)
                                         .strafeRight(18) // Strafe to center truss
-                                        .forward(60) // Drive across field
+                                        .forward(70) // Drive across field
                                         .splineToLinearHeading(new Pose2d(40, 28, Math.toRadians(180)), Math.toRadians(180)) // Spline to backboard
                                         .build());
                                 break;
@@ -428,7 +420,7 @@ public class TestAutonomous extends LinearOpMode {
                 } else {
                     bot.slides.runToBottom();
                 }
-                bot.outtakeOut(bot.claw.getClawState());
+                bot.outtakeOut(1);
                 bot.fourbar.topOuttake();
                 sleep(800);
                 bot.claw.open();
@@ -453,7 +445,7 @@ public class TestAutonomous extends LinearOpMode {
 
                     // Drive across field
                     startPose = drive.getPoseEstimate();
-                    int acrossDistance = 100;
+                    int acrossDistance = 102;
                     if (centerTruss) { // Through center truss
                         int strafeAmount = 0;
                         switch (spikeMark) {
@@ -578,10 +570,10 @@ public class TestAutonomous extends LinearOpMode {
                     bot.outtakeOut(2);
                     sleep(1000);
                     bot.claw.open();
-                    sleep(200);
+                    sleep(500);
                     // Second pixel
-                    bot.claw.open();
-                    sleep(800);
+                    bot.claw.fullOpen();
+                    sleep(500);
                     // Return to storage
                     bot.storage();
                     bot.claw.close();
@@ -601,13 +593,13 @@ public class TestAutonomous extends LinearOpMode {
                         if (park == 1) { // Left park
                             switch (spikeMark) {
                                 case 1: parkStrafe = 17; break;
-                                case 2: parkStrafe = 23; break;
+                                case 2: parkStrafe = 21; break;
                                 case 3: parkStrafe = 31; break;
                             }
                         } else if (park == 2) { // Right park
                             switch (spikeMark) {
                                 case 1: parkStrafe = 31; break;
-                                case 2: parkStrafe = 23; break;
+                                case 2: parkStrafe = 21; break;
                                 case 3: parkStrafe = 17; break;
                             }
                         }
@@ -616,6 +608,9 @@ public class TestAutonomous extends LinearOpMode {
                         drive.followTrajectory(drive.trajectoryBuilder(drive.getPoseEstimate()).strafeRight(parkStrafe).build());
                     } else { // Right park
                         drive.followTrajectory(drive.trajectoryBuilder(drive.getPoseEstimate()).strafeLeft(parkStrafe).build());
+                    }
+                    if (side == Side.CLOSE && !pixelStack) {
+                        drive.followTrajectory(drive.trajectoryBuilder(startPose).back(3).build()); // Back away from backboard
                     }
                 }
             }
@@ -633,84 +628,4 @@ public class TestAutonomous extends LinearOpMode {
             telemetry.addLine("Exception as followsL: " + e);
         }
     }
-
-    // April tag detection telemetry
-    @SuppressLint("DefaultLocale")
-    void tagToTelemetry(AprilTagDetection detection) {
-        telemetry.addLine(String.format("Detected tag ID=%d", detection.id));
-        telemetry.addLine(String.format("Translation X: %.2f feet", detection.pose.x * FEET_PER_METER));
-        telemetry.addLine(String.format("Translation Y: %.2f feet", detection.pose.y * FEET_PER_METER));
-        telemetry.addLine(String.format("Translation Z: %.2f feet", detection.pose.z * FEET_PER_METER));
-        telemetry.addLine(String.format("Rotation Yaw: %.2f degrees", Math.toDegrees(detection.pose.x)));
-        telemetry.addLine(String.format("Rotation Pitch: %.2f degrees", Math.toDegrees(detection.pose.y)));
-        telemetry.addLine(String.format("Rotation Roll: %.2f degrees", Math.toDegrees(detection.pose.z)));
-    }
-
 }
-
-//            // This code should be inside the runOpMode() loop
-//            // Run to backboard spline
-//            Vector2d scoreBlue = new Vector2d(42,30), scoreRed = new Vector2d(42,-30); // Vector2d spline end positions (backboard)
-//            Trajectory backboard;
-//            if (alliance == Alliance.RED) {
-//                backboard = drive.trajectoryBuilder(drive.getPoseEstimate())
-//                        .splineTo(scoreRed, Math.toRadians(0))
-//                        .build();
-//            } else {
-//                backboard = drive.trajectoryBuilder(drive.getPoseEstimate())
-//                        .splineTo(scoreBlue, Math.toRadians(0))
-//                        .build();
-//            }
-//            drive.followTrajectory(backboard);
-
-//            // Set april tag pipeline
-//            camera.setPipeline(aprilTagDetectionPipeline);
-//
-//            // Strafing along backboard trajectory
-//            Trajectory strafe;
-//            if (alliance == Alliance.RED) {
-//                strafe = drive.trajectoryBuilder(drive.getPoseEstimate())
-//                        .strafeLeft(26)
-//                        .build();
-//            } else { // alliance == Alliance.BLUE
-//                strafe = drive.trajectoryBuilder(drive.getPoseEstimate())
-//                        .strafeRight(26)
-//                        .build();
-//            }
-//            drive.followTrajectoryAsync(strafe);
-//
-//            // Repeatedly detecting april tag
-//            while (strafe.duration() > 6.0 && strafe.duration() < 8.0) { // TODO: tune this time frame to be accurate (if it even works lmao)
-//                ArrayList<AprilTagDetection> currentDetections = aprilTagDetectionPipeline.getLatestDetections();
-//                if (currentDetections.size() != 0) {
-//                    boolean tagFound = false;
-//                    for (AprilTagDetection tag : currentDetections) {
-//                        if (tag.id == ID_ONE || tag.id == ID_TWO || tag.id == ID_THREE) {
-//                            tagOfInterest = tag;
-//                            tagFound = true;
-//                            strafe.end();
-//                            break;
-//                        }
-//                    }
-//                    if (tagFound) {
-//                        telemetry.addLine("Tag of interest is in sight!\n\nLocation data:");
-//                        tagToTelemetry(tagOfInterest);
-//                    } else {
-//                        telemetry.addLine("Don't see tag of interest :(");
-//                        if (tagOfInterest == null) {
-//                            telemetry.addLine("(The tag has never been seen)");
-//                        } else {
-//                            telemetry.addLine("\nBut we HAVE seen the tag before; last seen at:");
-//                            tagToTelemetry(tagOfInterest);
-//                        }
-//                    }
-//                } else {
-//                    telemetry.addLine("Don't see tag of interest :(");
-//                    if (tagOfInterest == null) {
-//                        telemetry.addLine("(The tag has never been seen)");
-//                    } else {
-//                        telemetry.addLine("\nBut we HAVE seen the tag before; last seen at:");
-//                        tagToTelemetry(tagOfInterest);
-//                    }
-//                }
-//            }
