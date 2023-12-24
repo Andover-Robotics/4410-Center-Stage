@@ -77,7 +77,7 @@ public class ColorDetectionTest extends LinearOpMode {
 
                 int inc = 1;
 
-                if (highOrLow == 1) {
+                if (highOrLow == 0) {
                     HSV = ColorDetectionPipeline.currentHighHSV;
                     if (gp1.wasJustPressed(GamepadKeys.Button.DPAD_UP)) {
                         ColorDetectionPipeline.currentHighHSV.set(new double[]{HSV.val[0]+ inc, HSV.val[1], HSV.val[2]});
@@ -129,9 +129,9 @@ public class ColorDetectionTest extends LinearOpMode {
                 telemetry.addData("Alliance(Toggle with START)", ColorDetectionPipeline.alliance);
                 telemetry.addData("High or Low(Toggle with BACK)", (highOrLow == 0) ? "HIGH" : "LOW");
                 telemetry.addData("HSV RAW", Arrays.toString(HSV.val));
-                telemetry.addData("H value (Up - Dpad UP, Down - Dpad DOWN)", HSV.val[0]);
-                telemetry.addData("S value (Up - Dpad RIGHT, Down - Dpad LEFT)", HSV.val[1]);
-                telemetry.addData("V value (Up - RIGHT Bumper, Down - LEFT Bumper)", HSV.val[2]);
+                telemetry.addData("H value 180 (Up - Dpad UP, Down - Dpad DOWN)", HSV.val[0]);
+                telemetry.addData("S value 255 (Up - Dpad LEFT, Down - Dpad RIGHT)", HSV.val[1]);
+                telemetry.addData("V value 255 (Up - RIGHT Bumper, Down - LEFT Bumper)", HSV.val[2]);
 
             }
             telemetry.update();

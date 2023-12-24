@@ -46,7 +46,7 @@ public class ColorDetectionPipeline extends OpenCvPipeline{
     public static int alliance = 0;
 
     // Red HSV Values
-    public static double redLH = 0, redLS = 0, redLV = 35, redHH = 2, redHS = 360, redHV = 255;
+    public static double redLH = 0, redLS = 30, redLV = 35, redHH = 8, redHS = 255, redHV = 255;
     public static Scalar redLowHSV= new Scalar(redLH,redLS,redLV);
     public static Scalar redHighHSV = new Scalar(redHH,redHS,redHV);
 //    public static Scalar redLowHSV2= new Scalar(redLH2,redLS,redLV);
