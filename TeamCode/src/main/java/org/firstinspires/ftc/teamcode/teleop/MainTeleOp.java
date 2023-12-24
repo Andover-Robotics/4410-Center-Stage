@@ -41,14 +41,13 @@ public class MainTeleOp extends LinearOpMode {
 
     @Override
     public void runOpMode() throws InterruptedException {
+        Bot.instance = null;
+        bot = Bot.getInstance(this);
 
         SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
         drive.setPoseEstimate(bot.getAutoEndPose());
 
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
-
-        Bot.instance = null;
-        bot = Bot.getInstance(this);
 
         gp1 = new GamepadEx(gamepad1);
         gp2 = new GamepadEx(gamepad2);
