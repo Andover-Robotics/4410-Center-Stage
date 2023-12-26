@@ -41,13 +41,14 @@ public class MainTeleOp extends LinearOpMode {
 
     @Override
     public void runOpMode() throws InterruptedException {
+
+        telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
+
         Bot.instance = null;
         bot = Bot.getInstance(this);
 
         SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
         drive.setPoseEstimate(bot.getAutoEndPose());
-
-        telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
 
         gp1 = new GamepadEx(gamepad1);
         gp2 = new GamepadEx(gamepad2);
@@ -244,16 +245,16 @@ public class MainTeleOp extends LinearOpMode {
 
             // Alignment
             if (gp1.wasJustPressed(GamepadKeys.Button.START)) {
-                double angle = Math.toRadians(90);
-                drive.turnAsync(Angle.normDelta(angle - poseEstimate.getHeading()));
+                double angle = Math.toRadians(5);
+                drive.setExternalHeading(angle);
             }
 
             // TELEMETRY
             telemetry.addData("Bot State",bot.state);
-            telemetry.addData("Intake Power", bot.intake.power +"(running=" + bot.intake.getIsRunning() + ")");
             telemetry.addData("Slides Position", bot.slides.getPosition() + " (pos=" + bot.slides.position + " current=" + bot.slides.getCurrent() + ")");
             telemetry.addData("Pixels", bot.claw.getClawState());
             telemetry.addData("Arm Position", bot.fourbar.getArmPosition());
+            telemetry.addData("Heading",Math.toDegrees(drive.getPoseEstimate().getHeading()));
             //telemetry.addData("IK Coefficent", ikCoefficient );
 
             telemetry.update();

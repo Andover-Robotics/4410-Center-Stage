@@ -92,6 +92,11 @@ public class V4B {
         setArm(armTopOuttake);
     }
 
+    public void autoTopOuttake() {
+        setWrist(wristTopOuttake);
+        setArm(0.21);
+    }
+
     public void runManualOuttake(double fourpos, double clawpos) {
         setArm(fourpos);
         setWrist(clawpos);

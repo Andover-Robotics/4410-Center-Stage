@@ -46,14 +46,14 @@ public class ColorDetectionPipeline extends OpenCvPipeline{
     public static int alliance = 0;
 
     // Red HSV Values
-    public static double redLH = 0, redLS = 30, redLV = 35, redHH = 8, redHS = 255, redHV = 255;
+    public static double redLH = 0, redLS = 0, redLV = 35, redHH = 20, redHS = 360, redHV = 255;
     public static Scalar redLowHSV= new Scalar(redLH,redLS,redLV);
     public static Scalar redHighHSV = new Scalar(redHH,redHS,redHV);
 //    public static Scalar redLowHSV2= new Scalar(redLH2,redLS,redLV);
 //    public static Scalar redHighHSV2 = new Scalar(redHH2,redHS,redHV);
 
     // Blue HSV Values
-    public static double blueLH = 90, blueLS = 56, blueLV = 35, blueHH = 117, blueHS = 255, blueHV = 255;
+    public static double blueLH = 90, blueLS = 56, blueLV = 35, blueHH = 140, blueHS = 360, blueHV = 255;
     public static Scalar blueLowHSV= new Scalar(blueLH,blueLS,blueLV);
     public static Scalar blueHighHSV = new Scalar(blueHH,blueHS,blueHV);
 
@@ -156,7 +156,6 @@ public class ColorDetectionPipeline extends OpenCvPipeline{
                     height = rect.height;
                     iterations++;
                 } else {
-                    iterations = 0;
                     spikeMark = SpikeMark.RIGHT;
                     break;
                 }
@@ -173,13 +172,13 @@ public class ColorDetectionPipeline extends OpenCvPipeline{
                     spikeMark = SpikeMark.LEFT;
                 }
             } else if (midpointrect > rightrect.tl().x && midpointrect < leftrect.br().x) {
-                if (height > 20) {
+                if (height > 50) { // make sure it is not center tape
                     spikeMark = SpikeMark.MIDDLE;
                 } else {
                     spikeMark = SpikeMark.RIGHT;
                 }
             } else {
-                if (height > 20) {
+                if (height > 50) { // make sure it is not center tape
                     spikeMark = SpikeMark.MIDDLE;
                 } else {
                     spikeMark = SpikeMark.RIGHT;
