@@ -98,13 +98,13 @@ public class ColorDetectionPipeline extends OpenCvPipeline{
 
         if (alliance == 1) {
             Core.inRange(HSV, redLowHSV, redHighHSV, HSV);
-            redHighHSV = currentHighHSV;
-            redLowHSV = currentLowHSV;
-            //Core.inRange(HSV, redLowHSV2, redHighHSV2, HSV);
+//            redHighHSV = currentHighHSV;
+//            redLowHSV = currentLowHSV;
+//            Core.inRange(HSV, redLowHSV2, redHighHSV2, HSV);
         } else {
             Core.inRange(HSV, blueLowHSV, blueHighHSV, HSV);
-            blueHighHSV = currentHighHSV;
-            redLowHSV = currentLowHSV;
+//            blueHighHSV = currentHighHSV;
+//            redLowHSV = currentLowHSV;
         }
 
         // filters HSV mat into image with black being the lowest red/blue HSV and white being the highest red/blue HSV

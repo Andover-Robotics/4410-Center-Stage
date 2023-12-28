@@ -283,21 +283,21 @@ public class TestAutonomous extends LinearOpMode {
                     switch (spikeMark) {
                         case 1: spikePose = new Pose2d(-35, 36, Math.toRadians(180)); break;
                         case 2: spikePose = new Pose2d(-51, 23, Math.toRadians(180)); break;
-                        case 3: spikePose = new Pose2d(-13, 30, Math.toRadians(0)); break;
+                        case 3: spikePose = new Pose2d(-35, 30, Math.toRadians(0)); break;
                     }
                 }
             } else if (alliance == Alliance.RED) {
                 if (side == Side.CLOSE) {
                     switch (spikeMark) {
                         case 1: spikePose = new Pose2d(37, -32, Math.toRadians(0)); break;
-                        case 2: spikePose = new Pose2d(17, 36, Math.toRadians(-90)); break;
+                        case 2: spikePose = new Pose2d(17, -36, Math.toRadians(-90)); break;
                         case 3: spikePose = new Pose2d(13, -32, Math.toRadians(0)); break;
                     }
                 } else if (side == Side.FAR) {
                     switch (spikeMark) {
                         case 1: spikePose = new Pose2d(-35, -36, Math.toRadians(180)); break;
                         case 2: spikePose = new Pose2d(-51, -23, Math.toRadians(180)); break;
-                        case 3: spikePose = new Pose2d(-15, -30, Math.toRadians(0)); break;
+                        case 3: spikePose = new Pose2d(-35, -30, Math.toRadians(0)); break;
                     }
                 }
             }
@@ -307,9 +307,9 @@ public class TestAutonomous extends LinearOpMode {
 
             // Score purple pixel
             bot.outtakeGround();
-            sleep(1100);
-            bot.claw.open();
             sleep(600);
+            bot.claw.open();
+            sleep(1000);
             bot.storage();
             bot.claw.close();
             bot.calculateWristPos();
@@ -433,9 +433,9 @@ public class TestAutonomous extends LinearOpMode {
                 }
                 bot.outtakeOut(1);
                 bot.fourbar.autoTopOuttake();
-                sleep(800);
+                sleep(500);
                 bot.claw.open();
-                sleep(800);
+                sleep(1000);
                 // Return to storage
                 bot.storage();
                 bot.claw.close();

@@ -204,7 +204,7 @@ public class MeepMeepTesting {
                         drive.trajectorySequenceBuilder(redCloseStart) // Starting position
 //                                .back(36)
 //                                .forward(12) // Distance away from spike mark when scoring
-                                .lineToLinearHeading(new Pose2d(20, -40, Math.toRadians(-90)))
+                                .lineToLinearHeading(new Pose2d(17, -36, Math.toRadians(-90)))
                                 .waitSeconds(0.5) // Wait to score
                                 .splineToLinearHeading(new Pose2d(42, -35, Math.toRadians(180)), Math.toRadians(180)) // Spline to backboard
                                 .back(10) // Back into backboard
@@ -236,8 +236,7 @@ public class MeepMeepTesting {
                 );
 
         meepMeep.setBackground(MeepMeep.Background.FIELD_CENTERSTAGE_OFFICIAL)
-                .addEntity(blueCloseCenter)
-                .addEntity(blueFarCenter)
+                .addEntity(blueFarRight)
                 .start();
     }
 }

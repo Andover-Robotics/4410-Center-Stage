@@ -243,12 +243,6 @@ public class MainTeleOp extends LinearOpMode {
             }
             inverseKinematics(gp2.getRightY(), ikCoefficient);
 
-            // Alignment
-            if (gp1.wasJustPressed(GamepadKeys.Button.START)) {
-                double angle = Math.toRadians(5);
-                drive.setExternalHeading(angle);
-            }
-
             // TELEMETRY
             telemetry.addData("Bot State",bot.state);
             telemetry.addData("Slides Position", bot.slides.getPosition() + " (pos=" + bot.slides.position + " current=" + bot.slides.getCurrent() + ")");
