@@ -58,9 +58,10 @@ public class TestAutonomous extends LinearOpMode {
     boolean centerTruss = true; // Middle truss go under: true - center truss, false - side truss
     int slidesPos = 0; // Slide up: 0-1000, increment by 200
     int park = 0; // Parking position: 0 - don't park, 1 - left, 2 - right
-    int newTiles = 0;
-    double  backboardWait = 0; // How long (seconds) to wait before scoring on backboard: 0-15 seconds, increment by 0.5
-    int backIncrement = 0;
+    double backboardWait = 0.0; // How long (seconds) to wait before scoring on backboard: 0-15 seconds, increment by 1
+    double spikeWait = 0.0; // How long (seconds) to wait before going to spike mark position and scoring: 0-15 seconds, increment by 1
+
+    int secondsElapsed = 0; // Track how many seconds have passed
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -90,7 +91,7 @@ public class TestAutonomous extends LinearOpMode {
         });
         camera.setPipeline(colorDetection);
 
-        // Threads
+        // Run slides periodic
         Thread periodic = new Thread(() -> {
             while (opModeIsActive() && !isStopRequested()) {
                 bot.slides.periodic();
@@ -100,7 +101,7 @@ public class TestAutonomous extends LinearOpMode {
         bot.state = Bot.BotState.STORAGE;
         bot.storage();
 
-        // Pickup top
+        // Pickup
         Thread pickup = new Thread(() -> {
             sleep(500);
             bot.slides.runToBottom();
@@ -126,24 +127,18 @@ public class TestAutonomous extends LinearOpMode {
         X - change park
         B - change pixel stack parameters
 
-        left bumper - change backboard wait time
-        right bumper - change slides height
+        (DPAD)
+        up - change backboard wait time
+        down - change spike wait time
+
+        right bumper - increment slides height
+        left bumper - decrement slides height
 
         START - re-pickup pixel
         BACK - toggle to backboard
          */
         while (!isStarted()) {
             gp1.readButtons();
-
-            // Change alliance
-            if (gp1.wasJustPressed(GamepadKeys.Button.Y)) {
-                if (alliance == Alliance.RED)  {
-                    alliance = Alliance.BLUE;
-                } else  {
-                    alliance = Alliance.RED;
-                }
-            }
-            telemetry.addData("Alliance (Y)", alliance);
 
             // Re-grip/pick up pixel
             if (gp1.wasJustPressed(GamepadKeys.Button.START)) {
@@ -159,16 +154,30 @@ public class TestAutonomous extends LinearOpMode {
                 bot.storage();
             }
 
+            // Change alliance
+            if (gp1.wasJustPressed(GamepadKeys.Button.Y)) {
+                if (alliance == Alliance.RED)  {
+                    alliance = Alliance.BLUE;
+                } else  {
+                    alliance = Alliance.RED;
+                }
+            }
+            telemetry.addData("Alliance (Y)", alliance);
+
             // Toggle to pixel stack
             if (gp1.wasJustPressed(GamepadKeys.Button.B)) {
-                switch (backIncrement) {
-                    case 2: pixelStack = true; centerTruss = true; break;
-                    case 3: pixelStack = true; centerTruss = false; backIncrement = 0; break;
-                    default: pixelStack = false; centerTruss = false; break;
+                if (pixelStack && centerTruss) { // Pixel stack through center truss -> pixel stack through side truss
+                    pixelStack = true; // note: ik this logic can be simplified but i'm leaving it for readability - zachery
+                    centerTruss = false;
+                } else if (pixelStack && !centerTruss) { // Pixel stack through side truss -> none
+                    pixelStack = false;
+                    centerTruss = false;
+                } else if (!pixelStack && !centerTruss) { // No pixel stack (no truss) -> pixel stack through center truss
+                    pixelStack = true;
+                    centerTruss = true;
                 }
-                backIncrement++;
             }
-            telemetry.addData("Pixel stack (B)", pixelStack + " Center truss: " + centerTruss);
+            telemetry.addData("PixelStack (B)", pixelStack + " CenterTruss: " + centerTruss);
 
             // Change side
             if (gp1.wasJustPressed(GamepadKeys.Button.A)) {
@@ -183,12 +192,18 @@ public class TestAutonomous extends LinearOpMode {
             }
             telemetry.addData("Side (A)", side);
 
-            // Change slide height
+            // CHANGE SLIDES HEIGHT
+            // Increment
             if (gp1.wasJustPressed(GamepadKeys.Button.RIGHT_BUMPER)) {
-                if (slidesPos < 1000) slidesPos += 200;
+                if (slidesPos < 2000) slidesPos += 200;
+                else slidesPos = 2000;
+            }
+            // Decrement
+            if (gp1.wasJustPressed(GamepadKeys.Button.LEFT_BUMPER)) {
+                if (slidesPos > 0) slidesPos -= 200;
                 else slidesPos = 0;
             }
-            telemetry.addData("Slides (R-BUMPER)", slidesPos);
+            telemetry.addData("Slides (RB)", slidesPos);
 
             // Switch park
             if (gp1.wasJustPressed(GamepadKeys.Button.X)) {
@@ -206,12 +221,19 @@ public class TestAutonomous extends LinearOpMode {
             }
             telemetry.addData("Parking (X)", parkSpot);
 
+            // WAIT TIMES
             // Change backboard wait time
-            if (gp1.wasJustPressed(GamepadKeys.Button.LEFT_BUMPER)) {
-                if (backboardWait < 15.0) backboardWait+=0.5;
+            if (gp1.wasJustPressed(GamepadKeys.Button.DPAD_UP)) {
+                if (backboardWait < 15.0) backboardWait+=1.0;
                 else backboardWait = 0.0;
             }
-            telemetry.addData("Backboard sleep (L-BUMPER)", backboardWait + " seconds");
+            telemetry.addData("BackboardWait (UP)", backboardWait + " seconds");
+            // Change spike mark wait time
+            if (gp1.wasJustPressed(GamepadKeys.Button.DPAD_DOWN)) {
+                if (spikeWait < 15.0) spikeWait+=1.0;
+                else spikeWait = 0.0;
+            }
+            telemetry.addData("SpikeWait (UP)", spikeWait + " seconds");
 
             // Toggle to backboard
             if (gp1.wasJustPressed(GamepadKeys.Button.BACK)) {
@@ -251,6 +273,14 @@ public class TestAutonomous extends LinearOpMode {
 
         // Auto start
         if (opModeIsActive() && !isStopRequested()) {
+            // Track time passed while op mode is running
+            Thread trackTime = new Thread(() -> {
+                while (opModeIsActive() && !isStopRequested()) {
+                    secondsElapsed++;
+                }
+            });
+            trackTime.start();
+
             // Set starting poses
             Pose2d blueCloseStart = new Pose2d(12,60,Math.toRadians(90));
             Pose2d blueFarStart = new Pose2d(-35,60,Math.toRadians(90));
@@ -302,6 +332,7 @@ public class TestAutonomous extends LinearOpMode {
                 }
             }
             drive.followTrajectorySequence(drive.trajectorySequenceBuilder(startPose)
+                    .waitSeconds(spikeWait) // Wait before going to spike mark
                     .lineToLinearHeading(spikePose) // Line to spike mark
                     .build());
 
@@ -408,10 +439,9 @@ public class TestAutonomous extends LinearOpMode {
                 }
 
                 // Run into backboard
-                startPose = drive.getPoseEstimate();
                 int slowerVelocity = 10; // Slower velocity that is the max constraint when running into backboard (in/s)
 //                if (side == Side.FAR) {
-//                    drive.followTrajectory(drive.trajectoryBuilder(startPose).back(2,
+//                    drive.followTrajectory(drive.trajectoryBuilder(drive.getPoseEstimate()).back(2,
 //                                    SampleMecanumDrive.getVelocityConstraint(slowerVelocity, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
 //                                    SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
 //                            .build());
@@ -437,6 +467,7 @@ public class TestAutonomous extends LinearOpMode {
                 bot.claw.close();
                 sleep(100);
 
+                // TODO: TUNE/CODE PIXEL STACK TRAJECTORY FOR 2+2
                 // PIXEL STACK TRAJECTORY STARTS HERE
                 if (side == Side.CLOSE && pixelStack) {
                     bot.intake(true); // Run reverse
@@ -579,6 +610,7 @@ public class TestAutonomous extends LinearOpMode {
                     bot.fourbar.wrist.setPosition(bot.fourbar.wrist.getPosition()+ bot.wristUpPos);
                     sleep(200);
                 }
+                // END OF PIXEL STACK TRAJECTORY
 
                 // Parking
                 startPose = drive.getPoseEstimate();
@@ -607,9 +639,6 @@ public class TestAutonomous extends LinearOpMode {
                         drive.followTrajectory(drive.trajectoryBuilder(drive.getPoseEstimate()).strafeRight(parkStrafe).build());
                     } else { // Right park
                         drive.followTrajectory(drive.trajectoryBuilder(drive.getPoseEstimate()).strafeLeft(parkStrafe).build());
-                    }
-                    if (!pixelStack) {
-                        drive.followTrajectory(drive.trajectoryBuilder(drive.getPoseEstimate()).back(2).build()); // Back away from backboard
                     }
                 }
             }
