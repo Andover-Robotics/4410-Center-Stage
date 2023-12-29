@@ -300,7 +300,7 @@ public class MainTeleOp extends LinearOpMode {
 
     public void inverseKinematics(double manual, double ikCoefficient) {
         //bot.slides.runManual(ikCoefficient * -manual * -0.5);//-0.5 and coefficient and - on the manual arent doing anything
-            bot.fourbar.runArm(manual);
+        bot.fourbar.runArm(manual);
 
     }
 

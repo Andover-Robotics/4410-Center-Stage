@@ -10,6 +10,7 @@ public class Claw {
 
     // TODO: Tune open and close values
     public static double fullOpen = 0.68;
+    public static double extraOpen = 0.66;
     public static double halfOpen = 0.71;
     public static double close = 0.77;
     public enum ClawState{
@@ -39,6 +40,16 @@ public class Claw {
 
     public void fullOpen() { // open full, drop both top and bottom or top
         claw.setPosition(fullOpen);
+        clawState = ClawState.EMPTY;
+    }
+
+    public void halfOpen() {
+        claw.setPosition(halfOpen);
+        clawState = ClawState.SINGLE;
+    }
+
+    public void autoOpen() {
+        claw.setPosition(extraOpen);
         clawState = ClawState.EMPTY;
     }
 

@@ -23,14 +23,14 @@ public class MeepMeepTesting {
                 .setColorScheme(new ColorSchemeBlueDark())
                 .setConstraints(60, 60, Math.toRadians(180), Math.toRadians(180), 15)
                 .followTrajectorySequence(drive ->
-                        drive.trajectorySequenceBuilder(blueCloseStart) // Starting position
-                                .lineToLinearHeading(new Pose2d(35, 30, Math.toRadians(0))) // Line to spike mark
-                                .waitSeconds(0.5) // Wait for score
-                                .lineToLinearHeading(new Pose2d(35, 55, Math.toRadians(180)))
-                                .lineToLinearHeading(new Pose2d(45, 40, Math.toRadians(180))) // To backboard
-                                .back(5)
-                                .waitSeconds(0.5) // Wait for score
-                                .forward(8)
+                                drive.trajectorySequenceBuilder(blueCloseStart) // Starting position
+                                        .lineToLinearHeading(new Pose2d(35, 30, Math.toRadians(0))) // Line to spike mark
+                                        .waitSeconds(0.5) // Wait for score
+                                        .lineToLinearHeading(new Pose2d(35, 55, Math.toRadians(180)))
+                                        .lineToLinearHeading(new Pose2d(45, 40, Math.toRadians(180))) // To backboard
+                                        .back(5)
+                                        .waitSeconds(0.5) // Wait for score
+                                        .forward(8)
 
 //                                // GO THROUGH SIDE TRUSS
 //                                .strafeRight(18)
@@ -45,40 +45,40 @@ public class MeepMeepTesting {
 //                                .waitSeconds(0.5) // Wait to score
 //                                .forward(5) // Back up
 
-                                // GO THROUGH MIDDLE TRUSS
-                                .strafeLeft(28) // Start pixel stack trajectory
-                                .forward(100) // Drive across field
-                                .waitSeconds(3) // Wait for intake from stack
-                                .back(100)
-                                .strafeRight(23) // Strafe to center of backboard
-                                .back(10) // Back into backboard
-                                .waitSeconds(0.5) // Wait to score
-                                .forward(5) // Back up
-                                .strafeLeft(23) // Park on right side
+                                        // GO THROUGH MIDDLE TRUSS
+                                        .strafeLeft(28) // Start pixel stack trajectory
+                                        .forward(100) // Drive across field
+                                        .waitSeconds(3) // Wait for intake from stack
+                                        .back(100)
+                                        .strafeRight(23) // Strafe to center of backboard
+                                        .back(10) // Back into backboard
+                                        .waitSeconds(0.5) // Wait to score
+                                        .forward(5) // Back up
+                                        .strafeLeft(23) // Park on right side
 
-                                .waitSeconds(2)
-                                .build()
+                                        .waitSeconds(2)
+                                        .build()
                 );
 
         RoadRunnerBotEntity blueCloseCenter = new DefaultBotBuilder(meepMeep)
                 .setColorScheme(new ColorSchemeBlueDark())
                 .setConstraints(60, 60, Math.toRadians(180), Math.toRadians(180), 15)
                 .followTrajectorySequence(drive ->
-                        drive.trajectorySequenceBuilder(blueCloseStart) // Starting position
-                                .lineToLinearHeading(new Pose2d(18, 38, Math.toRadians(90)))
-                                .waitSeconds(0.5) // Wait to score
-                                .splineToLinearHeading(new Pose2d(42, 35, Math.toRadians(180)), Math.toRadians(180)) // Spline to backboard
-                                .back(10) // Back into backboard
-                                .waitSeconds(0.5) // Wait to score
-                                .forward(8) // Back up
+                                drive.trajectorySequenceBuilder(blueCloseStart) // Starting position
+                                        .lineToLinearHeading(new Pose2d(18, 38, Math.toRadians(90)))
+                                        .waitSeconds(0.5) // Wait to score
+                                        .splineToLinearHeading(new Pose2d(42, 35, Math.toRadians(180)), Math.toRadians(180)) // Spline to backboard
+                                        .back(10) // Back into backboard
+                                        .waitSeconds(0.5) // Wait to score
+                                        .forward(8) // Back up
 
-                                // GO THROUGH SIDE TRUSS
-                                .forward(100) // Drive across field
-                                .waitSeconds(3) // Wait for intake from stack
-                                .back(110)
-                                .waitSeconds(0.5) // Wait to score
-                                .forward(5) // Back up
-                                .strafeRight(23) // Park on left side
+                                        // GO THROUGH SIDE TRUSS
+                                        .forward(100) // Drive across field
+                                        .waitSeconds(3) // Wait for intake from stack
+                                        .back(110)
+                                        .waitSeconds(0.5) // Wait to score
+                                        .forward(5) // Back up
+                                        .strafeRight(23) // Park on left side
 
 ////
 //                                // GO THROUGH MIDDLE TRUSS
@@ -92,21 +92,21 @@ public class MeepMeepTesting {
 //                                .forward(5) // Back up
 //                                .strafeLeft(23) // Park on right side
 
-                                .waitSeconds(2)
-                                .build()
+                                        .waitSeconds(2)
+                                        .build()
                 );
 
         RoadRunnerBotEntity blueCloseRight = new DefaultBotBuilder(meepMeep)
                 .setColorScheme(new ColorSchemeBlueDark())
                 .setConstraints(60, 60, Math.toRadians(180), Math.toRadians(180), 15)
                 .followTrajectorySequence(drive ->
-                        drive.trajectorySequenceBuilder(blueCloseStart) // Starting position
-                                .lineToLinearHeading(new Pose2d(13, 30, Math.toRadians(0))) // Line to spike mark
-                                .waitSeconds(0.5) // Wait for score
-                                .lineToLinearHeading(new Pose2d(45, 30, Math.toRadians(180))) // To backboard
-                                .back(5)
-                                .waitSeconds(0.5) // Wait for score
-                                .forward(8)
+                                drive.trajectorySequenceBuilder(blueCloseStart) // Starting position
+                                        .lineToLinearHeading(new Pose2d(13, 30, Math.toRadians(0))) // Line to spike mark
+                                        .waitSeconds(0.5) // Wait for score
+                                        .lineToLinearHeading(new Pose2d(45, 30, Math.toRadians(180))) // To backboard
+                                        .back(5)
+                                        .waitSeconds(0.5) // Wait for score
+                                        .forward(8)
 
 //                                // GO THROUGH SIDE TRUSS
 //                                .strafeRight(28)
@@ -121,19 +121,19 @@ public class MeepMeepTesting {
 //                                .waitSeconds(0.5) // Wait to score
 //                                .forward(5) // Back up
 
-                                // GO THROUGH MIDDLE TRUSS
-                                .strafeLeft(18) // Start pixel stack trajectory
-                                .forward(100) // Drive across field
-                                .waitSeconds(3) // Wait for intake from stack
-                                .back(100)
-                                .strafeRight(23) // Strafe to center of backboard
-                                .back(10) // Back into backboard
-                                .waitSeconds(0.5) // Wait to score
-                                .forward(5) // Back up
-                                .strafeLeft(23) // Park on right side
+                                        // GO THROUGH MIDDLE TRUSS
+                                        .strafeLeft(18) // Start pixel stack trajectory
+                                        .forward(100) // Drive across field
+                                        .waitSeconds(3) // Wait for intake from stack
+                                        .back(100)
+                                        .strafeRight(23) // Strafe to center of backboard
+                                        .back(10) // Back into backboard
+                                        .waitSeconds(0.5) // Wait to score
+                                        .forward(5) // Back up
+                                        .strafeLeft(23) // Park on right side
 
-                                .waitSeconds(2)
-                                .build()
+                                        .waitSeconds(2)
+                                        .build()
                 );
 
         // FAR SIDE
@@ -163,6 +163,7 @@ public class MeepMeepTesting {
                         drive.trajectorySequenceBuilder(blueFarStart) // Starting position
                                 .lineToLinearHeading(new Pose2d(-50, 25, Math.toRadians(180))) // Line to spike mark
                                 .waitSeconds(0.5) // Wait to score
+                                .lineToLinearHeading(new Pose2d(-35, 14, Math.toRadians(180)))
                                 .strafeLeft(12) // Strafe to center truss
                                 .back(90) // Drive to backboard
                                 .waitSeconds(2) // Wait for close auto to finish
@@ -181,14 +182,11 @@ public class MeepMeepTesting {
                 .setConstraints(60, 60, Math.toRadians(180), Math.toRadians(180), 15)
                 .followTrajectorySequence(drive ->
                         drive.trajectorySequenceBuilder(blueFarStart) // Starting position
-                                .lineToLinearHeading(new Pose2d(-35, 30, Math.toRadians(0))) // Line to spike mark
+                                .lineToLinearHeading(new Pose2d(-35,50, Math.toRadians(60))) // Line to spike mark
                                 .waitSeconds(0.5) // Wait to score
-                                .strafeRight(18) // Strafe to center truss
-                                .forward(60) // Drive across field
-                                .splineToLinearHeading(new Pose2d(40, 28, Math.toRadians(180)), Math.toRadians(180)) // Spline to backboard
-                                .back(10) // Drive into backboard
-                                .forward(5)
-                                .strafeRight(31)
+                                .lineToLinearHeading(new Pose2d(-35, 13, Math.toRadians(180)))
+                                .back(80) // Drive across field
+                                .strafeRight(15)
                                 .waitSeconds(0.5) // Wait to score
 
                                 .waitSeconds(2)
@@ -201,15 +199,15 @@ public class MeepMeepTesting {
                 .setColorScheme(new ColorSchemeRedDark())
                 .setConstraints(60, 60, Math.toRadians(180), Math.toRadians(180), 15)
                 .followTrajectorySequence(drive ->
-                        drive.trajectorySequenceBuilder(redCloseStart) // Starting position
+                                drive.trajectorySequenceBuilder(redCloseStart) // Starting position
 //                                .back(36)
 //                                .forward(12) // Distance away from spike mark when scoring
-                                .lineToLinearHeading(new Pose2d(17, -36, Math.toRadians(-90)))
-                                .waitSeconds(0.5) // Wait to score
-                                .splineToLinearHeading(new Pose2d(42, -35, Math.toRadians(180)), Math.toRadians(180)) // Spline to backboard
-                                .back(10) // Back into backboard
-                                .waitSeconds(0.5) // Wait to score
-                                .forward(10) // Back up
+                                        .lineToLinearHeading(new Pose2d(17, -36, Math.toRadians(-90)))
+                                        .waitSeconds(0.5) // Wait to score
+                                        .splineToLinearHeading(new Pose2d(42, -35, Math.toRadians(180)), Math.toRadians(180)) // Spline to backboard
+                                        .back(10) // Back into backboard
+                                        .waitSeconds(0.5) // Wait to score
+                                        .forward(10) // Back up
 
 //                                // GO THROUGH SIDE TRUSS
 //                                .forward(100) // Drive across field
@@ -220,19 +218,19 @@ public class MeepMeepTesting {
 //                                .strafeRight(23) // Park on left side
 
 
-                                // GO THROUGH MIDDLE TRUSS
-                                .strafeRight(23) // Start pixel stack trajectory
-                                .forward(100) // Drive across field
-                                .waitSeconds(3) // Wait for intake from stack
-                                .back(100)
-                                .strafeLeft(23) // Strafe to center of backboard
-                                .back(10) // Back into backboard
-                                .waitSeconds(0.5) // Wait to score
-                                .forward(5) // Back up
-                                .strafeRight(23) // Park on right side
+                                        // GO THROUGH MIDDLE TRUSS
+                                        .strafeRight(23) // Start pixel stack trajectory
+                                        .forward(100) // Drive across field
+                                        .waitSeconds(3) // Wait for intake from stack
+                                        .back(100)
+                                        .strafeLeft(23) // Strafe to center of backboard
+                                        .back(10) // Back into backboard
+                                        .waitSeconds(0.5) // Wait to score
+                                        .forward(5) // Back up
+                                        .strafeRight(23) // Park on right side
 
-                                .waitSeconds(2)
-                                .build()
+                                        .waitSeconds(2)
+                                        .build()
                 );
 
         meepMeep.setBackground(MeepMeep.Background.FIELD_CENTERSTAGE_OFFICIAL)
