@@ -5,9 +5,12 @@ import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.arcrobotics.ftclib.controller.PIDController;
+import com.arcrobotics.ftclib.controller.PIDFController;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.arcrobotics.ftclib.gamepad.GamepadKeys;
 import com.arcrobotics.ftclib.geometry.Vector2d;
+import com.arcrobotics.ftclib.hardware.motors.Motor;
+import com.arcrobotics.ftclib.hardware.motors.MotorEx;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
@@ -19,6 +22,7 @@ import org.firstinspires.ftc.teamcode.teleop.subsystems.Slides;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.trajectory.Trajectory;
 import com.acmerobotics.roadrunner.util.Angle;
+import com.qualcomm.robotcore.hardware.DcMotor;
 
 import java.lang.*;
 import java.util.Map;
@@ -35,10 +39,6 @@ public class MainTeleOp extends LinearOpMode {
 
     double ikCoefficient = 1;
 
-    // PID
-    //public static double kp = 0.025, ki = 0, kd = 0;
-    //private PIDController headingAligner = new PIDController(kp, ki, kd);
-
     @Override
     public void runOpMode() throws InterruptedException {
 
@@ -47,6 +47,7 @@ public class MainTeleOp extends LinearOpMode {
         Bot.instance = null;
         bot = Bot.getInstance(this);
 
+        // Drive
         SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
         drive.setPoseEstimate(bot.getAutoEndPose());
 
@@ -93,7 +94,7 @@ public class MainTeleOp extends LinearOpMode {
         waitForStart();
         while (opModeIsActive() && !isStopRequested()) {
             drive.update();
-            Pose2d poseEstimate = drive.getPoseEstimate();
+            Pose2d poseEstimate = drive.getLocalizer().getPoseEstimate();
 
             gp1.readButtons();
             gp2.readButtons();
@@ -227,7 +228,7 @@ public class MainTeleOp extends LinearOpMode {
                 bot.launch();
             }
 
-            // Fourbar/arm kinematics
+            // IK
             if (gp1.wasJustPressed(GamepadKeys.Button.DPAD_UP)){
                 if (bot.slides.getPosition() < -630 ){
                     bot.ikDemo1();
@@ -242,6 +243,11 @@ public class MainTeleOp extends LinearOpMode {
                 bot.intake.power = bot.intake.power + 0.01;
             }
             inverseKinematics(gp2.getRightY(), ikCoefficient);
+
+            // TODO: WRITE ALIGNMENT CODE
+            if (gp1.wasJustPressed(GamepadKeys.Button.START)) {
+            }
+
 
             // TELEMETRY
             telemetry.addData("Bot State",bot.state);

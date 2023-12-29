@@ -37,7 +37,6 @@ public class Claw {
         }
     }
 
-
     public void fullOpen() { // open full, drop both top and bottom or top
         claw.setPosition(fullOpen);
         clawState = ClawState.EMPTY;
@@ -48,7 +47,7 @@ public class Claw {
         clawState = ClawState.SINGLE;
     }
 
-    public void autoOpen() {
+    public void extraOpen() { // extra open for auto haha
         claw.setPosition(extraOpen);
         clawState = ClawState.EMPTY;
     }
