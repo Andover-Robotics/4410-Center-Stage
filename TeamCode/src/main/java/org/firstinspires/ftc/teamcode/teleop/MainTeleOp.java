@@ -244,10 +244,6 @@ public class MainTeleOp extends LinearOpMode {
             }
             inverseKinematics(gp2.getRightY(), ikCoefficient);
 
-            // TODO: WRITE ALIGNMENT CODE
-            if (gp1.wasJustPressed(GamepadKeys.Button.START)) {
-            }
-
 
             // TELEMETRY
             telemetry.addData("Bot State",bot.state);
