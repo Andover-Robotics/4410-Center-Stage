@@ -31,7 +31,7 @@ public class Intake {
 
     public void runReverseIntake(){
         noodles.setInverted(true);
-        noodles.set(Math.abs(power));
+        noodles.set(Math.abs(-0.27));
         counterRoller.set(-1*counterPower);
         isRunning = true;
     }
