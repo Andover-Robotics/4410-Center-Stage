@@ -444,7 +444,7 @@ public class TestAutonomous extends LinearOpMode {
                 }
 
                 // Run into backboard
-                int slowerVelocity = 10; // Slower velocity that is the max constraint when running into backboard (in/s)
+                int slowerVelocity = 15; // Slower velocity that is the max constraint when running into backboard (in/s)
 //                if (side == Side.FAR) {
 //                    drive.followTrajectory(drive.trajectoryBuilder(drive.getPoseEstimate()).back(2,
 //                                    SampleMecanumDrive.getVelocityConstraint(slowerVelocity, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
@@ -478,12 +478,6 @@ public class TestAutonomous extends LinearOpMode {
                     // Drive across field
                     startPose = drive.getPoseEstimate();
                     int acrossDistance = 93; // Tune this value across field
-                    int strafeAmount = 0;
-                    switch (spikeMark) {
-                        case 1: strafeAmount = 28; break;
-                        case 2: strafeAmount = 25; break;
-                        case 3: strafeAmount = 18; break;
-                    }
                     if (alliance == Alliance.BLUE) {
                         drive.followTrajectorySequence(drive.trajectorySequenceBuilder(startPose)
                                 .lineToLinearHeading(new Pose2d(35, 12, Math.toRadians(180))) // Line to center truss position
@@ -522,8 +516,9 @@ public class TestAutonomous extends LinearOpMode {
                             .build()
                     );
                     sleep(200);
+                    bot.intake(true);
 
-                    // Return to backboard
+                    // RETURN TO BACKBOARD
                     startPose = drive.getPoseEstimate();
                     if (alliance == Alliance.BLUE) {
                         drive.followTrajectorySequence(drive.trajectorySequenceBuilder(startPose)
@@ -550,23 +545,23 @@ public class TestAutonomous extends LinearOpMode {
                         bot.storage();
                     });
                     pixelTap.start();
-                    bot.intake(true); // Reverse intake
+                    bot.intake.stopIntake();
+
+                    // Line to backboard
+                    startPose = drive.getPoseEstimate();
                     if (alliance == Alliance.BLUE) {
-                        drive.followTrajectorySequence(drive.trajectorySequenceBuilder(drive.getPoseEstimate())
-                                .lineToLinearHeading(new Pose2d(55, 30, Math.toRadians(180)))
+                        drive.followTrajectory(drive.trajectoryBuilder(startPose)
+                                .lineToLinearHeading(new Pose2d(55, 30, Math.toRadians(180)),
+                                        SampleMecanumDrive.getVelocityConstraint(slowerVelocity, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
+                                        SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
                                 .build());
                     } else if (alliance == Alliance.RED) {
-                        drive.followTrajectorySequence(drive.trajectorySequenceBuilder(drive.getPoseEstimate())
-                                .lineToLinearHeading(new Pose2d(55, -30, Math.toRadians(180)))
-                                .build());
+                        drive.followTrajectory(drive.trajectoryBuilder(startPose)
+                                .lineToLinearHeading(new Pose2d(55, -30, Math.toRadians(180)),
+                                    SampleMecanumDrive.getVelocityConstraint(slowerVelocity, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
+                                    SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
+                            .build());
                     }
-
-//                    // Run into backboard
-//                    startPose = drive.getPoseEstimate();
-//                    drive.followTrajectory(drive.trajectoryBuilder(startPose).back(5,
-//                                    SampleMecanumDrive.getVelocityConstraint(slowerVelocity, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
-//                                    SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
-//                            .build());
 
                     // Score pixels on backboard
                     // Pick up pixels
@@ -579,7 +574,6 @@ public class TestAutonomous extends LinearOpMode {
                     sleep(200);
                     bot.storage();
                     sleep(500);
-                    bot.intake.stopIntake();
                     bot.slides.runToLow(); // Slides up
                     // First pixel
                     bot.outtakeOut(2);
