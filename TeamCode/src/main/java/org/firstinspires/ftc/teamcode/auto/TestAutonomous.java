@@ -325,7 +325,7 @@ public class TestAutonomous extends LinearOpMode {
                 } else if (side == Side.FAR) {
                     switch (spikeMark) {
                         case 1: spikePose = new Pose2d(-33, 34, Math.toRadians(180)); break;
-                        case 2: spikePose = new Pose2d(-51, 22, Math.toRadians(180)); break;
+                        case 2: spikePose = new Pose2d(-49, 22, Math.toRadians(180)); break;
                         case 3: spikePose = new Pose2d(-40,41, Math.toRadians(60)); break;
                     }
                 }
@@ -379,7 +379,7 @@ public class TestAutonomous extends LinearOpMode {
                 if (side == Side.CLOSE) {
                     drive.followTrajectorySequence(drive.trajectorySequenceBuilder(startPose)
                             .waitSeconds(backboardWait)
-                            .lineToLinearHeading(new Pose2d(54, backboardY, Math.toRadians(180)))
+                            .lineToLinearHeading(new Pose2d(55, backboardY, Math.toRadians(180)))
                             .build());
                 } else if (side == Side.FAR) {
                     if (alliance == Alliance.BLUE) {
