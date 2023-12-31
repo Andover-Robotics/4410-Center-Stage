@@ -416,24 +416,24 @@ public class TestAutonomous extends LinearOpMode {
                                 drive.followTrajectorySequence(drive.trajectorySequenceBuilder(startPose)
                                         .lineToLinearHeading(new Pose2d(-35, -55, Math.toRadians(180)))
                                         .lineToLinearHeading(new Pose2d(-35, -12, Math.toRadians(180)))
-                                        .back(86) // Drive across field
-                                        .strafeLeft(17)
+                                        .back(91 - 10) // Drive across field
+                                        .lineToLinearHeading(new Pose2d(54, backboardY, Math.toRadians(180)))
                                         .build());
                                 break;
                             case 2: // CENTER
                                 drive.followTrajectorySequence(drive.trajectorySequenceBuilder(startPose)
                                         .strafeRight(13) // Strafe to center truss
-                                        .back(104) // Drive to backboard
+                                        .back(106 - 10) // Drive to backboard
                                         .waitSeconds(backboardWait) // Wait for close auto to finish
-                                        .strafeLeft(25) // Strafe to center
+                                        .lineToLinearHeading(new Pose2d(54, backboardY, Math.toRadians(180)))
                                         .build());
                                 break;
                             case 3: // RIGHT
                                 drive.followTrajectorySequence(drive.trajectorySequenceBuilder(startPose)
                                         .lineToLinearHeading(new Pose2d(-35, -12, Math.toRadians(180)))
-                                        .back(86) // Drive to backboard
+                                        .back(88 - 10) // Drive to backboard
                                         .waitSeconds(backboardWait)
-                                        .strafeLeft(31) // Strafe to left
+                                        .lineToLinearHeading(new Pose2d(54, backboardY, Math.toRadians(180)))
                                         .build());
                                 break;
                         }
@@ -605,7 +605,12 @@ public class TestAutonomous extends LinearOpMode {
                 startPose = drive.getPoseEstimate();
                 drive.followTrajectory(drive.trajectoryBuilder(startPose).forward(2).build()); // Back away from backboard
                 if (park > 0) { // If park enabled
-                    int parkY = 0; if (park == 1) parkY = 58; else if (park == 2) parkY = 12; if (alliance == Alliance.RED) parkY*=-1;
+                    int parkY = 0;
+                    if (alliance == Alliance.BLUE) {
+                        if (park == 1) parkY = 58; else if (park == 2) parkY = 12;
+                    } else if (alliance == Alliance.RED) {
+                        if (park == 1) parkY = -12; else if (park == 2) parkY = -58;
+                    }
                     drive.followTrajectory(drive.trajectoryBuilder(drive.getPoseEstimate())
                             .lineTo(new Vector2d(54, parkY))
                             .build()
