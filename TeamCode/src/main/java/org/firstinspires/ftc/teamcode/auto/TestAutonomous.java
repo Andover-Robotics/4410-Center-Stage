@@ -363,7 +363,7 @@ public class TestAutonomous extends LinearOpMode {
                 int backboardY = 0;
                 if (alliance == Alliance.BLUE) {
                     switch (spikeMark) {
-                        case 1: backboardY = 40; break; // LEFT
+                        case 1: backboardY = 42; break; // LEFT
                         case 2: backboardY = 36; break; // CENTER
                         case 3: backboardY = 30; break; // RIGHT
                     }
@@ -371,7 +371,7 @@ public class TestAutonomous extends LinearOpMode {
                     switch (spikeMark) {
                         case 1: backboardY = -30; break; // LEFT
                         case 2: backboardY = -36; break; // CENTER
-                        case 3: backboardY = -40; break; // RIGHT
+                        case 3: backboardY = -42; break; // RIGHT
                     }
                 }
 
