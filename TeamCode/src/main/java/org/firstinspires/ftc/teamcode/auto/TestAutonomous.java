@@ -319,7 +319,7 @@ public class TestAutonomous extends LinearOpMode {
                 if (side == Side.CLOSE) {
                     switch (spikeMark) {
                         case 1: spikePose = new Pose2d(34, 32, Math.toRadians(0)); break;
-                        case 2: spikePose = new Pose2d(17, 33, Math.toRadians(90)); break;
+                        case 2: spikePose = new Pose2d(17, 34, Math.toRadians(90)); break;
                         case 3: spikePose = new Pose2d(13, 32, Math.toRadians(0)); break;
                     }
                 } else if (side == Side.FAR) {
@@ -441,7 +441,7 @@ public class TestAutonomous extends LinearOpMode {
                 }
 
                 // Run into backboard
-                int slowerVelocity = 17; // Slower velocity that is the max constraint when running into backboard (in/s)
+                int slowerVelocity = 20; // Slower velocity that is the max constraint when running into backboard (in/s)
 //                if (side == Side.FAR) {
 //                    drive.followTrajectory(drive.trajectoryBuilder(drive.getPoseEstimate()).back(2,
 //                                    SampleMecanumDrive.getVelocityConstraint(slowerVelocity, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
@@ -513,7 +513,7 @@ public class TestAutonomous extends LinearOpMode {
                             .forward(1)
                             .build()
                     );
-                    sleep(1700);
+                    sleep(1800);
 
                     drive.followTrajectorySequence(drive.trajectorySequenceBuilder(drive.getPoseEstimate())
                             .back(2)
@@ -547,6 +547,7 @@ public class TestAutonomous extends LinearOpMode {
                         sleep(300);
                         bot.claw.fullOpen();
                         bot.storage();
+                        sleep(200);
                         // Pick up pixels
                         bot.slides.runToBottom();
                         bot.claw.fullOpen();
@@ -578,7 +579,7 @@ public class TestAutonomous extends LinearOpMode {
                     }
 
                     // Score pixels on backboard
-                    sleep(400);
+                    sleep(200);
                     bot.slides.runTo(-300); // Slides up
                     // First pixel
                     bot.outtakeOut(2);
@@ -587,6 +588,7 @@ public class TestAutonomous extends LinearOpMode {
                     sleep(600);
                     // Second pixel
                     bot.slides.runTo(-500);
+                    sleep(200);
                     bot.outtakeOut(1);
                     bot.claw.extraOpen();
                     sleep(600);
