@@ -604,36 +604,18 @@ public class TestAutonomous extends LinearOpMode {
                 // Parking
                 startPose = drive.getPoseEstimate();
                 drive.followTrajectory(drive.trajectoryBuilder(startPose).forward(2).build()); // Back away from backboard
-                if (park != 0) {
-                    int parkStrafe = 0;
-                    int num1 = 18, num2 = 21, num3 = 29;
-                    if (pixelStack) { // Pixel stack pixels are always scored on center
-                        parkStrafe = 23;
-                    } else {
-                        if (park == 1) { // Left park
-                            switch (spikeMark) {
-                                case 1: parkStrafe = num1; break;
-                                case 2: parkStrafe = num2; break;
-                                case 3: parkStrafe = num3; break;
-                            }
-                        } else if (park == 2) { // Right park
-                            switch (spikeMark) {
-                                case 1: parkStrafe = num3; break;
-                                case 2: parkStrafe = num2; break;
-                                case 3: parkStrafe = num1; break;
-                            }
-                        }
-                    }
-                    if (park == 1) { // Left park
-                        drive.followTrajectory(drive.trajectoryBuilder(drive.getPoseEstimate()).strafeRight(parkStrafe).build());
-                    } else { // Right park
-                        drive.followTrajectory(drive.trajectoryBuilder(drive.getPoseEstimate()).strafeLeft(parkStrafe).build());
-                    }
+                if (park > 0) { // If park enabled
+                    int parkY = 0; if (park == 1) parkY = 58; else if (park == 2) parkY = 12; if (alliance == Alliance.RED) parkY*=-1;
+                    drive.followTrajectory(drive.trajectoryBuilder(drive.getPoseEstimate())
+                            .lineTo(new Vector2d(54, parkY))
+                            .build()
+                    );
+                    drive.followTrajectory(drive.trajectoryBuilder(drive.getPoseEstimate()).back(2).build()); // Go forward into parking spot
                 }
             }
 
             // Stop op mode
-            sleep(800);
+            sleep(500);
             requestOpModeStop();
         }
 
