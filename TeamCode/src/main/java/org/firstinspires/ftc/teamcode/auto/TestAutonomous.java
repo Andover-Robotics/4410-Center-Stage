@@ -170,7 +170,7 @@ public class TestAutonomous extends LinearOpMode {
                 sleep(300);
                 bot.storage();
             }
-            //Drop Pixel
+            // Drop Pixel
             if (gp1.wasJustPressed(GamepadKeys.Button.BACK)){
                 bot.claw.fullOpen();
             }
@@ -265,6 +265,16 @@ public class TestAutonomous extends LinearOpMode {
                 toBackboard = !toBackboard;
             }
             telemetry.addData("ToBackboard (BACK)", toBackboard);
+
+            // Tune center tape min height
+            if (gp1.wasJustPressed(GamepadKeys.Button.DPAD_LEFT)) {
+                if (colorDetection.getCenterTapeHeight() > 100) {
+                    colorDetection.setCenterTapeHeight(10);
+                } else {
+                    colorDetection.setCenterTapeHeight(colorDetection.getCenterTapeHeight()+1);
+                }
+            }
+            telemetry.addData("CenterTapeHeight (LEFT)", colorDetection.getCenterTapeHeight());
 
             // Initiate color detection
             if (alliance == Alliance.RED) {

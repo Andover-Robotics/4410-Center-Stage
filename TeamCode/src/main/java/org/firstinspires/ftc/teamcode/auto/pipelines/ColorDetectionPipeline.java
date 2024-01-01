@@ -45,8 +45,11 @@ public class ColorDetectionPipeline extends OpenCvPipeline{
     // Alliance: 0 - NONE, 1 - RED, 2 - BLUE
     public static int alliance = 0;
 
+    //
+    public static int centerTapeMinHeight = 50;
+
     // Red HSV Values
-    public static double redLH = 0, redLS = 0, redLV = 35, redHH = 20, redHS = 360, redHV = 255;
+    public static double redLH = 0, redLS = 56, redLV = 35, redHH = 20, redHS = 360, redHV = 255;
     public static Scalar redLowHSV= new Scalar(redLH,redLS,redLV);
     public static Scalar redHighHSV = new Scalar(redHH,redHS,redHV);
 //    public static Scalar redLowHSV2= new Scalar(redLH2,redLS,redLV);
@@ -68,14 +71,22 @@ public class ColorDetectionPipeline extends OpenCvPipeline{
 
     public void setAlliance(int alliance) {
         ColorDetectionPipeline.alliance = alliance;
-        if (alliance == 1) {
-            currentHighHSV = redHighHSV;
-            currentLowHSV = redLowHSV;
-        } else {
-            currentHighHSV = blueHighHSV;
-            currentLowHSV = blueLowHSV;
-        }
+//        if (alliance == 1) {
+//            currentHighHSV = redHighHSV;
+//            currentLowHSV = redLowHSV;
+//        } else {
+//            currentHighHSV = blueHighHSV;
+//            currentLowHSV = blueLowHSV;
+//        }
     }
+
+    public void setCenterTapeHeight (int height) {
+        centerTapeMinHeight = height;
+    }
+    public int getCenterTapeHeight() {
+        return centerTapeMinHeight;
+    }
+
 
     public int getSpikeMark() {
         switch (spikeMark) {
@@ -147,7 +158,7 @@ public class ColorDetectionPipeline extends OpenCvPipeline{
             midpointrect = rect.tl().x + rect.width/2.0; // gets midpoint x of the rectangle
             width = rect.width;
             height = rect.height;
-            while (height < 50) {
+            while (height < centerTapeMinHeight) {
                 if (iterations < contours.size()) {
                     biggest = contours.get(iterations);
                     rect = Imgproc.boundingRect(biggest); // turns biggest contour into a rectangle
@@ -172,13 +183,13 @@ public class ColorDetectionPipeline extends OpenCvPipeline{
                     spikeMark = SpikeMark.LEFT;
                 }
             } else if (midpointrect > rightrect.tl().x && midpointrect < leftrect.br().x) {
-                if (height > 50) { // make sure it is not center tape
+                if (height > centerTapeMinHeight) { // make sure it is not center tape
                     spikeMark = SpikeMark.MIDDLE;
                 } else {
                     spikeMark = SpikeMark.RIGHT;
                 }
             } else {
-                if (height > 50) { // make sure it is not center tape
+                if (height > centerTapeMinHeight) { // make sure it is not center tape
                     spikeMark = SpikeMark.MIDDLE;
                 } else {
                     spikeMark = SpikeMark.RIGHT;
