@@ -109,6 +109,7 @@ public class TestAutonomous extends LinearOpMode {
                 secondsElapsed++;
                 telemetry.addData("Seconds",secondsElapsed);
                 telemetry.update();
+                sleep(1000);
             }
         });
 
