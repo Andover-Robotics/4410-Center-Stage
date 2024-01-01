@@ -107,7 +107,7 @@ public class MainTeleOp extends LinearOpMode {
                         bot.slides.runToBottom();
                         bot.claw.fullOpen();
                         sleep(100);
-                        bot.fourbar.bottomPixel();
+                        bot.fourbar.pickup();
                         sleep(400);
                         bot.claw.pickupClose();
                         sleep(300);
@@ -226,6 +226,10 @@ public class MainTeleOp extends LinearOpMode {
             // LAUNCH DRONE
             if (gp1.wasJustPressed(GamepadKeys.Button.B)) {
                 bot.launch();
+            }
+            //Dock Drone
+            if (gp1.wasJustPressed(GamepadKeys.Button.A)) {
+                bot.launcher.reset();
             }
 
             // IK
