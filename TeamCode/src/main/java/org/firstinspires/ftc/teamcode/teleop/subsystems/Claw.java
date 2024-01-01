@@ -12,6 +12,8 @@ public class Claw {
     public static double fullOpen = 0.68;
     public static double extraOpen = 0.66;
     public static double halfOpen = 0.71;
+
+    public static double block = 0.51;
     public static double close = 0.77;
     public enum ClawState{
         EMPTY, // Has no pixels
@@ -40,6 +42,10 @@ public class Claw {
     public void fullOpen() { // open full, drop both top and bottom or top
         claw.setPosition(fullOpen);
         clawState = ClawState.EMPTY;
+    }
+
+    public void clawBlock() { // open full, drop both top and bottom or top
+        claw.setPosition(block);
     }
 
     public void halfOpen() {

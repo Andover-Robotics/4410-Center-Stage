@@ -81,6 +81,7 @@ public class Bot {
 //        state = BotState.OUTTAKE_OUT;
 //    }
 
+
     public void outtakeOut(int pixel) { // go to outtake backboard position
         fourbar.dualOuttake(pixel);
         state = BotState.OUTTAKE_OUT;
