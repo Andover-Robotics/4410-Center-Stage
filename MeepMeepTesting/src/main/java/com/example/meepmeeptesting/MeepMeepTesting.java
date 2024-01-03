@@ -234,7 +234,7 @@ public class MeepMeepTesting {
                 );
 
         meepMeep.setBackground(MeepMeep.Background.FIELD_CENTERSTAGE_OFFICIAL)
-                .addEntity(blueFarRight)
+                .addEntity(blueCloseRight)
                 .start();
     }
 }

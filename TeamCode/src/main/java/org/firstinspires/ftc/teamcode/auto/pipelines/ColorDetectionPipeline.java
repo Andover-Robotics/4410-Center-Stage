@@ -46,7 +46,7 @@ public class ColorDetectionPipeline extends OpenCvPipeline{
     public static int alliance = 0;
 
     //
-    public static int centerTapeMinHeight = 50;
+    public static int centerTapeMinHeight = 55;
 
     // Red HSV Values
     public static double redLH = 0, redLS = 56, redLV = 35, redHH = 20, redHS = 360, redHV = 255;
