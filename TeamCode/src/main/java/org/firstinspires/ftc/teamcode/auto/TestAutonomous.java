@@ -357,26 +357,28 @@ public class TestAutonomous extends LinearOpMode {
                     .lineToLinearHeading(spikePose) // Line to spike mark
                     .build());
 
+            // Re-alignment code to avoid hitting truss
+            Vector2d adjustVector = new Vector2d();
+            boolean hasAdjust = false;
             if (alliance == Alliance.BLUE) {
                 if (side == Side.CLOSE && spikeMark == 3) {
-                    drive.followTrajectorySequence(drive.trajectorySequenceBuilder(startPose)
-                            .lineToLinearHeading(new Pose2d(13, 32, Math.toRadians(0))) // Line to spike mark
-                            .build());
-                } else if (side == Side.FAR && spikeMark == 1) {
-                    drive.followTrajectorySequence(drive.trajectorySequenceBuilder(startPose)
-                            .lineToLinearHeading(new Pose2d(-33, 34, Math.toRadians(180))) // Line to spike mark
-                            .build());
+                    adjustVector = new Vector2d(13, 32); hasAdjust = true;
+                }
+                else if (side == Side.FAR && spikeMark == 1) {
+                    adjustVector = new Vector2d(-33, 34); hasAdjust = true;
                 }
             } else if (alliance == Alliance.RED) {
                 if (side == Side.CLOSE && spikeMark == 1) {
-                    drive.followTrajectorySequence(drive.trajectorySequenceBuilder(startPose)
-                            .lineToLinearHeading(new Pose2d(15, -32, Math.toRadians(0))) // Line to spike mark
-                            .build());
-                } else if (side == Side.FAR && spikeMark == 3) {
-                    drive.followTrajectorySequence(drive.trajectorySequenceBuilder(startPose)
-                            .lineToLinearHeading(new Pose2d(-38, -34, Math.toRadians(180))) // Line to spike mark
-                            .build());
+                    adjustVector = new Vector2d(15, -32); hasAdjust = true;
                 }
+                else if (side == Side.FAR && spikeMark == 3) {
+                    adjustVector = new Vector2d(-38, -34); hasAdjust = true;
+                }
+            }
+            if (hasAdjust) {
+                drive.followTrajectorySequence(drive.trajectorySequenceBuilder(drive.getPoseEstimate())
+                        .lineTo(adjustVector)
+                        .build());
             }
 
             // Score purple pixel

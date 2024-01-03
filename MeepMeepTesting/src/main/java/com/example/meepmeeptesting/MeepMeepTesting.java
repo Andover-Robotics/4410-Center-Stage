@@ -9,6 +9,8 @@ import com.noahbres.meepmeep.core.colorscheme.scheme.*;
 import com.noahbres.meepmeep.roadrunner.DefaultBotBuilder;
 import com.noahbres.meepmeep.roadrunner.entity.RoadRunnerBotEntity;
 
+import java.util.Vector;
+
 public class MeepMeepTesting {
     public static void main(String[] args) {
         System.setProperty("sun.java2d.opengl", "true");
@@ -101,7 +103,8 @@ public class MeepMeepTesting {
                 .setConstraints(60, 60, Math.toRadians(180), Math.toRadians(180), 15)
                 .followTrajectorySequence(drive ->
                                 drive.trajectorySequenceBuilder(blueCloseStart) // Starting position
-                                        .lineToLinearHeading(new Pose2d(13, 30, Math.toRadians(0))) // Line to spike mark
+                                        .lineToLinearHeading(new Pose2d(20, 30, Math.toRadians(0))) // Line to spike mark
+                                        .lineTo(new Vector2d(13, 30)) // Line to spike mark
                                         .waitSeconds(0.5) // Wait for score
                                         .lineToLinearHeading(new Pose2d(45, 30, Math.toRadians(180))) // To backboard
                                         .back(5)
