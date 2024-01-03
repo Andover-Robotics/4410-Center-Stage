@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.teleop.subsystems;
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
+import com.arcrobotics.ftclib.drivebase.MecanumDrive;
 import com.arcrobotics.ftclib.hardware.motors.Motor;
 import com.arcrobotics.ftclib.hardware.motors.MotorEx;
 import com.qualcomm.hardware.bosch.BHI260IMU;
@@ -28,6 +29,7 @@ public class Bot {
     public BHI260IMU imu0;
     private double imuOffset = 0;
     private static Pose2d autoEndPose = new Pose2d(12,60,Math.toRadians(90));
+    public double heading = 0.0;
 
     // Define subsystem objects
     public Intake intake;
@@ -167,6 +169,11 @@ public class Bot {
         br.set(speeds[3]);
     }
 
+    public void driveFieldCentric(double strafeSpeed, double forwardBackSpeed, double turnSpeed) {
+        MecanumDrive drive = new MecanumDrive(fl, fr, bl, br);
+        drive.driveFieldCentric(strafeSpeed, forwardBackSpeed, turnSpeed, heading);
+    }
+
     // IMU
     public void setImuOffset(double offset) {
         imuOffset += offset;
@@ -200,6 +207,10 @@ public class Bot {
             angle = angle - 360;
         }
         return angle;
+    }
+
+    public void setHeading (double heading) {
+        this.heading = heading;
     }
 
     public void setAutoEndPose(Pose2d pose) {

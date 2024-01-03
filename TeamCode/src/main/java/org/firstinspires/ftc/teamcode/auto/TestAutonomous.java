@@ -233,7 +233,7 @@ public class TestAutonomous extends LinearOpMode {
             switch (park) {
                 case 1: parkSpot = "Left"; break;
                 case 2: parkSpot = "Right"; break;
-                default: parkSpot = "Middle"; break;
+                default: parkSpot = "None"; break;
             }
             telemetry.addData("Parking (X)", parkSpot);
 
@@ -280,7 +280,7 @@ public class TestAutonomous extends LinearOpMode {
             String spikeMarkString = "";
             switch (spikeMark) {
                 case 1: spikeMarkString = "Left"; break;
-                case 2: spikeMarkString = "Middle"; break;
+                case 2: spikeMarkString = "Center"; break;
                 case 3: spikeMarkString = "Right"; break;
                 default: spikeMarkString = "None"; break;
             }
@@ -332,23 +332,23 @@ public class TestAutonomous extends LinearOpMode {
                     }
                 } else if (side == Side.FAR) {
                     switch (spikeMark) {
-                        case 1: spikePose = new Pose2d(-36, 34, Math.toRadians(180)); break;
-                        case 2: spikePose = new Pose2d(-49, 22, Math.toRadians(180)); break;
+                        case 1: spikePose = new Pose2d(-40, 34, Math.toRadians(180)); break;
+                        case 2: spikePose = new Pose2d(-50, 22, Math.toRadians(180)); break;
                         case 3: spikePose = new Pose2d(-41,41, Math.toRadians(60)); break;
                     }
                 }
             } else if (alliance == Alliance.RED) {
                 if (side == Side.CLOSE) {
                     switch (spikeMark) {
-                        case 1: spikePose = new Pose2d(12, -32, Math.toRadians(0)); break;
+                        case 1: spikePose = new Pose2d(18, -32, Math.toRadians(0)); break;
                         case 2: spikePose = new Pose2d(23, -32, Math.toRadians(-60)); break;
                         case 3: spikePose = new Pose2d(34, -32, Math.toRadians(0)); break;
                     }
                 } else if (side == Side.FAR) {
                     switch (spikeMark) {
                         case 1: spikePose = new Pose2d(-41,-41, Math.toRadians(-60)); break;
-                        case 2: spikePose = new Pose2d(-49, -22, Math.toRadians(180)); break;
-                        case 3: spikePose = new Pose2d(-33, -34, Math.toRadians(180)); break;
+                        case 2: spikePose = new Pose2d(-50, -22, Math.toRadians(180)); break;
+                        case 3: spikePose = new Pose2d(-40, -34, Math.toRadians(180)); break;
                     }
                 }
             }
@@ -365,14 +365,14 @@ public class TestAutonomous extends LinearOpMode {
                     adjustVector = new Vector2d(13, 32); hasAdjust = true;
                 }
                 else if (side == Side.FAR && spikeMark == 1) {
-                    adjustVector = new Vector2d(-33, 34); hasAdjust = true;
+                    adjustVector = new Vector2d(-35, 35); hasAdjust = true;
                 }
             } else if (alliance == Alliance.RED) {
                 if (side == Side.CLOSE && spikeMark == 1) {
-                    adjustVector = new Vector2d(15, -32); hasAdjust = true;
+                    adjustVector = new Vector2d(12, -32); hasAdjust = true;
                 }
                 else if (side == Side.FAR && spikeMark == 3) {
-                    adjustVector = new Vector2d(-38, -34); hasAdjust = true;
+                    adjustVector = new Vector2d(-35, -35); hasAdjust = true;
                 }
             }
             if (hasAdjust) {
@@ -404,7 +404,7 @@ public class TestAutonomous extends LinearOpMode {
                 } else if (alliance == Alliance.RED) {
                     switch (spikeMark) {
                         case 1: backboardY = -30; break; // LEFT
-                        case 2: backboardY = -35; break; // CENTER
+                        case 2: backboardY = -36; break; // CENTER
                         case 3: backboardY = -41; break; // RIGHT
                     }
                 }
@@ -413,7 +413,7 @@ public class TestAutonomous extends LinearOpMode {
                 if (side == Side.CLOSE) {
                     drive.followTrajectorySequence(drive.trajectorySequenceBuilder(startPose)
                             .waitSeconds(backboardWait)
-                            .lineToLinearHeading(new Pose2d(52, backboardY, Math.toRadians(180)))
+                            .lineToLinearHeading(new Pose2d(50, backboardY, Math.toRadians(180)))
                             .build());
                 } else if (side == Side.FAR) {
                     if (alliance == Alliance.BLUE) {
@@ -423,7 +423,7 @@ public class TestAutonomous extends LinearOpMode {
                                         .lineToLinearHeading(new Pose2d(-36, 12, Math.toRadians(180)))
                                         .back(91 - 10) // Drive to backboard
                                         .waitSeconds(backboardWait)
-                                        .lineToLinearHeading(new Pose2d(53, backboardY, Math.toRadians(180)))
+                                        .lineToLinearHeading(new Pose2d(49, backboardY, Math.toRadians(180)))
                                         .build());
                                 break;
                             case 2: // CENTER
@@ -431,7 +431,7 @@ public class TestAutonomous extends LinearOpMode {
                                         .strafeLeft(13) // Strafe to center truss
                                         .back(106 - 10) // Drive to backboard
                                         .waitSeconds(backboardWait) // Wait for close auto to finish
-                                        .lineToLinearHeading(new Pose2d(53, backboardY, Math.toRadians(180)))
+                                        .lineToLinearHeading(new Pose2d(49, backboardY, Math.toRadians(180)))
                                         .build());
                                 break;
                             case 3: // RIGHT
@@ -440,7 +440,7 @@ public class TestAutonomous extends LinearOpMode {
                                         .lineToLinearHeading(new Pose2d(-34, 12, Math.toRadians(180))) // To center truss
                                         .back(88 - 10) // Drive across field
                                         .waitSeconds(backboardWait)
-                                        .lineToLinearHeading(new Pose2d(53, backboardY, Math.toRadians(180)))
+                                        .lineToLinearHeading(new Pose2d(49, backboardY, Math.toRadians(180)))
                                         .build());
                                 break;
                         }
@@ -451,7 +451,7 @@ public class TestAutonomous extends LinearOpMode {
                                         .lineToLinearHeading(new Pose2d(-34, -55, Math.toRadians(180)))
                                         .lineToLinearHeading(new Pose2d(-34, -12, Math.toRadians(180)))
                                         .back(91 - 10) // Drive across field
-                                        .lineToLinearHeading(new Pose2d(53, backboardY, Math.toRadians(180)))
+                                        .lineToLinearHeading(new Pose2d(49, backboardY, Math.toRadians(180)))
                                         .build());
                                 break;
                             case 2: // CENTER
@@ -459,7 +459,7 @@ public class TestAutonomous extends LinearOpMode {
                                         .strafeRight(13) // Strafe to center truss
                                         .back(106 - 10) // Drive to backboard
                                         .waitSeconds(backboardWait) // Wait for close auto to finish
-                                        .lineToLinearHeading(new Pose2d(53, backboardY, Math.toRadians(180)))
+                                        .lineToLinearHeading(new Pose2d(49, backboardY, Math.toRadians(180)))
                                         .build());
                                 break;
                             case 3: // RIGHT
@@ -467,7 +467,7 @@ public class TestAutonomous extends LinearOpMode {
                                         .lineToLinearHeading(new Pose2d(-36, -12, Math.toRadians(180)))
                                         .back(88 - 10) // Drive to backboard
                                         .waitSeconds(backboardWait)
-                                        .lineToLinearHeading(new Pose2d(53, backboardY, Math.toRadians(180)))
+                                        .lineToLinearHeading(new Pose2d(49, backboardY, Math.toRadians(180)))
                                         .build());
                                 break;
                         }
@@ -534,21 +534,6 @@ public class TestAutonomous extends LinearOpMode {
 
                     // AT PIXEL STACK, intake pixels
                     bot.intake(false);
-                    //sleep(700); // Wait for intake
-//                    // Go back
-//                    if (alliance == Alliance.BLUE) {
-//                        drive.followTrajectorySequence(drive.trajectorySequenceBuilder(drive.getPoseEstimate())
-//                                .lineToLinearHeading(new Pose2d(-53, 13, Math.toRadians(180)))
-//                                .build()
-//                        );
-//                    } else if (alliance == Alliance.RED) {
-//                        drive.followTrajectorySequence(drive.trajectorySequenceBuilder(drive.getPoseEstimate())
-//                                .lineToLinearHeading(new Pose2d(-53, -12, Math.toRadians(180)))
-//                                .build()
-//                        );
-//                    }
-//                    bot.intake(false);
-                    // Run forward into stack again
                     if (alliance == Alliance.BLUE){
                         drive.followTrajectorySequence(drive.trajectorySequenceBuilder(drive.getPoseEstimate())
                                 .forward(1)
@@ -577,6 +562,9 @@ public class TestAutonomous extends LinearOpMode {
                         bot.intake(true);
                         sleep(300);
                         bot.intake.stopIntake();
+                        sleep(500);
+                        bot.intake(false);
+                        sleep(1000);
                     });
                     reverseIntake.start();
 
@@ -622,6 +610,7 @@ public class TestAutonomous extends LinearOpMode {
 
                     Thread stackPickup = new Thread(() -> {
                         // Pick up pixels
+                        bot.intake.stopIntake();
                         bot.slides.runToBottom();
                         bot.claw.fullOpen();
                         sleep(100);
@@ -638,13 +627,13 @@ public class TestAutonomous extends LinearOpMode {
                     startPose = drive.getPoseEstimate();
                     if (alliance == Alliance.BLUE) {
                         drive.followTrajectory(drive.trajectoryBuilder(startPose)
-                                .lineToLinearHeading(new Pose2d(55, 30, Math.toRadians(180)),
+                                .lineToLinearHeading(new Pose2d(53, 30, Math.toRadians(180)),
                                         SampleMecanumDrive.getVelocityConstraint(slowerVelocity, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
                                         SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
                                 .build());
                     } else if (alliance == Alliance.RED) {
                         drive.followTrajectory(drive.trajectoryBuilder(startPose)
-                                .lineToLinearHeading(new Pose2d(55, -32, Math.toRadians(180)),
+                                .lineToLinearHeading(new Pose2d(53, -32, Math.toRadians(180)),
                                     SampleMecanumDrive.getVelocityConstraint(slowerVelocity, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
                                     SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
                             .build());
@@ -657,9 +646,9 @@ public class TestAutonomous extends LinearOpMode {
                     bot.outtakeOut(2);
                     sleep(500);
                     bot.claw.halfOpen();
-                    sleep(600);
+                    drive.followTrajectory(drive.trajectoryBuilder(drive.getPoseEstimate()).forward(2).build()); // Go forward into parking spot
                     // Second pixel
-                    bot.slides.runTo(-700.0);
+                    bot.slides.runTo(-700.0); // Slides up
                     bot.outtakeOut(1);
                     sleep(300);
                     bot.claw.extraOpen();
@@ -672,18 +661,21 @@ public class TestAutonomous extends LinearOpMode {
 
                 // Parking
                 startPose = drive.getPoseEstimate();
-                drive.followTrajectory(drive.trajectoryBuilder(startPose).forward(4).build()); // Back away from backboard
                 int parkY = 0;
                 if (alliance == Alliance.BLUE) {
-                    if (park == 0) parkY = 36; else if (park == 1) parkY = 58; else if (park == 2) parkY = 12;
+                    if (park == 1) parkY = 58; else if (park == 2) parkY = 11;
                 } else if (alliance == Alliance.RED) {
-                    if (park == 0) parkY = -36; else if (park == 1) parkY = -12; else if (park == 2) parkY = -58;
+                    if (park == 1) parkY = -11;else if (park == 2) parkY = -58;
                 }
-                drive.followTrajectory(drive.trajectoryBuilder(drive.getPoseEstimate())
-                        .lineTo(new Vector2d(52, parkY))
-                        .build()
-                );
-                drive.followTrajectory(drive.trajectoryBuilder(drive.getPoseEstimate()).back(2).build()); // Go forward into parking spot
+                if (park != 0) {
+                    drive.followTrajectorySequence(drive.trajectorySequenceBuilder(startPose)
+                            .forward(4)
+                            .lineTo(new Vector2d(50, parkY))
+                            .build()
+                    );
+                    drive.followTrajectory(drive.trajectoryBuilder(drive.getPoseEstimate()).back(2).build()); // Go forward into parking spot
+                }
+
 
             }
 

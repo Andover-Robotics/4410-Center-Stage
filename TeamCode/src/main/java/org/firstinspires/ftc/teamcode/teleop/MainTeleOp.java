@@ -6,6 +6,7 @@ import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.arcrobotics.ftclib.controller.PIDController;
 import com.arcrobotics.ftclib.controller.PIDFController;
+import com.arcrobotics.ftclib.drivebase.MecanumDrive;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.arcrobotics.ftclib.gamepad.GamepadKeys;
 import com.arcrobotics.ftclib.geometry.Vector2d;
@@ -212,7 +213,7 @@ public class MainTeleOp extends LinearOpMode {
             }
 
             // DRIVE
-            gp1drive();
+            driveRobotCentric();
 
             // INTAKE (driver 1)
             if (gp1.isDown(GamepadKeys.Button.LEFT_BUMPER)) { // intake
@@ -255,8 +256,8 @@ public class MainTeleOp extends LinearOpMode {
             telemetry.addData("Intake Power", bot.intake.power +"(running=" + bot.intake.getIsRunning() + ")");
             telemetry.addData("Pixels", bot.claw.getClawState());
             telemetry.addData("Arm Position", bot.fourbar.getArmPosition());
+
             telemetry.addData("Heading",Math.toDegrees(drive.getPoseEstimate().getHeading()));
-            //telemetry.addData("IK Coefficent", ikCoefficient );
 
             telemetry.update();
             bot.slides.periodic();
@@ -312,7 +313,22 @@ public class MainTeleOp extends LinearOpMode {
     }
 
     // Driving
-    private void gp1drive() { // Driver 1
+    private void driveRobotCentric() { // Driver 1
+        driveSpeed = 1 - 0.8 * gp1.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER);
+        driveSpeed = Math.max(0, driveSpeed);
+        bot.fixMotors();
+
+        Vector2d driveVector = new Vector2d(gp1.getLeftX(), -gp1.getLeftY()),
+                turnVector = new Vector2d(gp1.getRightX(), 0);
+
+        bot.drive(driveVector.getX() * driveSpeed,
+                driveVector.getY() * driveSpeed,
+                turnVector.getX() * driveSpeed
+        );
+
+    }
+
+    public void driveFieldCentric() { // Test field centric
         driveSpeed = 1 - 0.8 * gp1.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER);
         driveSpeed = Math.max(0, driveSpeed);
         bot.fixMotors();
@@ -326,7 +342,7 @@ public class MainTeleOp extends LinearOpMode {
         );
     }
 
-    private void gp2strafe() { // strafing left/right, no turning or forward/backward
+    private void driveStrafe() { // strafing left/right, no turning or forward/backward
         driveSpeed = 0.25; // strafing speed for driver 2 to adjust when scoring
         driveSpeed = Math.max(0, driveSpeed);
         bot.fixMotors();
