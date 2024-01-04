@@ -352,6 +352,7 @@ public class TestAutonomous extends LinearOpMode {
                     }
                 }
             }
+            bot.outtakeGround(); // Go to outtake ground
             drive.followTrajectorySequence(drive.trajectorySequenceBuilder(startPose)
                     .waitSeconds(spikeWait) // Wait before going to spike mark
                     .lineToLinearHeading(spikePose) // Line to spike mark
@@ -382,8 +383,8 @@ public class TestAutonomous extends LinearOpMode {
             }
 
             // Score purple pixel
-            bot.outtakeGround();
-            sleep(700);
+//            bot.outtakeGround();
+//            sleep(700);
             bot.claw.halfOpen();
             sleep(300);
             bot.outtakeOut(1);
@@ -393,6 +394,17 @@ public class TestAutonomous extends LinearOpMode {
 
             // Backstage actions
             if (toBackboard) {
+                // Outtake out while moving to backboad
+                Thread outtakeOut = new Thread(() -> {
+                    if (slidesPos != 0) {
+                        bot.slides.runTo(-slidesPos);
+                    } else {
+                        bot.slides.runToBottom();
+                    }
+                    bot.fourbar.autoTopOuttake();
+                });
+                outtakeOut.start();
+
                 // To backboard
                 int backboardY = 0;
                 if (alliance == Alliance.BLUE) {
@@ -484,13 +496,13 @@ public class TestAutonomous extends LinearOpMode {
 //                }
 
                 // Score yellow pixel on backboard
-                if (slidesPos != 0) {
-                    bot.slides.runTo(-slidesPos);
-                } else {
-                    bot.slides.runToBottom();
-                }
-                bot.fourbar.autoTopOuttake();
-                sleep(1000);
+//                if (slidesPos != 0) {
+//                    bot.slides.runTo(-slidesPos);
+//                } else {
+//                    bot.slides.runToBottom();
+//                }
+//                bot.fourbar.autoTopOuttake();
+//                sleep(1000);
                 bot.claw.extraOpen();
                 sleep(400);
                 bot.fourbar.setWrist(0.65);
