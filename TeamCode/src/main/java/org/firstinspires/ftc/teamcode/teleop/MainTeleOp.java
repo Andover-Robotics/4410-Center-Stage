@@ -249,7 +249,6 @@ public class MainTeleOp extends LinearOpMode {
             }
             inverseKinematics(gp2.getRightY(), ikCoefficient);
 
-
             // TELEMETRY
             telemetry.addData("Bot State",bot.state);
             telemetry.addData("Slides Position", bot.slides.getPosition() + " (pos=" + bot.slides.position + " current=" + bot.slides.getCurrent() + ")");

@@ -47,7 +47,7 @@ public class TestAutonomous extends LinearOpMode {
     public static Side side = Side.CLOSE;
 
     // Alliance
-    enum Alliance {
+    public enum Alliance {
         RED, BLUE, NULL;
     }
     public static Alliance alliance = Alliance.BLUE;
@@ -62,7 +62,8 @@ public class TestAutonomous extends LinearOpMode {
     // WAIT TIME CONFIG: In seconds from a range 0-15, increment by 1 second
     public static double backboardWait = 0.0; // How long to wait before going to and scoring on backboard
     public static double spikeWait = 0.0; // How long to wait before going to spike mark position and scoring
-    public static double stackWait = 0.0; // How long to wait before scoring on backboard after stack (essentially backboard 2)
+    public static double stackWait = 0.0; // How long to wait before going to pixel stack
+    public static double backWait = 0.0; // How long to wait before scoring on backboard after stack (essentially backboard 2)
 
     int secondsElapsed = 0; // Track how many seconds have passed
 
@@ -147,7 +148,8 @@ public class TestAutonomous extends LinearOpMode {
         (DPAD)
         up - change backboard wait time
         down - change spike wait time
-        right - change stack wait time
+        right - change back wait time
+        left - change stack wait time
 
         right bumper - increment slides height
         left bumper - decrement slides height
@@ -248,12 +250,17 @@ public class TestAutonomous extends LinearOpMode {
                 if (spikeWait < 10.0) spikeWait+=1.0;
                 else spikeWait = 0.0;
             }
-            // Change stack wait time
+            // Change back wait time
             if (gp1.wasJustPressed(GamepadKeys.Button.DPAD_RIGHT)) {
+                if (backWait < 10.0) backWait+=1.0;
+                else backWait = 0.0;
+            }
+            // Change stack wait time
+            if (gp1.wasJustPressed(GamepadKeys.Button.DPAD_LEFT)) {
                 if (stackWait < 10.0) stackWait+=1.0;
                 else stackWait = 0.0;
             }
-            telemetry.addData("WaitSeconds: Backboard(UP)", backboardWait + " Spike(DOWN): " + spikeWait + " Stack(RIGHT): " + stackWait);
+            telemetry.addData("(WaitTimes) Backboard(UP)", backboardWait + " Spike(DOWN): " + spikeWait + "Stack(LEFT): " + stackWait + " Back(RIGHT): " + backWait);
 
             // Toggle to backboard
             if (gp1.wasJustPressed(GamepadKeys.Button.BACK)) {
@@ -352,11 +359,6 @@ public class TestAutonomous extends LinearOpMode {
                     }
                 }
             }
-            bot.outtakeGround(); // Go to outtake ground
-            drive.followTrajectorySequence(drive.trajectorySequenceBuilder(startPose)
-                    .waitSeconds(spikeWait) // Wait before going to spike mark
-                    .lineToLinearHeading(spikePose) // Line to spike mark
-                    .build());
 
             // Re-alignment code to avoid hitting truss
             Vector2d adjustVector = new Vector2d();
@@ -376,9 +378,18 @@ public class TestAutonomous extends LinearOpMode {
                     adjustVector = new Vector2d(-35, -35); hasAdjust = true;
                 }
             }
-            if (hasAdjust) {
-                drive.followTrajectorySequence(drive.trajectorySequenceBuilder(drive.getPoseEstimate())
-                        .lineTo(adjustVector)
+
+            bot.outtakeGround(); // Go to outtake ground
+            if (hasAdjust) { // Avoid hitting truss
+                drive.followTrajectorySequence(drive.trajectorySequenceBuilder(startPose)
+                        .waitSeconds(spikeWait) // Wait before going to spike mark
+                        .lineToLinearHeading(spikePose) // Line to position
+                        .lineTo(adjustVector) // Line to spike mark
+                        .build());
+            } else {
+                drive.followTrajectorySequence(drive.trajectorySequenceBuilder(startPose)
+                        .waitSeconds(spikeWait) // Wait before going to spike mark
+                        .lineToLinearHeading(spikePose) // Line to spike mark
                         .build());
             }
 
@@ -394,16 +405,12 @@ public class TestAutonomous extends LinearOpMode {
 
             // Backstage actions
             if (toBackboard) {
-                // Outtake out while moving to backboad
-                Thread outtakeOut = new Thread(() -> {
-                    if (slidesPos != 0) {
-                        bot.slides.runTo(-slidesPos);
-                    } else {
-                        bot.slides.runToBottom();
-                    }
-                    bot.fourbar.autoTopOuttake();
-                });
-                outtakeOut.start();
+                // Slides up while moving to backboard
+                if (slidesPos != 0) {
+                    bot.slides.runTo(-slidesPos);
+                } else {
+                    bot.slides.runToBottom();
+                }
 
                 // To backboard
                 int backboardY = 0;
@@ -501,8 +508,8 @@ public class TestAutonomous extends LinearOpMode {
 //                } else {
 //                    bot.slides.runToBottom();
 //                }
-//                bot.fourbar.autoTopOuttake();
-//                sleep(1000);
+                bot.fourbar.autoTopOuttake();
+                sleep(700);
                 bot.claw.extraOpen();
                 sleep(400);
                 bot.fourbar.setWrist(0.65);
@@ -522,11 +529,29 @@ public class TestAutonomous extends LinearOpMode {
                     });
                     block.start();
 
+                    // If wait for stack drive to park location and then go
+                    if (stackWait != 0.0) {
+                        if (alliance == Alliance.BLUE) {
+                            drive.followTrajectorySequence(drive.trajectorySequenceBuilder(startPose)
+                                    .forward(4)
+                                    .lineTo(new Vector2d(50, 11))
+                                    .waitSeconds(stackWait)
+                                    .build()
+                            );
+                        } else if (alliance == Alliance.RED) {
+                            drive.followTrajectorySequence(drive.trajectorySequenceBuilder(startPose)
+                                    .forward(4)
+                                    .lineTo(new Vector2d(50, -11))
+                                    .waitSeconds(stackWait)
+                                    .build()
+                            );
+                        }
+                    }
+
                     bot.intake(true); // Reverse intake
 
                     // Drive across field
                     startPose = drive.getPoseEstimate();
-                    int acrossDistance = 90; // Tune this value across field
                     if (alliance == Alliance.BLUE) {
                         drive.followTrajectorySequence(drive.trajectorySequenceBuilder(startPose)
                                 .lineToLinearHeading(new Pose2d(35, 11, Math.toRadians(180))) // Line to center truss position
@@ -609,13 +634,13 @@ public class TestAutonomous extends LinearOpMode {
                     if (alliance == Alliance.BLUE) {
                         drive.followTrajectorySequence(drive.trajectorySequenceBuilder(startPose)
                                 .lineToLinearHeading(new Pose2d(34, 10, Math.toRadians(180))) // Drive across field
-                                .waitSeconds(stackWait)
+                                .waitSeconds(backWait)
                                 .build()
                         );
                     } else if (alliance == Alliance.RED) {
                         drive.followTrajectorySequence(drive.trajectorySequenceBuilder(startPose)
                                 .lineToLinearHeading(new Pose2d(34, -10, Math.toRadians(180))) // Drive across field
-                                .waitSeconds(stackWait)
+                                .waitSeconds(backWait)
                                 .build()
                         );
                     }
