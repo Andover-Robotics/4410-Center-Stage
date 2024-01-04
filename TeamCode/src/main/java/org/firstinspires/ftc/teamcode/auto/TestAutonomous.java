@@ -55,11 +55,10 @@ public class TestAutonomous extends LinearOpMode {
     // Autonomous config values
     public static boolean toBackboard = true; // Go to backboard: true - go to backboard and score, false - only score spike and stop
     public static boolean pixelStack = true; // Go to pixel stack: true - do 2+2, false - park/or stop after scoring yellow pixel
-    public static boolean centerTruss = true; // Middle truss go under: true - center truss, false - side truss
     public static int slidesPos = 0; // Slide up: 0-1000, increment by 200
     public static int park = 0; // Parking position: 0 - don't park, 1 - left, 2 - right
 
-    // WAIT TIME CONFIG: In seconds from a range 0-15, increment by 1 second
+    // WAIT TIME CONFIG: In seconds from a range 0-10, increment by 1 second
     public static double backboardWait = 0.0; // How long to wait before going to and scoring on backboard
     public static double spikeWait = 0.0; // How long to wait before going to spike mark position and scoring
     public static double stackWait = 0.0; // How long to wait before going to pixel stack
@@ -182,35 +181,23 @@ public class TestAutonomous extends LinearOpMode {
             if (gp1.wasJustPressed(GamepadKeys.Button.Y)) {
                 alliance = alliance == Alliance.RED ? Alliance.BLUE : Alliance.RED;
             }
-            telemetry.addData("Alliance (Y)", alliance);
-
-            // Toggle to pixel stack
-            if (gp1.wasJustPressed(GamepadKeys.Button.B)) {
-                if (pixelStack && centerTruss) { // Pixel stack through center truss -> pixel stack through side truss
-                    pixelStack = true; // note: ik this logic can be simplified but i'm leaving it for readability - zachery
-                    centerTruss = false;
-                } else if (pixelStack && !centerTruss) { // Pixel stack through side truss -> none
-                    pixelStack = false;
-                    centerTruss = false;
-                } else if (!pixelStack && !centerTruss) { // No pixel stack (no truss) -> pixel stack through center truss
-                    pixelStack = true;
-                    centerTruss = true;
-                }
-            }
-            telemetry.addData("PixelStack (B)", pixelStack + " CenterTruss: " + centerTruss);
-
             // Change side
             if (gp1.wasJustPressed(GamepadKeys.Button.A)) {
                 if (side == Side.CLOSE) { // Rn close, switch to FAR
                     side = Side.FAR;
                     pixelStack = false;
-                    centerTruss = false;
                 } else { // Rn far, switch to CLOSE
                     side = Side.CLOSE;
                     slidesPos = 0;
                 }
             }
-            telemetry.addData("Side (A)", side);
+            telemetry.addData("Alliance (Y)", alliance + " Side (A)" + side);
+
+            // Toggle to pixel stack
+            if (gp1.wasJustPressed(GamepadKeys.Button.B)) {
+                pixelStack = !pixelStack;
+            }
+            telemetry.addData("PixelStack (B)", pixelStack);
 
             // CHANGE SLIDES HEIGHT
             // Increment
@@ -221,7 +208,7 @@ public class TestAutonomous extends LinearOpMode {
             if (gp1.wasJustPressed(GamepadKeys.Button.LEFT_BUMPER)) {
                 slidesPos -= slidesPos > 0 ? 200 : 0;
             }
-            telemetry.addData("Slides (RB)", slidesPos);
+            telemetry.addData("Slides (BUMPER)", slidesPos);
 
             // Switch park
             if (gp1.wasJustPressed(GamepadKeys.Button.X)) {
@@ -268,12 +255,12 @@ public class TestAutonomous extends LinearOpMode {
             }
             telemetry.addData("ToBackboard (BACK)", toBackboard);
 
-            // Tune center tape min height
-            if (gp1.wasJustPressed(GamepadKeys.Button.DPAD_LEFT)) {
-                int height = colorDetection.getCenterTapeHeight() > 100 ? 10 : (colorDetection.getCenterTapeHeight()+1);
-                colorDetection.setCenterTapeHeight(height);
-            }
-            telemetry.addData("CenterTapeHeight (LEFT)", colorDetection.getCenterTapeHeight());
+//            // Tune center tape min height
+//            if (gp1.wasJustPressed(GamepadKeys.Button.DPAD_LEFT)) {
+//                int height = colorDetection.getCenterTapeHeight() > 100 ? 10 : (colorDetection.getCenterTapeHeight()+1);
+//                colorDetection.setCenterTapeHeight(height);
+//            }
+//            telemetry.addData("CenterTapeHeight (LEFT)", colorDetection.getCenterTapeHeight());
 
             // Initiate color detection
             if (alliance == Alliance.RED) {
@@ -379,23 +366,26 @@ public class TestAutonomous extends LinearOpMode {
                 }
             }
 
-            bot.outtakeGround(); // Go to outtake ground
             if (hasAdjust) { // Avoid hitting truss
                 drive.followTrajectorySequence(drive.trajectorySequenceBuilder(startPose)
                         .waitSeconds(spikeWait) // Wait before going to spike mark
                         .lineToLinearHeading(spikePose) // Line to position
+                        .addDisplacementMarker(2, () -> {
+                            bot.outtakeGround(); // Go to outtake ground before trajectory
+                        })
                         .lineTo(adjustVector) // Line to spike mark
                         .build());
             } else {
                 drive.followTrajectorySequence(drive.trajectorySequenceBuilder(startPose)
                         .waitSeconds(spikeWait) // Wait before going to spike mark
                         .lineToLinearHeading(spikePose) // Line to spike mark
+                        .addDisplacementMarker(2, () -> {
+                            bot.outtakeGround(); // Go to outtake ground before trajectory
+                        })
                         .build());
             }
 
             // Score purple pixel
-//            bot.outtakeGround();
-//            sleep(700);
             bot.claw.halfOpen();
             sleep(300);
             bot.outtakeOut(1);
@@ -405,13 +395,6 @@ public class TestAutonomous extends LinearOpMode {
 
             // Backstage actions
             if (toBackboard) {
-                // Slides up while moving to backboard
-                if (slidesPos != 0) {
-                    bot.slides.runTo(-slidesPos);
-                } else {
-                    bot.slides.runToBottom();
-                }
-
                 // To backboard
                 int backboardY = 0;
                 if (alliance == Alliance.BLUE) {
@@ -432,7 +415,11 @@ public class TestAutonomous extends LinearOpMode {
                 if (side == Side.CLOSE) {
                     drive.followTrajectorySequence(drive.trajectorySequenceBuilder(startPose)
                             .waitSeconds(backboardWait)
-                            .lineToLinearHeading(new Pose2d(50, backboardY, Math.toRadians(180)))
+                            .addDisplacementMarker(0.5, () -> { // Slides up
+                                if (slidesPos != 0) bot.slides.runTo(-slidesPos);
+                                else bot.slides.runToBottom();
+                            })
+                            .lineToLinearHeading(new Pose2d(50, backboardY, Math.toRadians(180))) // x value of Pose2d is how far away we are from backboard: lower the number - farther, closer the number - closer
                             .build());
                 } else if (side == Side.FAR) {
                     if (alliance == Alliance.BLUE) {
@@ -493,21 +480,7 @@ public class TestAutonomous extends LinearOpMode {
                     }
                 }
 
-                // Run into backboard
-                int slowerVelocity = 20; // Slower velocity that is the max constraint when running into backboard (in/s)
-//                if (side == Side.FAR) {
-//                    drive.followTrajectory(drive.trajectoryBuilder(drive.getPoseEstimate()).back(2,
-//                                    SampleMecanumDrive.getVelocityConstraint(slowerVelocity, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
-//                                    SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
-//                            .build());
-//                }
-
                 // Score yellow pixel on backboard
-//                if (slidesPos != 0) {
-//                    bot.slides.runTo(-slidesPos);
-//                } else {
-//                    bot.slides.runToBottom();
-//                }
                 bot.fourbar.autoTopOuttake();
                 sleep(700);
                 bot.claw.extraOpen();
@@ -517,12 +490,12 @@ public class TestAutonomous extends LinearOpMode {
                 // Return to storage
                 bot.storage();
                 bot.claw.close();
-                sleep(100);
 
                 // TODO: TUNE/CODE PIXEL STACK TRAJECTORY FOR 2+2
                 // PIXEL STACK TRAJECTORY STARTS HERE
                 if (side == Side.CLOSE && pixelStack) {
                     Thread block = new Thread(() -> {
+                        sleep(100);
                         bot.fourbar.armBlock();
                         sleep(300);
                         bot.claw.clawBlock();
@@ -574,25 +547,19 @@ public class TestAutonomous extends LinearOpMode {
                     if (alliance == Alliance.BLUE){
                         drive.followTrajectorySequence(drive.trajectorySequenceBuilder(drive.getPoseEstimate())
                                 .forward(1)
-                                .build()
-                        );
-                        sleep(1000);
-                        drive.followTrajectorySequence(drive.trajectorySequenceBuilder(drive.getPoseEstimate())
+                                .waitSeconds(1)
                                 .back(2)
+                                .waitSeconds(1)
                                 .build()
                         );
-                        sleep(1000);
                     } else if (alliance == Alliance.RED){
                         drive.followTrajectorySequence(drive.trajectorySequenceBuilder(drive.getPoseEstimate())
                                 .forward(2)
-                                .build()
-                        );
-                        sleep(1000);
-                        drive.followTrajectorySequence(drive.trajectorySequenceBuilder(drive.getPoseEstimate())
+                                .waitSeconds(1)
                                 .back(3)
+                                .waitSeconds(1)
                                 .build()
                         );
-                        sleep(1000);
                     }
 
                     Thread reverseIntake = new Thread(() -> {
@@ -645,28 +612,41 @@ public class TestAutonomous extends LinearOpMode {
                         );
                     }
 
-                    Thread stackPickup = new Thread(() -> {
-                        // Pick up pixels
-                        bot.intake.stopIntake();
-                        bot.slides.runToBottom();
-                        bot.claw.fullOpen();
-                        sleep(100);
-                        bot.fourbar.pickup();
-                        sleep(500);
-                        bot.claw.pickupClose();
-                        sleep(400);
-                        bot.storage();
-                        sleep(200);
-                    });
-                    stackPickup.start();
+//                    Thread stackPickup = new Thread(() -> {
+//                        // Pick up pixels
+//                        bot.intake.stopIntake();
+//                        bot.slides.runToBottom();
+//                        bot.claw.fullOpen();
+//                        sleep(100);
+//                        bot.fourbar.pickup();
+//                        sleep(500);
+//                        bot.claw.pickupClose();
+//                        sleep(400);
+//                        bot.storage();
+//                        sleep(200);
+//                    });
+//                    stackPickup.start();
 
                     // Line to backboard
+                    int slowerVelocity = 20; // Slower velocity that is the max constraint when running into backboard (in/s)
                     startPose = drive.getPoseEstimate();
                     if (alliance == Alliance.BLUE) {
                         drive.followTrajectory(drive.trajectoryBuilder(startPose)
                                 .lineToLinearHeading(new Pose2d(53, 30, Math.toRadians(180)),
                                         SampleMecanumDrive.getVelocityConstraint(slowerVelocity, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
                                         SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
+                                .addDisplacementMarker(() -> { // Pick up pixels from stack
+                                    bot.intake.stopIntake();
+                                    bot.slides.runToBottom();
+                                    bot.claw.fullOpen();
+                                    sleep(100);
+                                    bot.fourbar.pickup();
+                                    sleep(500);
+                                    bot.claw.pickupClose();
+                                    sleep(400);
+                                    bot.storage();
+                                    sleep(200);
+                                })
                                 .build());
                     } else if (alliance == Alliance.RED) {
                         drive.followTrajectory(drive.trajectoryBuilder(startPose)
