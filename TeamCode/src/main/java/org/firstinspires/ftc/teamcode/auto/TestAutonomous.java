@@ -540,8 +540,6 @@ public class TestAutonomous extends LinearOpMode {
                     }
                     sleep(600);
 
-
-
                     // AT PIXEL STACK, intake pixels
                     bot.intake(false);
                     if (alliance == Alliance.BLUE){
@@ -686,11 +684,15 @@ public class TestAutonomous extends LinearOpMode {
                 }
                 if (park != 0) {
                     drive.followTrajectorySequence(drive.trajectorySequenceBuilder(startPose)
-                            .forward(4)
-                            .lineTo(new Vector2d(50, parkY))
+                            .splineToLinearHeading(new Pose2d(55, parkY, Math.toRadians(180)),Math.toRadians(15))
                             .build()
                     );
-                    drive.followTrajectory(drive.trajectoryBuilder(drive.getPoseEstimate()).back(2).build()); // Go forward into parking spot
+//                    drive.followTrajectorySequence(drive.trajectorySequenceBuilder(startPose)
+//                            .forward(4)
+//                            .lineTo(new Vector2d(50, parkY))
+//                            .build()
+//                    );
+//                    drive.followTrajectory(drive.trajectoryBuilder(drive.getPoseEstimate()).back(2).build()); // Go forward into parking spot
                 }
 
 

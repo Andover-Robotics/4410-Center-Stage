@@ -109,7 +109,8 @@ public class MeepMeepTesting {
                                         .waitSeconds(0.5) // Wait for score
                                         .lineToLinearHeading(new Pose2d(50, 29, Math.toRadians(180))) // To backboard
                                         .waitSeconds(0.5) // Wait for score
-                                        .forward(4)
+                                        //.forward(4)
+                                        .splineToLinearHeading(new Pose2d(55, 11, Math.toRadians(180)),Math.toRadians(15))
 
 //                                // GO THROUGH SIDE TRUSS
 //                                .strafeRight(28)
