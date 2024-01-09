@@ -35,6 +35,7 @@ public class MainTeleOp extends LinearOpMode {
     private Bot bot;
     private double driveSpeed = 1;
     private GamepadEx gp1, gp2;
+    private boolean fieldCentric = false;
     double leftX, rightX, leftY, rightY;
     Thread thread;
 
@@ -73,7 +74,7 @@ public class MainTeleOp extends LinearOpMode {
         right trigger - slow down
         left bumper - run intake
         right bumper - run reverse intake
-        start - align robot
+        start - toggle field centric
 
         Driver 2 (gp2):
         B - pick up pixels, cancel outtake out
@@ -213,7 +214,11 @@ public class MainTeleOp extends LinearOpMode {
             }
 
             // DRIVE
-            driveRobotCentric();
+            if (fieldCentric) driveFieldCentric();
+            else driveRobotCentric();
+            if (gp1.wasJustPressed(GamepadKeys.Button.START)) { // toggle field/robot centric
+                fieldCentric = !fieldCentric;
+            }
 
             // INTAKE (driver 1)
             if (gp1.isDown(GamepadKeys.Button.LEFT_BUMPER)) { // intake
@@ -327,6 +332,7 @@ public class MainTeleOp extends LinearOpMode {
 
     }
 
+
     public void driveFieldCentric() { // Test field centric
         driveSpeed = 1 - 0.8 * gp1.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER);
         driveSpeed = Math.max(0, driveSpeed);
@@ -335,7 +341,7 @@ public class MainTeleOp extends LinearOpMode {
         Vector2d driveVector = new Vector2d(gp1.getLeftX(), -gp1.getLeftY()),
                 turnVector = new Vector2d(gp1.getRightX(), 0);
 
-        bot.drive(driveVector.getX() * driveSpeed,
+        bot.driveFieldCentric(driveVector.getX() * driveSpeed,
                 driveVector.getY() * driveSpeed,
                 turnVector.getX() * driveSpeed
         );
