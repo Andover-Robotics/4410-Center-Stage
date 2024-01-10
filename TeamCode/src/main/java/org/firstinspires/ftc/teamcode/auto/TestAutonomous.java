@@ -626,11 +626,15 @@ public class TestAutonomous extends LinearOpMode {
                     startPose = drive.getPoseEstimate();
                     if (alliance == Alliance.BLUE) {
                         drive.followTrajectory(drive.trajectoryBuilder(startPose)
-                                .lineToLinearHeading(new Pose2d(53, 30, Math.toRadians(180)))
+                                .lineToLinearHeading(new Pose2d(53, 30, Math.toRadians(180)),
+                                    SampleMecanumDrive.getVelocityConstraint(slowerVelocity, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
+                                    SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
                                 .build());
                     } else if (alliance == Alliance.RED) {
                         drive.followTrajectory(drive.trajectoryBuilder(startPose)
-                                .lineToLinearHeading(new Pose2d(53, -32, Math.toRadians(180)))
+                                .lineToLinearHeading(new Pose2d(53, -32, Math.toRadians(180)),
+                                        SampleMecanumDrive.getVelocityConstraint(slowerVelocity, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
+                                        SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
                             .build());
                     }
 
