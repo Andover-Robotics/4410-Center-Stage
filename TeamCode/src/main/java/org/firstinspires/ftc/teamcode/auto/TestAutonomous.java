@@ -478,6 +478,7 @@ public class TestAutonomous extends LinearOpMode {
 
                 // Score yellow pixel on backboard
                 bot.fourbar.autoTopOuttake();
+                bot.fourbar.setArm(0.21);
                 sleep(700);
                 bot.claw.extraOpen();
                 sleep(400);
@@ -642,8 +643,10 @@ public class TestAutonomous extends LinearOpMode {
                     // First pixel
                     bot.slides.runTo(-500.0); // Slides up
                     bot.outtakeOut(2);
+                    bot.fourbar.setArm(0.21);
                     sleep(500);
                     bot.claw.halfOpen();
+                    sleep(300);
                     // Second pixel
                     bot.slides.runTo(-700.0); // Slides up
                     bot.outtakeOut(1);
@@ -660,9 +663,9 @@ public class TestAutonomous extends LinearOpMode {
                 startPose = drive.getPoseEstimate();
                 int parkY = 0;
                 if (alliance == Alliance.BLUE) {
-                    if (park == 1) parkY = 60; else if (park == 2) parkY = 11;
+                    if (park == 1) parkY = 59; else if (park == 2) parkY = 11;
                 } else if (alliance == Alliance.RED) {
-                    if (park == 1) parkY = -11;else if (park == 2) parkY = -60;
+                    if (park == 1) parkY = -11;else if (park == 2) parkY = -59;
                 }
                 if (park != 0) {
                     drive.followTrajectorySequence(drive.trajectorySequenceBuilder(startPose)

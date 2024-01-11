@@ -10,7 +10,7 @@ import com.acmerobotics.dashboard.config.Config;
 public class V4B {
     public final Servo armLeft, armRight, wrist;
 
-    public static double armOuttake = 0.21, armTopOuttake = 0.23, armStorage = 0.74, armGround = 0.0, armTopPixel = 0.82, armBottomPixel = 0.9, armDualPickup = 0.93, armBlock = 0.84;
+    public static double armOuttake = 0.26, armTopOuttake = 0.23, armStorage = 0.74, armGround = 0.0, armTopPixel = 0.82, armBottomPixel = 0.9, armDualPickup = 0.93, armBlock = 0.84;
     public static double wristBottomOuttake = 0.44, wristTopOuttake = 0.55,  wristStorage = 0.24, wristGround = 0.30, wristTopPixel = 0.245, wristBottomPixel = 0.24, wristDualPickup = 0.22, wristTransfer = 0.22, wristBlock = 0.08;
 
     public V4B(OpMode opMode) {
