@@ -18,6 +18,7 @@ import org.firstinspires.ftc.teamcode.auto.drive.TwoWheelTrackingLocalizer;
 import org.firstinspires.ftc.teamcode.auto.pipelines.AprilTagDetectionPipeline;
 import org.firstinspires.ftc.teamcode.auto.pipelines.ColorDetectionPipeline;
 import org.firstinspires.ftc.teamcode.auto.trajectorysequence.*;
+import org.firstinspires.ftc.teamcode.auto.util.PoseStorage;
 import org.firstinspires.ftc.teamcode.teleop.subsystems.Bot;
 import org.openftc.apriltag.AprilTagDetection;
 import org.openftc.easyopencv.OpenCvCamera;
@@ -93,7 +94,6 @@ public class TestAutonomous extends LinearOpMode {
             }
         });
         camera.setPipeline(colorDetection);
-        
 
         // THREADS
 
@@ -488,7 +488,6 @@ public class TestAutonomous extends LinearOpMode {
                 bot.storage();
                 bot.claw.close();
 
-                // TODO: TUNE/CODE PIXEL STACK TRAJECTORY FOR 2+2
                 // PIXEL STACK TRAJECTORY STARTS HERE
                 if (side == Side.CLOSE && pixelStack) {
                     Thread block = new Thread(() -> {
@@ -685,7 +684,7 @@ public class TestAutonomous extends LinearOpMode {
 
             // Stop op mode
             sleep(500);
-            bot.setAutoEndPose(drive.getPoseEstimate());
+            PoseStorage.currentPose = drive.getPoseEstimate();
             requestOpModeStop();
         }
 

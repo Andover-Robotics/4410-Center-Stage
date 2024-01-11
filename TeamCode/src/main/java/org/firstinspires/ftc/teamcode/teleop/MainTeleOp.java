@@ -17,6 +17,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.auto.MainAutonomous;
 import org.firstinspires.ftc.teamcode.auto.drive.SampleMecanumDrive;
+import org.firstinspires.ftc.teamcode.auto.util.PoseStorage;
 import org.firstinspires.ftc.teamcode.teleop.subsystems.Bot;
 import org.firstinspires.ftc.teamcode.teleop.subsystems.Slides;
 
@@ -51,7 +52,7 @@ public class MainTeleOp extends LinearOpMode {
 
         // Drive
         SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
-        drive.setPoseEstimate(bot.getAutoEndPose());
+        drive.setPoseEstimate(PoseStorage.currentPose);
 
         gp1 = new GamepadEx(gamepad1);
         gp2 = new GamepadEx(gamepad2);

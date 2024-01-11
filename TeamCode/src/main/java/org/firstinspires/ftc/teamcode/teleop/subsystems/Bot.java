@@ -28,7 +28,6 @@ public class Bot {
     public OpMode opMode;
     public BHI260IMU imu0;
     private double imuOffset = 0;
-    private static Pose2d autoEndPose = new Pose2d(12,60,Math.toRadians(90));
     public double heading = 0.0;
 
     // Define subsystem objects
@@ -212,15 +211,5 @@ public class Bot {
     public void setHeading (double heading) {
         this.heading = heading;
     }
-
-    public void setAutoEndPose(Pose2d pose) {
-        autoEndPose = pose;
-    }
-
-    public Pose2d getAutoEndPose() {
-        return autoEndPose;
-    }
-
-
 
 }
