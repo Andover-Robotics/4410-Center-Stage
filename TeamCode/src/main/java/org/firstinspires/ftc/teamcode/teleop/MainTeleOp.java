@@ -263,6 +263,7 @@ public class MainTeleOp extends LinearOpMode {
             telemetry.addData("Arm Position", bot.fourbar.getArmPosition());
 
             telemetry.addData("Heading",Math.toDegrees(drive.getPoseEstimate().getHeading()));
+            bot.setHeading(drive.getPoseEstimate().getHeading());
 
             telemetry.update();
             bot.slides.periodic();
