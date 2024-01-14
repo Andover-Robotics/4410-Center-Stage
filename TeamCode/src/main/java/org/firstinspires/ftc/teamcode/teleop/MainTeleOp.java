@@ -255,11 +255,15 @@ public class MainTeleOp extends LinearOpMode {
             inverseKinematics(gp2.getRightY(), ikCoefficient);
 
             // TELEMETRY
+            telemetry.addData("Field Centric = ",fieldCentric);
             telemetry.addData("Bot State",bot.state);
             telemetry.addData("Slides Position", bot.slides.getPosition() + " (pos=" + bot.slides.position + " current=" + bot.slides.getCurrent() + ")");
             telemetry.addData("Intake Power", bot.intake.power +"(running=" + bot.intake.getIsRunning() + ")");
             telemetry.addData("Pixels", bot.claw.getClawState());
-            telemetry.addData("Arm Position", bot.fourbar.getArmPosition());
+
+            telemetry.addData("X = ", gp1.getLeftX());
+            telemetry.addData("Y = ", gp1.getLeftY());
+            telemetry.addData("RX = ", gp1.getRightX());
 
             telemetry.addData("Heading",Math.toDegrees(drive.getPoseEstimate().getHeading()));
             bot.setHeading(drive.getPoseEstimate().getHeading());
