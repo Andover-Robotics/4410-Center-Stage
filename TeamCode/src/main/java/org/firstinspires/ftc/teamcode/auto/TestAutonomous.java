@@ -64,6 +64,7 @@ public class TestAutonomous extends LinearOpMode {
     public static double spikeWait = 0.0; // How long to wait before going to spike mark position and scoring
     public static double stackWait = 0.0; // How long to wait before going to pixel stack
     public static double backWait = 0.0; // How long to wait before scoring on backboard after stack (essentially backboard 2)
+    public static double parkWait = 0.0; // How long to wait before going to parking position (run park spline)
 
     int secondsElapsed = 0; // Track how many seconds have passed
 
@@ -150,6 +151,8 @@ public class TestAutonomous extends LinearOpMode {
         down - change spike wait time
         right - change back wait time
         left - change stack wait time
+
+        left joystick - change park wait time (IT WAS OUR LAST RESORT)
 
         right bumper - increment slides height
         left bumper - decrement slides height
@@ -248,7 +251,12 @@ public class TestAutonomous extends LinearOpMode {
                 if (stackWait < 10.0) stackWait+=1.0;
                 else stackWait = 0.0;
             }
-            telemetry.addData("(WaitTimes) Backboard(UP)", backboardWait + " Spike(DOWN): " + spikeWait + "Stack(LEFT): " + stackWait + " Back(RIGHT): " + backWait);
+            // Change park wait time
+            if (gp1.wasJustPressed(GamepadKeys.Button.LEFT_STICK_BUTTON)) {
+                if (parkWait < 10.0) parkWait+=1.0;
+                else parkWait = 0.0;
+            }
+            telemetry.addData("DELAYS-Backboard(UP)", backboardWait + " Spike(DOWN): " + spikeWait + "Stack(LEFT): " + stackWait + " Back(RIGHT): " + backWait + " Park(LEFTSTICK): " + parkWait);
 
             // Toggle to backboard
             if (gp1.wasJustPressed(GamepadKeys.Button.BACK)) {
@@ -668,6 +676,7 @@ public class TestAutonomous extends LinearOpMode {
                 }
                 if (park != 0) {
                     drive.followTrajectorySequence(drive.trajectorySequenceBuilder(startPose)
+                            .waitSeconds(parkWait)
                             .splineToLinearHeading(new Pose2d(55, parkY, Math.toRadians(180)),Math.toRadians(15))
                             .build()
                     );
