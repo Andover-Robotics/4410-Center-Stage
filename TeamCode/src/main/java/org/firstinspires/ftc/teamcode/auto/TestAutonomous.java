@@ -141,6 +141,8 @@ public class TestAutonomous extends LinearOpMode {
         /*
         LIST OF CONFIG CONTROLS (so far) - Zachery:
         Driver 1 (gp1):
+
+        (BUTTONS)
         Y - change alliance
         A - change side
         X - change park
@@ -152,11 +154,15 @@ public class TestAutonomous extends LinearOpMode {
         right - change back wait time
         left - change stack wait time
 
-        left joystick - change park wait time (IT WAS OUR LAST RESORT)
+        (JOYSTICKS - IT WAS OUR LAST RESORT)
+        left stick - change park wait time
+        right stick -
 
+        (BUMPERS)
         right bumper - increment slides height
         left bumper - decrement slides height
 
+        (MISC.)
         START - once to drop, again to pick up again
         BACK - toggle to backboard
          */
@@ -615,7 +621,6 @@ public class TestAutonomous extends LinearOpMode {
                     }
 
                     Thread stackPickup = new Thread(() -> {
-                        // Pick up pixels
                         bot.intake.stopIntake();
                         bot.slides.runToBottom();
                         bot.claw.fullOpen();

@@ -29,6 +29,7 @@ public class Bot {
     public BHI260IMU imu0;
     private double imuOffset = 0;
     public double heading = 0.0;
+    private MecanumDrive drive;
 
     // Define subsystem objects
     public Intake intake;
@@ -62,6 +63,8 @@ public class Bot {
         fr = new MotorEx(opMode.hardwareMap, "motorFR", Motor.GoBILDA.RPM_435);
         bl = new MotorEx(opMode.hardwareMap, "motorBL", Motor.GoBILDA.RPM_435);
         br = new MotorEx(opMode.hardwareMap, "motorBR", Motor.GoBILDA.RPM_435);
+
+        drive = new MecanumDrive(fl, fr, bl, br);
 
         intake = new Intake(opMode);
         slides = new Slides(opMode);
@@ -169,9 +172,41 @@ public class Bot {
     }
 
     public void driveFieldCentric(double strafeSpeed, double forwardBackSpeed, double turnSpeed) {
-        MecanumDrive drive = new MecanumDrive(fl, fr, bl, br);
-        drive.driveFieldCentric(strafeSpeed, forwardBackSpeed, turnSpeed, heading);
+        double magnitude = Math.sqrt(strafeSpeed * strafeSpeed + forwardBackSpeed * forwardBackSpeed);
+        double theta = (Math.atan2(forwardBackSpeed, strafeSpeed) - heading) % (2 * Math.PI);
+        double[] speeds = {
+                magnitude * Math.sin(theta + Math.PI / 4) + turnSpeed,
+                magnitude * Math.sin(theta - Math.PI / 4) - turnSpeed,
+                magnitude * Math.sin(theta - Math.PI / 4) + turnSpeed,
+                magnitude * Math.sin(theta + Math.PI / 4) - turnSpeed
+        };
+
+        double maxSpeed = 0;
+
+        for (int i = 0; i < 4; i++) {
+            maxSpeed = Math.max(maxSpeed, speeds[i]);
+        }
+
+        if (maxSpeed > 1) {
+            for (int i = 0; i < 4; i++) {
+                speeds[i] /= maxSpeed;
+            }
+        }
+
+        //        for (int i = 0; i < 4; i++) {
+        //            driveTrainMotors[i].set(speeds[i]);
+        //        }
+        // manually invert the left side
+
+        fl.set(speeds[0]);
+        fr.set(speeds[1]);
+        bl.set(speeds[2]);
+        br.set(speeds[3]);
     }
+
+//    public void driveFieldCentric(double strafeSpeed, double forwardBackSpeed, double turnSpeed) {
+//        drive.driveFieldCentric(strafeSpeed, forwardBackSpeed, turnSpeed, heading);
+//    }
 
     // IMU
     public void setImuOffset(double offset) {
