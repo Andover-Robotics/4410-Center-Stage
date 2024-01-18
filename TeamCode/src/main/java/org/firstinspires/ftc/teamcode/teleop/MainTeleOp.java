@@ -95,6 +95,7 @@ public class MainTeleOp extends LinearOpMode {
         */
 
         waitForStart();
+
         while (opModeIsActive() && !isStopRequested()) {
             drive.update();
             Pose2d poseEstimate = drive.getLocalizer().getPoseEstimate();
@@ -218,6 +219,9 @@ public class MainTeleOp extends LinearOpMode {
             else driveRobotCentric();
             if (gp1.wasJustPressed(GamepadKeys.Button.START)) { // toggle field/robot centric
                 fieldCentric = !fieldCentric;
+            }
+            if (gp1.wasJustReleased(GamepadKeys.Button.LEFT_STICK_BUTTON)) {
+                drive.setPoseEstimate(PoseStorage.currentPose);
             }
 
             // INTAKE (driver 1)
@@ -343,25 +347,12 @@ public class MainTeleOp extends LinearOpMode {
         driveSpeed = Math.max(0, driveSpeed);
         bot.fixMotors();
 
-        Vector2d driveVector = new Vector2d(gp1.getLeftX(), gp1.getLeftY()),
-                turnVector = new Vector2d(gp1.getRightX(), 0);
+        Vector2d driveVector = new Vector2d(-gp1.getLeftX(), -gp1.getLeftY()),
+                turnVector = new Vector2d(-gp1.getRightX(), 0);
 
         bot.driveFieldCentric(driveVector.getX() * driveSpeed,
                 driveVector.getY() * driveSpeed,
                 turnVector.getX() * driveSpeed
-        );
-    }
-
-    private void driveStrafe() { // strafing left/right, no turning or forward/backward
-        driveSpeed = 0.25; // strafing speed for driver 2 to adjust when scoring
-        driveSpeed = Math.max(0, driveSpeed);
-        bot.fixMotors();
-
-        Vector2d driveVector = new Vector2d(-gp2.getLeftX(), -gp2.getRightY());
-
-        bot.drive(driveVector.getX() * driveSpeed,
-                driveVector.getY() * driveSpeed,
-                0.0
         );
     }
 

@@ -49,7 +49,7 @@ public class ColorDetectionTest extends LinearOpMode {
 
 
         bot = Bot.getInstance(this);
-        bot.initializeImus();
+        //bot.initializeImus();
         boolean choice = false;
         int highOrLow = 0;
         while (!isStarted()) {
