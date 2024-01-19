@@ -118,12 +118,12 @@ public class MainTeleOp extends LinearOpMode {
                         bot.storage();
                     });
                     thread.start();
-                } else if(gp2.wasJustPressed(GamepadKeys.Button.LEFT_BUMPER)) {
+                } else if(gp2.wasJustPressed(GamepadKeys.Button.LEFT_BUMPER)) { // fix top pixel
                     thread = new Thread(() -> {
                         bot.slides.runToBottom();
                         bot.claw.fullOpen();
                         sleep(100);
-                        bot.fourbar.topPixel();
+                        bot.fourbar.tapPixel(1);
                         sleep(400);
                         bot.claw.pickupClose();
                         sleep(300);
@@ -288,7 +288,7 @@ public class MainTeleOp extends LinearOpMode {
                     } else if (bot.slides.getPosition() <=-1850){
                         bot.slides.runTo(-2300);
                     }
-                    bot.fourbar.topOuttake();
+                    bot.fourbar.topOuttake(false);
                 }
             } else {
                 bot.storage();

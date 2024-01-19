@@ -9,7 +9,6 @@ import com.acmerobotics.dashboard.config.Config;
 @Config
 public class V4B {
     public final Servo armLeft, armRight, wrist;
-
     public static double armOuttake = 0.26, armTopOuttake = 0.23, armStorage = 0.74, armGround = 0.0, armTopPixel = 0.82, armBottomPixel = 0.9, armDualPickup = 0.95, armBlock = 0.84;
     public static double wristBottomOuttake = 0.44, wristTopOuttake = 0.55,  wristStorage = 0.24, wristGround = 0.30, wristTopPixel = 0.245, wristBottomPixel = 0.24, wristDualPickup = 0.22, wristTransfer = 0.22, wristBlock = 0.08;
 
@@ -31,17 +30,11 @@ public class V4B {
         wrist.setPosition(position);
     }
 
-//    public void outtake() {
-//        setWrist(wristTransfer);
-//        setArm(armOuttake);
-//        setWrist(wristBottomOuttake);
-//    }
-
-
     public void armBlock(){
         setArm(armBlock);
         setWrist(wristBlock);
     }
+
     public void dualOuttake(int pixel) {
         setArm(wristTransfer);
         if (pixel == 1){
@@ -52,6 +45,7 @@ public class V4B {
             setWrist(wristBottomOuttake);
         }
     }
+
     public void ground() {
         setWrist(wristGround);
         setArm(armGround);
@@ -62,14 +56,11 @@ public class V4B {
         setArm(armStorage);
     }
 
-    public void topPixel() {
-        setWrist(wristTopPixel);
-        setArm(armTopPixel);
-    }
-
-    public void bottomPixel() {
-        setWrist(wristBottomPixel);
-        setArm(armBottomPixel);
+    public void tapPixel(int i) {
+        switch (i) {
+            case 1: setWrist(wristTopPixel); setArm(armTopPixel); break;
+            case 2: setWrist(wristBottomPixel); setArm(armBottomPixel); break;
+        }
     }
 
     public void pickup() {
@@ -93,21 +84,12 @@ public class V4B {
         return armLeft.getPosition();
     }
 
-    public void topOuttake(){
+    public void topOuttake(boolean auto){
         setWrist(wristTopOuttake);
-        setArm(armTopOuttake);
+        if (!auto) setArm(armTopOuttake); else setArm(0.21);
     }
 
-    public void autoTopOuttake() {
-        setWrist(wristTopOuttake);
-        setArm(0.21);
-    }
-
-    public void runManualOuttake(double fourpos, double clawpos) {
-        setArm(fourpos);
-        setWrist(clawpos);
-    }
-
+    // TODO: GET IK WORKING :D
     public void runAngle(double slidePosition) {
         double desiredAngle = 180 - 60.001 - Math.toDegrees(Math.asin((Math.sin(60.001) * 268.754 - (slidePosition / 8.558)) / 170.0));
         double newPosition = 0.00333 * desiredAngle;
