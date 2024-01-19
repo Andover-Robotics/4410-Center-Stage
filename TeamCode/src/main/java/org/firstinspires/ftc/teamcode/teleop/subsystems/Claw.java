@@ -8,7 +8,6 @@ import com.qualcomm.robotcore.hardware.Servo;
 public class Claw {
     private final Servo claw;
 
-    // TODO: Tune open and close values
     public static double fullOpen = 0.68;
     public static double extraOpen = 0.66;
     public static double halfOpen = 0.71;

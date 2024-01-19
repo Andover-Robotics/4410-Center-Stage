@@ -26,8 +26,6 @@ public class Bot {
     public BotState state = BotState.STORAGE; // Default bot state
     private final MotorEx fl, fr, bl, br;
     public OpMode opMode;
-    public BHI260IMU imu0;
-    private double imuOffset = 0;
     public double heading = 0.0;
     private MecanumDrive drive;
 
@@ -149,7 +147,7 @@ public class Bot {
     }
 
 
-    public void drive(double strafeSpeed, double forwardBackSpeed, double turnSpeed) {
+    public void driveRobotCentric(double strafeSpeed, double forwardBackSpeed, double turnSpeed) {
         double[] speeds = {
                 forwardBackSpeed - strafeSpeed - turnSpeed,
                 forwardBackSpeed + strafeSpeed + turnSpeed,
@@ -204,43 +202,12 @@ public class Bot {
         br.set(speeds[3]);
     }
 
-//    public void driveFieldCentric(double strafeSpeed, double forwardBackSpeed, double turnSpeed) {
-//        drive.driveFieldCentric(strafeSpeed, forwardBackSpeed, turnSpeed, heading);
-//    }
-
-    // IMU
-    public void setImuOffset(double offset) {
-        imuOffset += offset;
-    }
-
-    public void initializeImus() {
-        imu0 = opMode.hardwareMap.get(BHI260IMU.class, "imu");
-        final BHI260IMU.Parameters parameters = new BHI260IMU.Parameters(new RevHubOrientationOnRobot(
-                RevHubOrientationOnRobot.LogoFacingDirection.LEFT,
-                RevHubOrientationOnRobot.UsbFacingDirection.UP
-        ));
-        imu0.initialize(parameters);
-        resetIMU();
-    }
-
     public void calculateWristPos() {
         if (claw.clawState == Claw.ClawState.SINGLE) {
             this.wristUpPos = 0.03;
         } else {
             this.wristUpPos = 0.0;
         }
-    }
-
-    public void resetIMU() {
-        imuOffset += getIMU();
-    }
-
-    public double getIMU() {
-        double angle = (imu0.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES)- imuOffset) % 360;
-        if (angle > 180) {
-            angle = angle - 360;
-        }
-        return angle;
     }
 
     public void setHeading (double heading) {

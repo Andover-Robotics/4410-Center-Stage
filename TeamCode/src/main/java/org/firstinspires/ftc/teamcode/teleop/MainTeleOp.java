@@ -98,7 +98,6 @@ public class MainTeleOp extends LinearOpMode {
 
         while (opModeIsActive() && !isStopRequested()) {
             drive.update();
-            Pose2d poseEstimate = drive.getLocalizer().getPoseEstimate();
 
             gp1.readButtons();
             gp2.readButtons();
@@ -215,12 +214,11 @@ public class MainTeleOp extends LinearOpMode {
             }
 
             // DRIVE
-            if (fieldCentric) driveFieldCentric();
-            else driveRobotCentric();
-            if (gp1.wasJustPressed(GamepadKeys.Button.START)) { // toggle field/robot centric
+            if (fieldCentric) driveFieldCentric(); else driveRobotCentric();
+            if (gp1.wasJustPressed(GamepadKeys.Button.START)) { // Toggle field/robot centric
                 fieldCentric = !fieldCentric;
             }
-            if (gp1.wasJustReleased(GamepadKeys.Button.LEFT_STICK_BUTTON)) {
+            if (gp1.wasJustReleased(GamepadKeys.Button.LEFT_STICK_BUTTON)) { // Reset heading
                 drive.setPoseEstimate(PoseStorage.currentPose);
             }
 
@@ -259,18 +257,17 @@ public class MainTeleOp extends LinearOpMode {
             inverseKinematics(gp2.getRightY(), ikCoefficient);
 
             // TELEMETRY
-            telemetry.addData("Field Centric = ",fieldCentric);
+            telemetry.addData("Field Centric",fieldCentric + "Heading: " + Math.toDegrees(drive.getPoseEstimate().getHeading()));
+            bot.setHeading(drive.getPoseEstimate().getHeading());
+
             telemetry.addData("Bot State",bot.state);
-            telemetry.addData("Slides Position", bot.slides.getPosition() + " (pos=" + bot.slides.position + " current=" + bot.slides.getCurrent() + ")");
-            telemetry.addData("Intake Power", bot.intake.power +"(running=" + bot.intake.getIsRunning() + ")");
+            telemetry.addData("Slides Position", bot.slides.getPosition() + " (pos: " + bot.slides.position + " current: " + bot.slides.getCurrent() + ")");
+            telemetry.addData("Intake Power", bot.intake.power +"(running: " + bot.intake.getIsRunning() + ")");
             telemetry.addData("Pixels", bot.claw.getClawState());
 
             telemetry.addData("X = ", gp1.getLeftX());
             telemetry.addData("Y = ", gp1.getLeftY());
             telemetry.addData("RX = ", gp1.getRightX());
-
-            telemetry.addData("Heading",Math.toDegrees(drive.getPoseEstimate().getHeading()));
-            bot.setHeading(drive.getPoseEstimate().getHeading());
 
             telemetry.update();
             bot.slides.periodic();
@@ -326,7 +323,7 @@ public class MainTeleOp extends LinearOpMode {
     }
 
     // Driving
-    private void driveRobotCentric() { // Driver 1
+    private void driveRobotCentric() { // Robot centric
         driveSpeed = 1 - 0.8 * gp1.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER);
         driveSpeed = Math.max(0, driveSpeed);
         bot.fixMotors();
@@ -334,7 +331,7 @@ public class MainTeleOp extends LinearOpMode {
         Vector2d driveVector = new Vector2d(gp1.getLeftX(), -gp1.getLeftY()),
                 turnVector = new Vector2d(gp1.getRightX(), 0);
 
-        bot.drive(driveVector.getX() * driveSpeed,
+        bot.driveRobotCentric(driveVector.getX() * driveSpeed,
                 driveVector.getY() * driveSpeed,
                 turnVector.getX() * driveSpeed
         );
@@ -342,7 +339,7 @@ public class MainTeleOp extends LinearOpMode {
     }
 
 
-    public void driveFieldCentric() { // Test field centric
+    public void driveFieldCentric() { // Field centric
         driveSpeed = 1 - 0.8 * gp1.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER);
         driveSpeed = Math.max(0, driveSpeed);
         bot.fixMotors();
