@@ -494,7 +494,7 @@ public class TestAutonomous extends LinearOpMode {
                 bot.fourbar.autoTopOuttake();
                 bot.fourbar.setArm(0.21);
                 sleep(700);
-                bot.claw.extraOpen();
+                bot.claw.setPosition(0.66); // extra open
                 sleep(400);
                 bot.fourbar.setWrist(0.65);
                 sleep(200);
@@ -508,7 +508,7 @@ public class TestAutonomous extends LinearOpMode {
                         sleep(100);
                         bot.fourbar.armBlock();
                         sleep(300);
-                        bot.claw.clawBlock();
+                        bot.claw.setPosition(0.51);
                     });
                     block.start();
 
@@ -663,7 +663,7 @@ public class TestAutonomous extends LinearOpMode {
                     bot.slides.runTo(-700.0); // Slides up
                     bot.outtakeOut(1);
                     sleep(300);
-                    bot.claw.extraOpen();
+                    bot.claw.setPosition(0.66); // extra open
                     sleep(400);
                     // Return to storage
                     bot.storage();

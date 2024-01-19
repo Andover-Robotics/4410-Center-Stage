@@ -8,53 +8,50 @@ import com.qualcomm.robotcore.hardware.Servo;
 public class Claw {
     private final Servo claw;
 
-    public static double fullOpen = 0.68;
-    public static double extraOpen = 0.66;
-    public static double halfOpen = 0.71;
+    public static double fullOpen = 0.68, close = 0.77, halfOpen = 0.71;
 
-    public static double block = 0.51;
-    public static double close = 0.77;
+
     public enum ClawState{
         EMPTY, // Has no pixels
         SINGLE, // Only one pixel (top one)
         BOTH // Both pixels (top and bottom)
     }
     public ClawState clawState = ClawState.EMPTY;
+    public int getClawState() {
+        switch (clawState) {
+            case SINGLE: return 1;
+            case BOTH: return 2;
+            default: return 0; // default or empty
+        }
+    }
 
     public Claw(OpMode opMode){
         claw = opMode.hardwareMap.servo.get("claw");
         claw.setDirection(Servo.Direction.FORWARD);
     }
 
-    // Open methods
-    public void open() { // open full, drop both top and bottom or top
-        if (clawState == ClawState.BOTH) {
-            claw.setPosition(halfOpen);
-
-            clawState = ClawState.SINGLE;
-        } else {
-            claw.setPosition(fullOpen);
+    public void setPosition(double position) { // Only used in autonomous to set claw servo to specific pos !DOES NOT TYPICALLY CHANGE CLAW STATE!
+        claw.setPosition(position);
+        if (position == 0.66) { // position is extra open, set claw state to empty
             clawState = ClawState.EMPTY;
         }
     }
 
+    // Open methods
+    public void open() { // open full, drop both top and bottom or top
+        if (clawState == ClawState.BOTH) {
+            halfOpen();
+        } else {
+            fullOpen();
+        }
+    }
     public void fullOpen() { // open full, drop both top and bottom or top
         claw.setPosition(fullOpen);
         clawState = ClawState.EMPTY;
     }
-
-    public void clawBlock() { // open full, drop both top and bottom or top
-        claw.setPosition(block);
-    }
-
     public void halfOpen() {
         claw.setPosition(halfOpen);
         clawState = ClawState.SINGLE;
-    }
-
-    public void extraOpen() { // extra open for auto haha
-        claw.setPosition(extraOpen);
-        clawState = ClawState.EMPTY;
     }
 
     // Close methods
@@ -62,16 +59,7 @@ public class Claw {
         claw.setPosition(close);
         clawState = ClawState.BOTH;
     }
-
     public void close() { // close, cover
         claw.setPosition(close);
-    }
-
-    public int getClawState() {
-        switch (clawState) {
-            case SINGLE: return 1;
-            case BOTH: return 2;
-            default: return 0; // default or empty
-        }
     }
 }
