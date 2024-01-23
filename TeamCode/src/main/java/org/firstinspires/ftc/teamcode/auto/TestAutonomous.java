@@ -145,8 +145,11 @@ public class TestAutonomous extends LinearOpMode {
                     .lineToLinearHeading(new Pose2d(-60, 11, Math.toRadians(180)))
                     .build());
             // Intake from stack
+            bot.intake.setIntakeHeight(bot.intake.intakeStack);
             bot.intake(false);
             sleep(1000);
+            bot.intake.stopIntake();
+            bot.intake.setIntakeHeight(bot.intake.intakeStorage);
             // To backboard
             drive.followTrajectorySequence(drive.trajectorySequenceBuilder(drive.getPoseEstimate())
                     .lineToLinearHeading(new Pose2d(38, 11, Math.toRadians(180)))

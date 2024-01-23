@@ -72,35 +72,17 @@ public class Bot {
     }
 
     // BOT STATES
-    public void storage() {//was initialized
+    public void storage() {
         fourbar.storage();
         slides.runToBottom();
+        intake.setIntakeHeight(intake.intakeStorage);
         state = BotState.STORAGE;
     }
-
-//    public void outtakeOut() { // go to outtake backboard position
-//        fourbar.outtake();
-//        state = BotState.OUTTAKE_OUT;
-//    }
-
 
     public void outtakeOut(int pixel) { // go to outtake backboard position
         fourbar.dualOuttake(pixel);
         state = BotState.OUTTAKE_OUT;
     }
-
-
-
-    public void ikDemo1() {
-        fourbar.setArm(0.35);
-        slides.runTo(slides.getPosition()+600);
-    }
-
-    public void ikDemo2() {
-        fourbar.setArm(0.18);
-        slides.runTo(slides.getPosition()-600);
-    }
-
 
     public void outtakeGround() { // go to outtake ground position
         fourbar.ground();
@@ -109,14 +91,20 @@ public class Bot {
     }
 
     public void intake(boolean isReverse) {
+        if (intake.getIntakeHeight() != intake.intakeGround) intake.setIntakeHeight(intake.intakeGround);
         if (!isReverse) {
             intake.runIntake();
-        } else intake.runReverseIntake();
+        } else {
+            intake.runReverseIntake();
+        }
     }
 
     public void launch() {
         launcher.launch();
     }
+
+    public void ikDemo1() { fourbar.setArm(0.35); slides.runTo(slides.getPosition()+600);}
+    public void ikDemo2() { fourbar.setArm(0.18); slides.runTo(slides.getPosition()-600);}
 
     public void fixMotors() {
         fl.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);

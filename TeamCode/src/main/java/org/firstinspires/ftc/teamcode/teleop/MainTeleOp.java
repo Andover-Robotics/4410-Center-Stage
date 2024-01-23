@@ -225,10 +225,17 @@ public class MainTeleOp extends LinearOpMode {
             // INTAKE (driver 1)
             if (gp1.isDown(GamepadKeys.Button.LEFT_BUMPER)) { // intake
                 bot.intake(false);
+                if (bot.intake.getIntakeHeight() != bot.intake.intakeGround) {
+                    bot.intake.setIntakeHeight(bot.intake.intakeGround);
+                }
             } else if (gp1.isDown(GamepadKeys.Button.RIGHT_BUMPER)) { // reverse intake
                 bot.intake(true);
+                if (bot.intake.getIntakeHeight() != bot.intake.intakeGround) {
+                    bot.intake.setIntakeHeight(bot.intake.intakeGround);
+                }
             } else {
                 bot.intake.stopIntake();
+                bot.intake.setIntakeHeight(bot.intake.intakeStorage);
             }
 
             // LAUNCH DRONE

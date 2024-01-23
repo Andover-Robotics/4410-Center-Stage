@@ -5,21 +5,30 @@ import com.arcrobotics.ftclib.hardware.motors.CRServo;
 import com.arcrobotics.ftclib.hardware.motors.Motor;
 import com.arcrobotics.ftclib.hardware.motors.MotorEx;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+import com.qualcomm.robotcore.hardware.Servo;
 
 @Config
 public class Intake {
     private final MotorEx noodles;
     private final CRServo counterRoller;
-    public double power = 0.25; // optimal speed for intake
-    private double counterPower = 1.0;
+    private final Servo intakeLeft, intakeRight;
+
+    public double power = 0.25, counterPower = 1.0; // optimal speed for intake
+    public double intakeStorage = 1.0, intakeGround = 0.0, intakeStack = 0.5; // TODO: TUNE THESE VALUES
     private boolean isRunning = false;
 
     public Intake(OpMode opMode){
         noodles = new MotorEx(opMode.hardwareMap, "intake");
-        counterRoller = new CRServo(opMode.hardwareMap, "counterRoller");
         noodles.setRunMode(Motor.RunMode.RawPower);
         noodles.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
         noodles.setInverted(false);
+
+        counterRoller = new CRServo(opMode.hardwareMap, "counterRoller");
+
+        intakeLeft = opMode.hardwareMap.servo.get("intakeLeft");
+        intakeLeft.setDirection(Servo.Direction.FORWARD);
+        intakeRight = opMode.hardwareMap.servo.get("intakeRight");
+        intakeRight.setDirection(Servo.Direction.FORWARD);
     }
 
     public void runIntake(){
@@ -40,6 +49,15 @@ public class Intake {
         noodles.set(0);
         counterRoller.set(0);
         isRunning = false;
+    }
+
+    public void setIntakeHeight(double position) {
+        intakeLeft.setPosition(position);
+        intakeRight.setPosition(position);
+    }
+
+    public double getIntakeHeight() {
+        return intakeLeft.getPosition();
     }
 
     public boolean getIsRunning() {
