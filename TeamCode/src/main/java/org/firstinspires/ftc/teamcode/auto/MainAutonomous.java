@@ -501,7 +501,7 @@ public class MainAutonomous extends LinearOpMode {
                     bot.slides.runToBottom();
                 }
                 bot.outtakeOut(bot.claw.getClawState());
-                bot.fourbar.topOuttake();
+                bot.fourbar.topOuttake(true);
                 sleep(800);
                 bot.claw.open();
                 sleep(800);

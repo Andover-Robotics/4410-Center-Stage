@@ -338,7 +338,6 @@ public class MainTeleOp extends LinearOpMode {
 
     }
 
-
     public void driveFieldCentric() { // Field centric
         driveSpeed = 1 - 0.8 * gp1.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER);
         driveSpeed = Math.max(0, driveSpeed);

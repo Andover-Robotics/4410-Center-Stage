@@ -67,8 +67,10 @@ public class Slides {
     public void runTo(double pos) {
         motorLeft.setRunMode(Motor.RunMode.RawPower);
         motorLeft.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
+
         motorRight.setRunMode(Motor.RunMode.RawPower);
         motorRight.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
+
         motorCenter.setRunMode(Motor.RunMode.RawPower);
         motorCenter.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
 
@@ -105,7 +107,6 @@ public class Slides {
     public void runManual(double manual) {
         if (manual > powerMin || manual < -powerMin) {
             manualPower = manual;
-
         } else {
             manualPower = 0;
         }

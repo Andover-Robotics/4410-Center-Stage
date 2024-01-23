@@ -49,14 +49,14 @@ public class ColorDetectionPipeline extends OpenCvPipeline{
     public static int centerTapeMinHeight = 55;
 
     // Red HSV Values
-    public static double redLH = 0, redLS = 56, redLV = 35, redHH = 20, redHS = 360, redHV = 255;
+    public static double redLH = 0, redLS = 56, redLV = 35, redHH = 20, redHS = 360, redHV = 176;
     public static Scalar redLowHSV= new Scalar(redLH,redLS,redLV);
     public static Scalar redHighHSV = new Scalar(redHH,redHS,redHV);
 //    public static Scalar redLowHSV2= new Scalar(redLH2,redLS,redLV);
 //    public static Scalar redHighHSV2 = new Scalar(redHH2,redHS,redHV);
 
     // Blue HSV Values
-    public static double blueLH = 90, blueLS = 56, blueLV = 35, blueHH = 140, blueHS = 360, blueHV = 255;
+    public static double blueLH = 90, blueLS = 56, blueLV = 35, blueHH = 140, blueHS = 360, blueHV = 176;
     public static Scalar blueLowHSV= new Scalar(blueLH,blueLS,blueLV);
     public static Scalar blueHighHSV = new Scalar(blueHH,blueHS,blueHV);
 
