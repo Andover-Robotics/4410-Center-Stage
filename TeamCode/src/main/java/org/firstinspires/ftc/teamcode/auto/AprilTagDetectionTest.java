@@ -1,6 +1,5 @@
 package org.firstinspires.ftc.teamcode.auto;
 
-import static org.firstinspires.ftc.teamcode.auto.MainAutonomous.FEET_PER_METER;
 import static org.firstinspires.ftc.teamcode.auto.drive.DriveConstants.MAX_ANG_VEL;
 import static org.firstinspires.ftc.teamcode.auto.drive.DriveConstants.MAX_VEL;
 import static org.firstinspires.ftc.teamcode.auto.drive.DriveConstants.TRACK_WIDTH;
@@ -128,6 +127,7 @@ public class AprilTagDetectionTest extends LinearOpMode {
 
     @SuppressLint("DefaultLocale")
     void tagToTelemetry(AprilTagDetection detection) {
+        double FEET_PER_METER = 3.28084;
         telemetry.addLine(String.format("Detected tag ID=%d", detection.id));
         telemetry.addLine(String.format("Translation X: %.2f feet", detection.pose.x * FEET_PER_METER));
         telemetry.addLine(String.format("Translation Y: %.2f feet", detection.pose.y * FEET_PER_METER));
