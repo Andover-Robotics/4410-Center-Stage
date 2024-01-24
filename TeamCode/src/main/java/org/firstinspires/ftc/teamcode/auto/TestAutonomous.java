@@ -145,7 +145,7 @@ public class TestAutonomous extends LinearOpMode {
                     .lineToLinearHeading(new Pose2d(-60, 11, Math.toRadians(180)))
                     .build());
             // Intake from stack
-            bot.intake.setIntakeHeight(bot.intake.intakeStack);
+            bot.intake.setIntakeHeight(0.5);
             bot.intake(false);
             sleep(1000);
             bot.intake.stopIntake();

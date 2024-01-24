@@ -17,6 +17,7 @@ import org.firstinspires.ftc.teamcode.auto.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.auto.drive.TwoWheelTrackingLocalizer;
 import org.firstinspires.ftc.teamcode.auto.pipelines.AprilTagDetectionPipeline;
 import org.firstinspires.ftc.teamcode.auto.pipelines.ColorDetectionPipeline;
+import org.firstinspires.ftc.teamcode.auto.pipelines.ColorDetectionPipeline2;
 import org.firstinspires.ftc.teamcode.auto.trajectorysequence.*;
 import org.firstinspires.ftc.teamcode.auto.util.PoseStorage;
 import org.firstinspires.ftc.teamcode.teleop.subsystems.Bot;
@@ -80,7 +81,7 @@ public class MainAutonomous extends LinearOpMode {
         // Define camera values
         WebcamName camName = hardwareMap.get(WebcamName.class, "Webcam 1");
         OpenCvCamera camera = OpenCvCameraFactory.getInstance().createWebcam(camName);
-        ColorDetectionPipeline colorDetection = new ColorDetectionPipeline(telemetry);
+        ColorDetectionPipeline2 colorDetection = new ColorDetectionPipeline2(telemetry);
 
         // Start camera
         camera.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
@@ -278,14 +279,23 @@ public class MainAutonomous extends LinearOpMode {
 //            telemetry.addData("CenterTapeHeight (LEFT)", colorDetection.getCenterTapeHeight());
 
             // Initiate color detection
-            if (alliance == Alliance.RED) {
+            if (alliance == Alliance.BLUE) {
                 colorDetection.setAlliance(1);
-            } else { // Automatically checks for blue if no alliance is set
+            } else if (alliance == Alliance.RED) {
                 colorDetection.setAlliance(2);
             }
             telemetry.addData("Current Camera FPS", camera.getFps());
 
+
             spikeMark = colorDetection.getSpikeMark();
+            if (colorDetection.getAvgCenter() <= 100 && colorDetection.getAvgLeft() <= 100) {
+                spikeMark = 1;
+            } else if (colorDetection.getAvgCenter() >= 100 && colorDetection.getAvgLeft() >= 100) {
+                spikeMark = 2;
+            } else {
+                spikeMark = 3;
+            }
+
             String spikeMarkString = "";
             switch (spikeMark) {
                 case 1: spikeMarkString = "Left"; break;
