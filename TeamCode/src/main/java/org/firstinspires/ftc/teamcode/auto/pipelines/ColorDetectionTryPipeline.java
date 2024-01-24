@@ -1,10 +1,5 @@
 package org.firstinspires.ftc.teamcode.auto.pipelines;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-
 import org.opencv.core.Mat;
 import org.opencv.core.Core;
 import org.opencv.core.MatOfPoint;
@@ -14,130 +9,93 @@ import org.openftc.easyopencv.OpenCvPipeline;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.opencv.core.Scalar;
 
-/*
-TODO: FIX WHATEVER MESS OF CODE THIS IS SOME OTHER TIME AFTER SCRIMMAGE - ZACHERY
- */
-
-public class ColorDetectionTryPipeline extends OpenCvPipeline{
-
+public class ColorDetectionTryPipeline extends OpenCvPipeline {
+    // VARIABLES
     Telemetry telemetry;
-    Mat HSV = new Mat();
-    MatOfPoint biggest;
+    public static int minimumAvg = 50;
 
-    public static int minheight = 100;
-    public static int minwidth = 100;
-    public static int width = 0;
-    public static int height = 0;
-    public static int camwidth = 1280;
-    public static int camheight = 720;
+    // Processing frames
+    private Mat matYCrCb = new Mat();;
+    private Mat spikeCenter = new Mat();
+    private Mat spikeLeft = new Mat();
 
-    public static double midpointrect;
+    // Cb and Cr predetermined Mats
+    private Mat matCbCenter = new Mat();
+    private Mat matCbLeft = new Mat();
+    private Mat matCrCenter = new Mat();
+    private Mat matCrLeft = new Mat();
 
+    // Average Cb and Cr values
+    private double avgCenter = 0;
+    private double avgLeft = 0;
+
+    // Configurations
     public enum SpikeMark{
-        LEFT,
-        MIDDLE,
-        RIGHT,
-        NOTDETECTED
+        LEFT, MIDDLE, RIGHT, NONE
     }
-    public static SpikeMark spikeMark = SpikeMark.NOTDETECTED;
-
-    // Alliance: 0 - NONE, 1 - RED, 2 - BLUE
-    int alliance = 0;
-
-    // Red HSV Values
-    public static double redLH = 142, redLS = 50, redLV = 50, redHH = 172, redHS = 255, redHV = 255;
-    public static Scalar redLowHSV= new Scalar(redLH,redLS,redLV);
-    public static Scalar redHighHSV = new Scalar(redHH,redHS,redHV);
-
-    // Blue HSV Values
-    public static double blueLH = 90, blueLS = 50, blueLV = 50, blueHH = 117, blueHS = 255, blueHV = 255;
-    public static Scalar blueLowHSV= new Scalar(blueLH,blueLS,blueLV);
-    public static Scalar blueHighHSV = new Scalar(blueHH,blueHS,blueHV);
-
-    public ColorDetectionTryPipeline(Telemetry telemetry){ // CONSTRUCTOR :D
-        spikeMark = SpikeMark.NOTDETECTED;
-        this.telemetry = telemetry;
-    }
-
+    public static SpikeMark spikeMark = SpikeMark.NONE;
+    public static int alliance = 0; // Alliance: 0 - NONE, 1 - RED, 2 - BLUE
     public void setAlliance(int alliance) {
         this.alliance = alliance;
     }
 
+    // CONSTRUCTOR
+    public ColorDetectionTryPipeline(Telemetry telemetry){
+        spikeMark = SpikeMark.NONE;
+        this.telemetry = telemetry;
+    }
+
+    // Execute logic
     public int getSpikeMark() {
-        switch (spikeMark) {
-            case LEFT: return 1;
-            case MIDDLE: return 2;
-            case RIGHT: return 3;
+        if (getAvgLeft() < minimumAvg && getAvgCenter() < minimumAvg) { // Right, both avgs is too small
+            return 3;
+        } else if (getAvgCenter() < getAvgLeft()) { // Left, left avg greater than center avg
+            return 1;
+        } else if (getAvgLeft() < getAvgCenter()) { // Center, center avg greater than left avg
+            return 2;
         }
-        return 0; // None detected
+        return 3;
     }
 
-    @Override
+    // PROCESSING FRAMES
     public Mat processFrame(Mat input) {
-        Imgproc.cvtColor(input, HSV, Imgproc.COLOR_RGB2HSV); //converting RGB colors to HSV
+        // Convert from RGB to YCrCb
+        Imgproc.cvtColor(input, matYCrCb, Imgproc.COLOR_RGB2YCrCb);
 
-        Rect rightrect = new Rect(600, 50, 680, 240);
-        Rect leftrect = new Rect(100, 0, 325, 400); // rectangle sizes
+        // Draw rectangles of left and center positions
+        Rect rectCenter = new Rect(600, 50, 680, 240);
+        Rect rectLeft = new Rect(100, 0, 325, 400);
+        // Display rectangles
+        Imgproc.rectangle(input, rectCenter, new Scalar(0, 255, 0), 5);
+        Imgproc.rectangle(input, rectLeft, new Scalar(0, 255, 0), 5);
 
-        Imgproc.rectangle(input, leftrect, new Scalar(0, 255, 0), 5); //displays rectangles with green color
-        Imgproc.rectangle(input, rightrect, new Scalar(0, 255, 0), 5);
+        // Create mats for each rectangle
+        spikeCenter = matYCrCb.submat(rectCenter);
+        spikeLeft = matYCrCb.submat(rectLeft);
 
-        // filters HSV mat into image with black being the lowest red/blue HSV and white being the highest red/blue HSV
-        if (alliance == 1) {
-            Core.inRange(HSV, redLowHSV, redHighHSV, HSV);
-        } else {
-            Core.inRange(HSV, blueLowHSV, blueHighHSV, HSV);
+        // Extract color based off of alliance
+        if (alliance == 1) { // Blue
+            Core.extractChannel(spikeCenter, matCbCenter, 2);
+            Core.extractChannel(spikeLeft, matCbLeft, 2);
+            // Calculate average
+            Scalar meanCenter = Core.mean(matCbCenter);
+            Scalar meanLeft = Core.mean(matCbLeft);
+            avgCenter = meanCenter.val[0];
+            avgLeft = meanLeft.val[0];
+        } else if (alliance == 2) { // Red
+            Core.extractChannel(spikeCenter, matCrCenter, 2);
+            Core.extractChannel(spikeLeft, matCrLeft, 2);
+            // Calculate average
+            Scalar meanCenter = Core.mean(matCrCenter);
+            Scalar meanLeft = Core.mean(matCrLeft);
+            avgCenter = meanCenter.val[0];
+            avgLeft = meanLeft.val[0];
         }
 
-        List<MatOfPoint> contours = new ArrayList<>();
-        Imgproc.findContours(HSV, contours, new Mat(), 0,1); // finds contours in HSV mat
-
-        if (!contours.isEmpty()) { // checks if no contours are found
-            contours.sort(Collections.reverseOrder(Comparator.comparingDouble(m -> Imgproc.boundingRect(m).width))); //orders contours in array from big to small(by width)
-
-            biggest = contours.get(0); //contour with the largest width(first in the array)
-            Rect rect = Imgproc.boundingRect(biggest); // turns biggest contour into a rectangle
-            midpointrect = rect.tl().x + rect.width/2.0; // gets midpoint x of the rectangle
-            width = rect.width;
-            height = rect.height;
-            double error = Math.abs(((double) width/height)-1); // get error from perfect square ratio
-            for (MatOfPoint contour : contours) {
-                if (Math.abs(((double) Imgproc.boundingRect(contour).width/Imgproc.boundingRect(contour).height)-1) >= error && Imgproc.boundingRect(contour).height >= 50) { // check if error is greater than last
-                    rect = Imgproc.boundingRect(contour);
-                    width = rect.width;
-                    height = rect.height;
-                    midpointrect = rect.tl().x + width/2.0; // gets midpoint x of the rectangle
-                    error = Math.abs(((double) rect.width/rect.height)-1);
-                }
-            }
-
-            // Draw rectangle on screen
-            Imgproc.rectangle(input, rect.tl(), rect.br(), new Scalar(255, 0, 0), 6); // puts border around contours with a red shade
-
-            // Check which zone it is in (left or right)
-            if (midpointrect > leftrect.tl().x && midpointrect < leftrect.br().x) { // LEFT SPIKE
-                if (height < 200) { // make sure it is not left tape
-                    spikeMark = SpikeMark.RIGHT;
-                } else {
-                    spikeMark = SpikeMark.LEFT;
-                }
-            } else if (midpointrect > rightrect.tl().x && midpointrect < leftrect.br().x) {
-                spikeMark = SpikeMark.MIDDLE;
-            } else {
-                if (width > 500) {
-                    spikeMark = SpikeMark.MIDDLE;
-                } else { // make sure it is not center tape
-                    spikeMark = SpikeMark.RIGHT;
-                }
-            }
-            //telemetry.addLine("Midpoint of Bounding Box :"+ midpointrect);
-        } else { // NOT IN FRAME, RIGHT SPIKE
-            spikeMark = SpikeMark.RIGHT;
-        }
-        //telemetry.addData("contours: ", contours.size());
-        // telemetry.addData("Spikemark status: ",spikeMark);
-        // Releasing all our mats for the next iteration
-        HSV.release();
-        return input; // return end frame with rectangles drawn
+        // Return img frame
+        return input;
     }
+
+    public double getAvgCenter() { return avgCenter; }
+    public double getAvgLeft() { return avgLeft; }
 }

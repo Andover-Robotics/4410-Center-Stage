@@ -4,7 +4,6 @@ import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.arcrobotics.ftclib.gamepad.GamepadKeys;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.teamcode.auto.pipelines.ColorDetectionPipeline;
@@ -19,7 +18,7 @@ import org.openftc.easyopencv.OpenCvCameraRotation;
 import java.util.Arrays;
 
 @Autonomous(name = "Test Color Detection", group = "Test")
-public class ColorDetectionTest extends LinearOpMode {
+public class ColorHSVDetectionTest extends LinearOpMode {
 
     private Bot bot;
     private double cycleTime = 1;
@@ -62,56 +61,56 @@ public class ColorDetectionTest extends LinearOpMode {
             //dpad up down does H high
             //left right does s high
             //bumper/trigger does v
-                if (gp1.wasJustPressed(GamepadKeys.Button.START)) {
-                    switch (ColorDetectionPipeline.alliance) {
-                        case 1:
-                            colorPipeline.setAlliance(2);
-                            ColorDetectionPipeline.count = 0;
-                            break;
-                        default:
-                            colorPipeline.setAlliance(1);
-                            ColorDetectionPipeline.count = 0;
-                            break;
-                    }
+            if (gp1.wasJustPressed(GamepadKeys.Button.START)) {
+                switch (ColorDetectionPipeline.alliance) {
+                    case 1:
+                        colorPipeline.setAlliance(2);
+                        ColorDetectionPipeline.count = 0;
+                        break;
+                    default:
+                        colorPipeline.setAlliance(1);
+                        ColorDetectionPipeline.count = 0;
+                        break;
                 }
+            }
 
-                int inc = 1;
+            int inc = 1;
 
-                if (highOrLow == 0) {
-                    HSV = ColorDetectionPipeline.currentHighHSV;
-                    if (gp1.wasJustPressed(GamepadKeys.Button.DPAD_UP)) {
-                        ColorDetectionPipeline.currentHighHSV.set(new double[]{HSV.val[0]+ inc, HSV.val[1], HSV.val[2]});
-                    } else if (gp1.wasJustPressed(GamepadKeys.Button.DPAD_DOWN)) {
-                        ColorDetectionPipeline.currentHighHSV.set(new double[]{HSV.val[0]- inc, HSV.val[1], HSV.val[2]});
-                    }
-                    if (gp1.wasJustPressed(GamepadKeys.Button.DPAD_LEFT)) {
-                        ColorDetectionPipeline.currentHighHSV.set(new double[]{HSV.val[0], HSV.val[1]+ inc, HSV.val[2]});
-                    } else if (gp1.wasJustPressed(GamepadKeys.Button.DPAD_RIGHT)) {
-                        ColorDetectionPipeline.currentHighHSV.set(new double[]{HSV.val[0], HSV.val[1]- inc, HSV.val[2]});
-                    }
-                    if (gp1.wasJustPressed(GamepadKeys.Button.RIGHT_BUMPER)) {
-                        ColorDetectionPipeline.currentHighHSV.set(new double[]{HSV.val[0], HSV.val[1], HSV.val[2]+ inc});
-                    } else if (gp1.wasJustPressed(GamepadKeys.Button.LEFT_BUMPER)) {
-                        ColorDetectionPipeline.currentHighHSV.set(new double[]{HSV.val[0], HSV.val[1], HSV.val[2]- inc});
-                    }
-                } else {
-                    HSV = ColorDetectionPipeline.currentLowHSV;
-                    if (gp1.wasJustPressed(GamepadKeys.Button.DPAD_UP)) {
-                        ColorDetectionPipeline.currentLowHSV.set(new double[]{HSV.val[0]+ inc, HSV.val[1], HSV.val[2]});
-                    } else if (gp1.wasJustPressed(GamepadKeys.Button.DPAD_DOWN)) {
-                        ColorDetectionPipeline.currentLowHSV.set(new double[]{HSV.val[0]- inc, HSV.val[1], HSV.val[2]});
-                    }
-                    if (gp1.wasJustPressed(GamepadKeys.Button.DPAD_RIGHT)) {
-                        ColorDetectionPipeline.currentLowHSV.set(new double[]{HSV.val[0], HSV.val[1]+ inc, HSV.val[2]});
-                    } else if (gp1.wasJustPressed(GamepadKeys.Button.DPAD_LEFT)) {
-                        ColorDetectionPipeline.currentLowHSV.set(new double[]{HSV.val[0], HSV.val[1]- inc, HSV.val[2]});
-                    }
-                    if (gp1.wasJustPressed(GamepadKeys.Button.RIGHT_BUMPER)) {
-                        ColorDetectionPipeline.currentLowHSV.set(new double[]{HSV.val[0], HSV.val[1], HSV.val[2]+ inc});
-                    } else if (gp1.wasJustPressed(GamepadKeys.Button.LEFT_BUMPER)) {
-                        ColorDetectionPipeline.currentLowHSV.set(new double[]{HSV.val[0], HSV.val[1], HSV.val[2]- inc});
-                    }
+            if (highOrLow == 0) {
+                HSV = ColorDetectionPipeline.currentHighHSV;
+                if (gp1.wasJustPressed(GamepadKeys.Button.DPAD_UP)) {
+                    ColorDetectionPipeline.currentHighHSV.set(new double[]{HSV.val[0]+ inc, HSV.val[1], HSV.val[2]});
+                } else if (gp1.wasJustPressed(GamepadKeys.Button.DPAD_DOWN)) {
+                    ColorDetectionPipeline.currentHighHSV.set(new double[]{HSV.val[0]- inc, HSV.val[1], HSV.val[2]});
                 }
+                if (gp1.wasJustPressed(GamepadKeys.Button.DPAD_LEFT)) {
+                    ColorDetectionPipeline.currentHighHSV.set(new double[]{HSV.val[0], HSV.val[1]+ inc, HSV.val[2]});
+                } else if (gp1.wasJustPressed(GamepadKeys.Button.DPAD_RIGHT)) {
+                    ColorDetectionPipeline.currentHighHSV.set(new double[]{HSV.val[0], HSV.val[1]- inc, HSV.val[2]});
+                }
+                if (gp1.wasJustPressed(GamepadKeys.Button.RIGHT_BUMPER)) {
+                    ColorDetectionPipeline.currentHighHSV.set(new double[]{HSV.val[0], HSV.val[1], HSV.val[2]+ inc});
+                } else if (gp1.wasJustPressed(GamepadKeys.Button.LEFT_BUMPER)) {
+                    ColorDetectionPipeline.currentHighHSV.set(new double[]{HSV.val[0], HSV.val[1], HSV.val[2]- inc});
+                }
+            } else {
+                HSV = ColorDetectionPipeline.currentLowHSV;
+                if (gp1.wasJustPressed(GamepadKeys.Button.DPAD_UP)) {
+                    ColorDetectionPipeline.currentLowHSV.set(new double[]{HSV.val[0]+ inc, HSV.val[1], HSV.val[2]});
+                } else if (gp1.wasJustPressed(GamepadKeys.Button.DPAD_DOWN)) {
+                    ColorDetectionPipeline.currentLowHSV.set(new double[]{HSV.val[0]- inc, HSV.val[1], HSV.val[2]});
+                }
+                if (gp1.wasJustPressed(GamepadKeys.Button.DPAD_RIGHT)) {
+                    ColorDetectionPipeline.currentLowHSV.set(new double[]{HSV.val[0], HSV.val[1]+ inc, HSV.val[2]});
+                } else if (gp1.wasJustPressed(GamepadKeys.Button.DPAD_LEFT)) {
+                    ColorDetectionPipeline.currentLowHSV.set(new double[]{HSV.val[0], HSV.val[1]- inc, HSV.val[2]});
+                }
+                if (gp1.wasJustPressed(GamepadKeys.Button.RIGHT_BUMPER)) {
+                    ColorDetectionPipeline.currentLowHSV.set(new double[]{HSV.val[0], HSV.val[1], HSV.val[2]+ inc});
+                } else if (gp1.wasJustPressed(GamepadKeys.Button.LEFT_BUMPER)) {
+                    ColorDetectionPipeline.currentLowHSV.set(new double[]{HSV.val[0], HSV.val[1], HSV.val[2]- inc});
+                }
+            }
 
 
 
@@ -120,7 +119,7 @@ public class ColorDetectionTest extends LinearOpMode {
             if (choice) {
                 telemetry.addLine("Current Pipeline: Vig's ColorDetectionPipeline");
                 telemetry.addData("Spikemark Status", ColorDetectionTryPipeline.spikeMark);
-                telemetry.addData("width", ColorDetectionTryPipeline.width);
+//                telemetry.addData("width", ColorDetectionTryPipeline.width);
 
             } else {
                 telemetry.addLine("Current Pipeline: ColorDetectionPipeline");
@@ -147,7 +146,7 @@ public class ColorDetectionTest extends LinearOpMode {
             if (choice) {
                 telemetry.addLine("Current Pipeline: Vig's ColorDetectionPipeline");
                 telemetry.addData("Spikemark Status", ColorDetectionTryPipeline.spikeMark);
-                telemetry.addData("width", ColorDetectionTryPipeline.width);
+//                telemetry.addData("width", ColorDetectionTryPipeline.width);
                 telemetry.addData("cycle", time - cycleTime);
                 cycleTime = time;
             } else {

@@ -12,7 +12,7 @@ import org.opencv.core.Scalar;
 public class ColorDetectionPipeline2 extends OpenCvPipeline {
     // VARIABLES
     Telemetry telemetry;
-    public static int minimumAvg = 50;
+    public int minimumAvg = 50;
 
     // Processing frames
     private Mat matYCrCb = new Mat();;
@@ -26,8 +26,8 @@ public class ColorDetectionPipeline2 extends OpenCvPipeline {
     private Mat matCrLeft = new Mat();
 
     // Average Cb and Cr values
-    private double avgCenter = 0;
-    private double avgLeft = 0;
+    public double avgCenter = 0;
+    public double avgLeft = 0;
 
     // Configurations
     public enum SpikeMark{
