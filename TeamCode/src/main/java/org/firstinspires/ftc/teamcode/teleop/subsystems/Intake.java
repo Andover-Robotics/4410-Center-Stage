@@ -14,7 +14,7 @@ public class Intake {
     private final Servo intakeLeft, intakeRight;
 
     public double power = 0.25, counterPower = 1.0; // optimal speed for intake
-    public double intakeStorage = 1.0, intakeGround = 0.0; // TODO: TUNE THESE VALUES
+    public double intakeStorage = 0.0, intakeOut = 0.27; // TODO: TUNE THESE VALUES
     private boolean isRunning = false;
 
     public Intake(OpMode opMode){
@@ -53,7 +53,7 @@ public class Intake {
 
     public void setIntakeHeight(double position) {
         intakeLeft.setPosition(position);
-        intakeRight.setPosition(position);
+        intakeRight.setPosition(1-position);
     }
 
     public double getIntakeHeight() {

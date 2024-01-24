@@ -9,8 +9,9 @@ import com.acmerobotics.dashboard.config.Config;
 @Config
 public class V4B {
     public final Servo armLeft, armRight, wrist;
-    public static double armOuttake = 0.26, armTopOuttake = 0.23, armStorage = 0.74, armGround = 0.0, armTopPixel = 0.82, armBottomPixel = 0.9, armDualPickup = 0.93, armBlock = 0.84;
-    public static double wristBottomOuttake = 0.44, wristTopOuttake = 0.55,  wristStorage = 0.24, wristGround = 0.30, wristTopPixel = 0.245, wristBottomPixel = 0.24, wristDualPickup = 0.22, wristTransfer = 0.22, wristBlock = 0.08;
+
+    public static double armBottomOuttake = 0.26, armTopOuttake = 0.23, armStorage = 0.82, armGround = 0.10, armDualPickup = 0.95, armBlock = 0.84;
+    public static double wristBottomOuttake = 0.12, wristTopOuttake = 0.12,  wristStorage = 0.98, wristGround = 0.0, wristDualPickup = 0.94, wristBlock = 0.08;
 
     public V4B(OpMode opMode) {
         armLeft = opMode.hardwareMap.servo.get("armLeft");
@@ -36,12 +37,11 @@ public class V4B {
     }
 
     public void dualOuttake(int pixel) {
-        setArm(wristTransfer);
         if (pixel == 1){
             setArm(armTopOuttake);
             setWrist(wristTopOuttake);
         } else {
-            setArm(armOuttake);
+            setArm(armBottomOuttake);
             setWrist(wristBottomOuttake);
         }
     }
@@ -54,13 +54,6 @@ public class V4B {
     public void storage() {
         setWrist(wristStorage);
         setArm(armStorage);
-    }
-
-    public void tapPixel(int i) {
-        switch (i) {
-            case 1: setWrist(wristTopPixel); setArm(armTopPixel); break;
-            case 2: setWrist(wristBottomPixel); setArm(armBottomPixel); break;
-        }
     }
 
     public void pickup() {
@@ -89,7 +82,11 @@ public class V4B {
         if (!auto) setArm(armTopOuttake); else setArm(0.21);
     }
 
-    // TODO: GET IK WORKING :D
+    // TODO: GET IK WORKING :D greyson gay
+    // i am gay - greyson 2024 1/23/24
+    //cap - Vignesha 1/23/24
+    // our robot is gay - anushka 1/23/24
+
     public void runAngle(double slidePosition) {
         double desiredAngle = 180 - 60.001 - Math.toDegrees(Math.asin((Math.sin(60.001) * 268.754 - (slidePosition / 8.558)) / 170.0));
         double newPosition = 0.00333 * desiredAngle;

@@ -106,34 +106,6 @@ public class MainTeleOp extends LinearOpMode {
 
             // FINITE STATES
             if (bot.state == Bot.BotState.STORAGE) { // INITIALIZED
-                // TRANSFER
-                if (gp2.wasJustPressed(GamepadKeys.Button.A)) { // fix bottom pixel
-                    thread = new Thread(() -> {
-                        bot.slides.runToBottom();
-                        bot.claw.fullOpen();
-                        sleep(100);
-                        bot.fourbar.pickup();
-                        sleep(400);
-                        bot.claw.pickupClose();
-                        sleep(300);
-                        bot.claw.fullOpen();
-                        bot.storage();
-                    });
-                    thread.start();
-                } else if(gp2.wasJustPressed(GamepadKeys.Button.LEFT_BUMPER)) { // fix top pixel
-                    thread = new Thread(() -> {
-                        bot.slides.runToBottom();
-                        bot.claw.fullOpen();
-                        sleep(100);
-                        bot.fourbar.tapPixel(1);
-                        sleep(400);
-                        bot.claw.pickupClose();
-                        sleep(300);
-                        bot.claw.fullOpen();
-                        bot.storage();
-                    });
-                    thread.start();
-                }
                 if (gp2.wasJustPressed(GamepadKeys.Button.B)) { // pickup pixel
                     thread = new Thread(() -> {
                         bot.slides.runToBottom();
@@ -170,9 +142,9 @@ public class MainTeleOp extends LinearOpMode {
                 if (gp2.wasJustPressed(GamepadKeys.Button.X)) { // go to outtake ground position
                     bot.outtakeGround();
                 }
-                //if (Math.abs(gp2.getLeftY()) > 0.01) {
-                //    bot.fourbar.runAngle(bot.slides.motorLeft.getCurrentPosition());
-                //}
+                if (Math.abs(gp2.getLeftY()) > 0.01) {
+                    bot.fourbar.runAngle(bot.slides.motorLeft.getCurrentPosition());
+                }
             } else if (bot.state == Bot.BotState.OUTTAKE_DOWN) { // SCORING GROUND
                 if (gp2.wasJustPressed(GamepadKeys.Button.X)) {
                     dropGround();
@@ -225,6 +197,7 @@ public class MainTeleOp extends LinearOpMode {
             }
             // AUTO ALIGN??????????
             if (gp1.wasJustPressed(GamepadKeys.Button.BACK)) {
+                drive.setPoseEstimate(PoseStorage.currentPose);
                 drive.followTrajectory(drive.trajectoryBuilder(drive.getPoseEstimate())
                         .splineToSplineHeading(new Pose2d(drive.getPoseEstimate().getX(), drive.getPoseEstimate().getY()+1, drive.getPoseEstimate().getHeading()), Math.toRadians(180))
                         .build());
@@ -233,13 +206,13 @@ public class MainTeleOp extends LinearOpMode {
             // INTAKE (driver 1)
             if (gp1.isDown(GamepadKeys.Button.LEFT_BUMPER)) { // intake
                 bot.intake(false);
-                if (bot.intake.getIntakeHeight() != bot.intake.intakeGround) {
-                    bot.intake.setIntakeHeight(bot.intake.intakeGround);
+                if (bot.intake.getIntakeHeight() != bot.intake.intakeOut) {
+                    bot.intake.setIntakeHeight(bot.intake.intakeOut);
                 }
             } else if (gp1.isDown(GamepadKeys.Button.RIGHT_BUMPER)) { // reverse intake
                 bot.intake(true);
-                if (bot.intake.getIntakeHeight() != bot.intake.intakeGround) {
-                    bot.intake.setIntakeHeight(bot.intake.intakeGround);
+                if (bot.intake.getIntakeHeight() != bot.intake.intakeOut) {
+                    bot.intake.setIntakeHeight(bot.intake.intakeOut);
                 }
             } else {
                 bot.intake.stopIntake();

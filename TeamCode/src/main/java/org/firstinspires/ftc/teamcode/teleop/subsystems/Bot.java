@@ -91,7 +91,7 @@ public class Bot {
     }
 
     public void intake(boolean isReverse) {
-        if (intake.getIntakeHeight() != intake.intakeGround) intake.setIntakeHeight(intake.intakeGround);
+        if (intake.getIntakeHeight() != intake.intakeOut) intake.setIntakeHeight(intake.intakeOut);
         if (!isReverse) {
             intake.runIntake();
         } else {
