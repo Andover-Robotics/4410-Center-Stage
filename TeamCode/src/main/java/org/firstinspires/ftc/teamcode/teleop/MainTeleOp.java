@@ -17,6 +17,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.auto.MainAutonomous;
 import org.firstinspires.ftc.teamcode.auto.drive.SampleMecanumDrive;
+import org.firstinspires.ftc.teamcode.auto.trajectorysequence.TrajectorySequence;
 import org.firstinspires.ftc.teamcode.auto.util.PoseStorage;
 import org.firstinspires.ftc.teamcode.teleop.subsystems.Bot;
 import org.firstinspires.ftc.teamcode.teleop.subsystems.Slides;
@@ -25,6 +26,7 @@ import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.trajectory.Trajectory;
 import com.acmerobotics.roadrunner.util.Angle;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.Gamepad;
 
 import java.lang.*;
 import java.util.Map;
@@ -220,6 +222,12 @@ public class MainTeleOp extends LinearOpMode {
             }
             if (gp1.wasJustReleased(GamepadKeys.Button.LEFT_STICK_BUTTON)) { // Reset heading
                 drive.setPoseEstimate(PoseStorage.currentPose);
+            }
+            // AUTO ALIGN??????????
+            if (gp1.wasJustPressed(GamepadKeys.Button.BACK)) {
+                drive.followTrajectory(drive.trajectoryBuilder(drive.getPoseEstimate())
+                        .splineToSplineHeading(new Pose2d(drive.getPoseEstimate().getX(), drive.getPoseEstimate().getY()+1, drive.getPoseEstimate().getHeading()), Math.toRadians(180))
+                        .build());
             }
 
             // INTAKE (driver 1)

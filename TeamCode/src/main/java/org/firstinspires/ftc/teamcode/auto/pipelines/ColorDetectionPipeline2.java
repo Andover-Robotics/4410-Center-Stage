@@ -12,7 +12,6 @@ import org.opencv.core.Scalar;
 public class ColorDetectionPipeline2 extends OpenCvPipeline {
     // VARIABLES
     Telemetry telemetry;
-    public int minimumAvg = 50;
 
     // Processing frames
     private Mat matYCrCb = new Mat();;
@@ -28,6 +27,7 @@ public class ColorDetectionPipeline2 extends OpenCvPipeline {
     // Average Cb and Cr values
     public double avgCenter = 0;
     public double avgLeft = 0;
+    public double minimumAvg = 50;
 
     // Configurations
     public enum SpikeMark{
@@ -75,8 +75,8 @@ public class ColorDetectionPipeline2 extends OpenCvPipeline {
 
         // Extract color based off of alliance
         if (alliance == 1) { // Blue
-            Core.extractChannel(spikeCenter, matCbCenter, 2);
-            Core.extractChannel(spikeLeft, matCbLeft, 2);
+            Core.extractChannel(spikeCenter, matCbCenter, 1);
+            Core.extractChannel(spikeLeft, matCbLeft, 1);
             // Calculate average
             Scalar meanCenter = Core.mean(matCbCenter);
             Scalar meanLeft = Core.mean(matCbLeft);
