@@ -17,7 +17,6 @@ public class Slides {
 
     public final MotorEx motorLeft;
     public final MotorEx motorRight;
-    public final MotorEx motorCenter;
     private PIDFController controller;
 
     public enum Position {
@@ -44,11 +43,9 @@ public class Slides {
     public Slides(OpMode opMode) {
         motorLeft = new MotorEx(opMode.hardwareMap, "slidesLeft", Motor.GoBILDA.RPM_312);
         motorRight = new MotorEx(opMode.hardwareMap, "slidesRight", Motor.GoBILDA.RPM_312);
-        motorCenter = new MotorEx(opMode.hardwareMap, "slidesCenter", Motor.GoBILDA.RPM_312);
 
         motorRight.setInverted(true);
         motorLeft.setInverted(false);
-        motorCenter.setInverted(false);
 
         controller = new PIDFController(p, i, d, f);
         controller.setTolerance(tolerance);
@@ -58,8 +55,6 @@ public class Slides {
         motorLeft.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
         motorRight.setRunMode(Motor.RunMode.RawPower);
         motorRight.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
-        motorCenter.setRunMode(Motor.RunMode.RawPower);
-        motorCenter.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
 
         this.opMode = opMode;
     }
@@ -70,9 +65,6 @@ public class Slides {
 
         motorRight.setRunMode(Motor.RunMode.RawPower);
         motorRight.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
-
-        motorCenter.setRunMode(Motor.RunMode.RawPower);
-        motorCenter.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
 
         controller = new PIDFController(p, i, d, f);
         controller.setTolerance(tolerance);
@@ -115,7 +107,6 @@ public class Slides {
     public void periodic() {
         motorRight.setInverted(false);
         motorLeft.setInverted(true);
-        motorCenter.setInverted(true);
         controller.setPIDF(p, i, d, f);
         double dt = opMode.time - profile_init_time;
         if (!profiler.isOver()) {
@@ -126,7 +117,6 @@ public class Slides {
             }
             motorLeft.set(power);
             motorRight.set(power);
-            motorCenter.set(power);
         } else {
             if (profiler.isDone()) {
                 profiler = new MotionProfiler(30000, 20000);
@@ -135,23 +125,16 @@ public class Slides {
                 controller.setSetPoint(motorLeft.getCurrentPosition());
                 motorLeft.set(manualPower / manualDivide);
                 motorRight.set(manualPower / manualDivide);
-                motorCenter.set(manualPower / manualDivide);
             } else {
                 power = staticF * controller.calculate(motorLeft.getCurrentPosition());
                 motorLeft.set(power);
                 motorRight.set(power);
-                if (power < Math.abs(0.1)) {
-                    motorCenter.set(0);
-                } else {
-                    motorCenter.set(power);
-                }
-
             }
         }
     }
 
     public double getCurrent() {
-        return motorLeft.motorEx.getCurrent(CurrentUnit.MILLIAMPS) + motorRight.motorEx.getCurrent(CurrentUnit.MILLIAMPS) + motorCenter.motorEx.getCurrent(CurrentUnit.MILLIAMPS);
+        return motorLeft.motorEx.getCurrent(CurrentUnit.MILLIAMPS) + motorRight.motorEx.getCurrent(CurrentUnit.MILLIAMPS);
     }
 
     public void resetEncoder() {
