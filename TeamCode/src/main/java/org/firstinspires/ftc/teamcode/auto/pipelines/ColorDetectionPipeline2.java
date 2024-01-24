@@ -12,6 +12,7 @@ import org.opencv.core.Scalar;
 public class ColorDetectionPipeline2 extends OpenCvPipeline {
     // VARIABLES
     Telemetry telemetry;
+    public static int minimumAvg = 50;
 
     // Processing frames
     private Mat matYCrCb = new Mat();;
@@ -34,22 +35,26 @@ public class ColorDetectionPipeline2 extends OpenCvPipeline {
     }
     public SpikeMark spikeMark = SpikeMark.NONE;
     public static int alliance = 0; // Alliance: 0 - NONE, 1 - RED, 2 - BLUE
+    public void setAlliance(int alliance) {
+        this.alliance = alliance;
+    }
 
     // CONSTRUCTOR
     public ColorDetectionPipeline2(Telemetry telemetry){
         spikeMark = SpikeMark.NONE;
         this.telemetry = telemetry;
     }
-    public void setAlliance(int alliance) {
-        this.alliance = alliance;
-    }
+
+    // Execute logic
     public int getSpikeMark() {
-        switch (spikeMark) {
-            case LEFT: return 1;
-            case MIDDLE: return 2;
-            case RIGHT: return 3;
+        if (getAvgLeft() < minimumAvg && getAvgCenter() < minimumAvg) { // Right, both avgs is too small
+            return 3;
+        } else if (getAvgCenter() < getAvgLeft()) { // Left, left avg greater than center avg
+            return 1;
+        } else if (getAvgLeft() < getAvgCenter()) { // Center, center avg greater than left avg
+            return 2;
         }
-        return 0; // None detected
+        return 3;
     }
 
     // PROCESSING FRAMES
@@ -69,7 +74,7 @@ public class ColorDetectionPipeline2 extends OpenCvPipeline {
         spikeLeft = matYCrCb.submat(rectLeft);
 
         // Extract color based off of alliance
-        if (alliance == 1) {
+        if (alliance == 1) { // Blue
             Core.extractChannel(spikeCenter, matCbCenter, 2);
             Core.extractChannel(spikeLeft, matCbLeft, 2);
             // Calculate average
@@ -77,7 +82,7 @@ public class ColorDetectionPipeline2 extends OpenCvPipeline {
             Scalar meanLeft = Core.mean(matCbLeft);
             avgCenter = meanCenter.val[0];
             avgLeft = meanLeft.val[0];
-        } else if (alliance == 2) {
+        } else if (alliance == 2) { // Red
             Core.extractChannel(spikeCenter, matCrCenter, 2);
             Core.extractChannel(spikeLeft, matCrLeft, 2);
             // Calculate average

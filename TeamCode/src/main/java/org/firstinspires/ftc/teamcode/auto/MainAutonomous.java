@@ -288,14 +288,6 @@ public class MainAutonomous extends LinearOpMode {
 
 
             spikeMark = colorDetection.getSpikeMark();
-            if (colorDetection.getAvgCenter() <= 100 && colorDetection.getAvgLeft() <= 100) {
-                spikeMark = 1;
-            } else if (colorDetection.getAvgCenter() >= 100 && colorDetection.getAvgLeft() >= 100) {
-                spikeMark = 2;
-            } else {
-                spikeMark = 3;
-            }
-
             String spikeMarkString = "";
             switch (spikeMark) {
                 case 1: spikeMarkString = "Left"; break;
