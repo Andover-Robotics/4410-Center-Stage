@@ -142,8 +142,8 @@ public class MainTeleOp extends LinearOpMode {
                 if (gp2.wasJustPressed(GamepadKeys.Button.X)) { // go to outtake ground position
                     bot.outtakeGround();
                 }
-                if (Math.abs(gp2.getLeftY()) > 0.01) {
-                    bot.fourbar.runAngle(bot.slides.motorLeft.getCurrentPosition());
+                if (Math.abs(gp2.getRightY()) > 0.01) {
+                    bot.slides.runAngle(bot.fourbar.getArmPosition());
                 }
             } else if (bot.state == Bot.BotState.OUTTAKE_DOWN) { // SCORING GROUND
                 if (gp2.wasJustPressed(GamepadKeys.Button.X)) {

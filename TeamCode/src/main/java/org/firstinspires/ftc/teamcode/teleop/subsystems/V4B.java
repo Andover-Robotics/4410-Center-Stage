@@ -87,12 +87,4 @@ public class V4B {
     //cap - Vignesha 1/23/24
     // our robot is gay - anushka 1/23/24
 
-    public void runAngle(double slidePosition) {
-        double desiredAngle = 180 - 60.001 - Math.toDegrees(Math.asin((Math.sin(60.001) * 268.754 - (slidePosition / 8.558)) / 170.0));
-        double newPosition = 0.00333 * desiredAngle;
-        if (slidePosition > -1500) {
-            setArm(newPosition);
-        }
-    }
-
 }
