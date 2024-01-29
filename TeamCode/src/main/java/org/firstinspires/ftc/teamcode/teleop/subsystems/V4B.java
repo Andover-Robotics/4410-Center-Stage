@@ -82,9 +82,4 @@ public class V4B {
         if (!auto) setArm(armTopOuttake); else setArm(0.21);
     }
 
-    // TODO: GET IK WORKING :D greyson gay
-    // i am gay - greyson 2024 1/23/24
-    //cap - Vignesha 1/23/24
-    // our robot is gay - anushka 1/23/24
-
 }

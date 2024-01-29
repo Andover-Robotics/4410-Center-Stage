@@ -136,7 +136,7 @@ public class Slides {
     public void runAngle(double desiredAngle) {
 //        double desiredAngle = 180 - 60.001 - Math.toDegrees(Math.asin((Math.sin(60.001) * 268.754 - (slidePosition / 8.558)) / 170.0));
         double slidePosition = 8.558*(Math.sin(60.001)*268.754 - Math.sin(170*Math.toRadians(desiredAngle+119.999)));
-        runTo(slidePosition*3);
+        runTo(slidePosition*300);
 //        double newPosition = 0.00333 * desiredAngle;
 //        if (slidePosition > -1500) {
 //            setArm(newPosition);

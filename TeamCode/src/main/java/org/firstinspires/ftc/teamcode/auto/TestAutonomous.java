@@ -39,11 +39,20 @@ import java.util.Objects;
 @Autonomous(name = "TestAutonomous")
 public class TestAutonomous extends LinearOpMode {
     Bot bot;
-    public static double stackDelay = 0.0; // Delay before going to stack
+    private int secondsElapsed = 0; // Track how many seconds have passed
+
+    // CONFIGURATION VARIABLES
     public static int park = 0; // Parking position (0-none, 1-left, 2-right)
     public static int side = 1; // Side (1-close, 2-far)
+    public static int alliance = 1; // Side (1-red, 2-blue)
     public static int spikeMark = 0; // Which spike mark randomization object is detected on (1-left, 2-center, 3-right)
-    private int secondsElapsed = 0; // Track how many seconds have passed
+    // BOOLEANS
+    public static boolean toBackboard = true; // Go to backboard or stop after scoring purple pixel on spike mark
+    public static boolean toStack = false; // Go to pixel stack for extra points or stop after scoring yellow pixel
+    // DELAYS
+    public static double spikeDelay = 0.0; // Delay before going to spike mark
+    public static double stackDelay = 0.0; // Delay before going to stack, will park on side and wait
+    public static double backboardDelay = 0.0; // Delay before going to backboard, after scoring spike mark
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -110,7 +119,29 @@ public class TestAutonomous extends LinearOpMode {
         });
         pickup.start();
 
+        // Configuration variables
         boolean dropped = false;
+        String allianceString = "RED", sideString = "CLOSE", spikeMarkString = "";
+        //LIST OF CONFIGURATION CONTROLS: last updated 1/29/24 - zachery
+        /*
+            buttons
+        Y - change alliance
+        A - change side
+        X -
+        B -
+            dpad
+        UP - backboard delay
+        DOWN - spike mark delay
+        LEFT - stack delay
+        RIGHT -
+            joysticks
+        LEFT BUTTON - toggle to backboard
+        RIGHT BUTTON - toggle to stack
+            misc.
+        START - drop/pickup
+        BACK -
+         */
+        // Initialized configurations start
         while (!isStarted()) {
             gp1.readButtons();
 
@@ -119,7 +150,7 @@ public class TestAutonomous extends LinearOpMode {
                 if (!dropped){ // Drop
                     bot.claw.fullOpen();
                     dropped = true;
-                } else { // Re-grip
+                } else { // Pickup
                     bot.slides.runToBottom();
                     bot.claw.fullOpen();
                     sleep(100);
@@ -132,32 +163,53 @@ public class TestAutonomous extends LinearOpMode {
                 }
             }
 
+            // Change alliance
+            if (gp1.wasJustPressed(GamepadKeys.Button.Y)) {
+                alliance = alliance == 1 ? 2 : 1;
+                allianceString = alliance == 1 ? "BLUE" : "RED";
+            }
             // Change side
             if (gp1.wasJustPressed(GamepadKeys.Button.A)) {
                 side = side == 1 ? 2 : 1;
+                sideString = side == 1 ? "FAR" : "CLOSE";
             }
-            telemetry.addData("side", side);
+            telemetry.addData("side", sideString + " alliance: " + allianceString);
 
-            // Change stack wait time
+            // DELAYS
+            // Backboard
+            if (gp1.wasJustPressed(GamepadKeys.Button.DPAD_UP)) {
+                if (backboardDelay < 10.0) backboardDelay+=1.0;
+                else backboardDelay = 0.0;
+            }
+            // Spike mark
+            if (gp1.wasJustPressed(GamepadKeys.Button.DPAD_DOWN)) {
+                if (spikeDelay < 10.0) spikeDelay+=1.0;
+                else spikeDelay = 0.0;
+            }
+            // Stack
             if (gp1.wasJustPressed(GamepadKeys.Button.DPAD_LEFT)) {
                 if (stackDelay < 10.0) stackDelay+=1.0;
                 else stackDelay = 0.0;
             }
-            telemetry.addData("stack delay", stackDelay);
+            telemetry.addData("delays(s): backboard", backboardDelay + " spike: " + spikeDelay + " stack: " + stackDelay);
+
+            // Toggle to backboard
+            if (gp1.wasJustPressed(GamepadKeys.Button.LEFT_STICK_BUTTON)) toBackboard = !toBackboard;
+            telemetry.addData("to backboard", toBackboard);
+            // Toggle to stack
+            if (gp1.wasJustPressed(GamepadKeys.Button.RIGHT_STICK_BUTTON)) toStack = !toStack;
+            telemetry.addData("to stack", toStack);
 
             // Initiate color detection
+            colorDetection.setAlliance(alliance);
             spikeMark = colorDetection.getSpikeMark();
-            String spikeMarkString = "";
             switch (spikeMark) {
-                case 1: spikeMarkString = "left"; break;
-                case 2: spikeMarkString = "center"; break;
-                case 3: spikeMarkString = "right"; break;
-                default: spikeMarkString = "none"; break;
+                case 1: spikeMarkString = "LEFT"; break;
+                case 2: spikeMarkString = "CENTER"; break;
+                case 3: spikeMarkString = "RIGHT"; break;
+                default: spikeMarkString = "NONE"; break;
             }
             telemetry.addData("detected spike", spikeMarkString);
-
-            // Controls
-            telemetry.addLine("START-drop/pickup, A-side, DPAD_LEFT-stack delay");
 
             // Update
             telemetry.update();
@@ -189,7 +241,7 @@ public class TestAutonomous extends LinearOpMode {
                             .lineToLinearHeading(new Pose2d(28, 25, Math.toRadians(180)))
                             .build(); break;
                     case 3: spikeTrajectory = drive.trajectorySequenceBuilder(startPose).back(2)
-                            .splineToConstantHeading(new Vector2d(25, 40), Math.toRadians(300))
+                            .splineToConstantHeading(new Vector2d(25, 40), Math.toRadians(225))
                             .splineToSplineHeading(new Pose2d(12, 33, Math.toRadians(180)), Math.toRadians(180))
                             .build(); break;
                 }
@@ -202,87 +254,93 @@ public class TestAutonomous extends LinearOpMode {
                     case 3:
                 }
             }
+            sleep((long) spikeDelay * 100);
             drive.followTrajectorySequence(spikeTrajectory);
             // Place purple pixel - 0.5 seconds
             bot.intake(true);
             sleep(500);
 
             // To backboard
-            // Define backboard y value
-            int backboardX = 51, backboardY = 0;
-            switch (spikeMark) {
-                case 1: backboardY = 35; break;
-                case 2: backboardY = 41; break;
-                case 3: backboardY = 29; break;
-            }
-            drive.followTrajectorySequence(drive.trajectorySequenceBuilder(drive.getPoseEstimate())
-                    .lineToLinearHeading(new Pose2d(backboardX, backboardY, Math.toRadians(180)))
-                    .addDisplacementMarker(10, () -> {
-                        bot.fourbar.topOuttake(true);
-                        bot.fourbar.setArm(0.21);
-                    })
-                    .build());
-            // Place yellow pixel - 0.5 seconds
-            bot.claw.setPosition(0.66);
-            sleep(400);
-            bot.fourbar.setWrist(0.65);
-            sleep(100);
-
-            // Pixel stack trajectory starts here
-            // Check if there is stack delay, if there is, run to corner
-            if (stackDelay != 0.0) {
+            if (toBackboard) {
+                // Define backboard y value
+                int backboardX = 51, backboardY = 0;
+                switch (spikeMark) {
+                    case 1: backboardY = 35; break;
+                    case 2: backboardY = 41; break;
+                    case 3: backboardY = 29; break;
+                }
                 drive.followTrajectorySequence(drive.trajectorySequenceBuilder(drive.getPoseEstimate())
-                    .splineToLinearHeading(new Pose2d(55, 11, Math.toRadians(180)),Math.toRadians(20))
-                    .waitSeconds(stackDelay)
-                    .build());
-            }
-            // To pixel stack
-            drive.followTrajectorySequence(drive.trajectorySequenceBuilder(drive.getPoseEstimate())
-                    .splineToLinearHeading(new Pose2d(30, 11, Math.toRadians(180)), Math.toRadians(180))
-                    .addDisplacementMarker(2, () -> {
-                        bot.storage();
-                        bot.claw.close();
-                    })
-                    .lineToLinearHeading(new Pose2d(-60, 11, Math.toRadians(180)))
-                    .build());
-            // Intake from stack - 1 second
-            bot.intake.setIntakeHeight(0.5);
-            bot.intake(false);
-            sleep(1000);
-            bot.intake.stopIntake();
-            bot.intake.setIntakeHeight(bot.intake.intakeStorage);
-            // To backboard
-            drive.followTrajectorySequence(drive.trajectorySequenceBuilder(drive.getPoseEstimate())
-                    .lineToLinearHeading(new Pose2d(38, 11, Math.toRadians(180)))
-                    .splineToLinearHeading(new Pose2d(50, 30, Math.toRadians(180)), Math.toRadians(90))
-                    .addDisplacementMarker(5, () -> {
-                        bot.slides.runTo(-500.0);
-                        bot.outtakeOut(2);
-                        bot.fourbar.setArm(0.21);
-                    })
-                    .build());
-            // Score pixels on backboard - 0.8 seconds
-            bot.claw.halfOpen();
-            sleep(500);
-            bot.slides.runTo(-700.0);
-            bot.outtakeOut(1);
-            sleep(300);
-            bot.claw.setPosition(0.66);
-            sleep(200);
+                        .waitSeconds(backboardDelay)
+                        .lineToLinearHeading(new Pose2d(backboardX, backboardY, Math.toRadians(180)))
+                        .addDisplacementMarker(10, () -> {
+                            bot.fourbar.topOuttake(true);
+                            bot.fourbar.setArm(0.21);
+                        })
+                        .build());
+                // Place yellow pixel - 0.5 seconds
+                bot.claw.setPosition(0.66);
+                sleep(400);
+                bot.fourbar.setWrist(0.65);
+                sleep(100);
 
-            // Parking trajectory
-            if (park != 0) {
-                // Define parking y value
-                int parkY = 0;
-                if (park == 1) parkY = 59; else if (park == 2) parkY = 11;
-                // To park
-                drive.followTrajectorySequence(drive.trajectorySequenceBuilder(drive.getPoseEstimate())
-                    .splineToLinearHeading(new Pose2d(52, parkY, Math.toRadians(180)),Math.toRadians(15))
-                    .addDisplacementMarker(2, () -> {
-                        bot.storage();
-                        bot.claw.close();
-                    })
-                    .build());
+                // Pixel stack trajectory starts here
+                if (toStack) {
+                    // Check if there is stack delay, if there is, run to corner
+                    if (stackDelay != 0.0) {
+                        drive.followTrajectorySequence(drive.trajectorySequenceBuilder(drive.getPoseEstimate())
+                                .splineToLinearHeading(new Pose2d(55, 11, Math.toRadians(180)),Math.toRadians(20))
+                                .waitSeconds(stackDelay)
+                                .build());
+                    }
+                    // To pixel stack
+                    drive.followTrajectorySequence(drive.trajectorySequenceBuilder(drive.getPoseEstimate())
+                            .splineToLinearHeading(new Pose2d(30, 11, Math.toRadians(180)), Math.toRadians(180))
+                            .addDisplacementMarker(2, () -> {
+                                bot.storage();
+                                bot.claw.close();
+                            })
+                            .lineToLinearHeading(new Pose2d(-60, 11, Math.toRadians(180)))
+                            .build());
+                    // Intake from stack - 1 second
+                    bot.intake.setIntakeHeight(bot.intake.intakeStack1);
+                    bot.intake(false);
+                    sleep(1000);
+                    bot.intake.setIntakeHeight(bot.intake.intakeStorage);
+                    // To backboard
+                    drive.followTrajectorySequence(drive.trajectorySequenceBuilder(drive.getPoseEstimate())
+                            .lineToLinearHeading(new Pose2d(38, 11, Math.toRadians(180)))
+                            .splineToLinearHeading(new Pose2d(50, 30, Math.toRadians(180)), Math.toRadians(90))
+                            .addDisplacementMarker(5, () -> {
+                                bot.slides.runTo(-500.0);
+                                bot.outtakeOut(2);
+                                bot.fourbar.setArm(0.21);
+                            })
+                            .build());
+                    // Score pixels on backboard - 0.8 seconds
+                    bot.intake.stopIntake();
+                    bot.claw.halfOpen();
+                    sleep(500);
+                    bot.slides.runTo(-700.0);
+                    bot.outtakeOut(1);
+                    sleep(300);
+                    bot.claw.setPosition(0.66);
+                    sleep(200);
+                }
+
+                // Parking trajectory
+                if (park != 0) {
+                    // Define parking y value
+                    int parkY = 0;
+                    if (park == 1) parkY = 59; else if (park == 2) parkY = 11;
+                    // To park
+                    drive.followTrajectorySequence(drive.trajectorySequenceBuilder(drive.getPoseEstimate())
+                            .splineToLinearHeading(new Pose2d(52, parkY, Math.toRadians(180)),Math.toRadians(15))
+                            .addDisplacementMarker(2, () -> {
+                                bot.storage();
+                                bot.claw.close();
+                            })
+                            .build());
+                }
             }
 
             // Stop op mode

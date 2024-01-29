@@ -59,11 +59,12 @@ public class MeepMeepTesting {
                 .followTrajectorySequence(drive -> drive.trajectorySequenceBuilder(blueCloseStart)
                         // 2+0
                         .back(2)
-                        .splineToConstantHeading(new Vector2d(25, 40), Math.toRadians(300))
+                        .splineToConstantHeading(new Vector2d(25, 40), Math.toRadians(225))
                         .splineToSplineHeading(new Pose2d(12, 33, Math.toRadians(180)), Math.toRadians(180))
                         .waitSeconds(0.5) // Place purple pixel
                         .lineToLinearHeading(new Pose2d(51, 29, Math.toRadians(180))) // To backboard
                         .waitSeconds(1) // Place yellow pixel
+                        .splineToLinearHeading(new Pose2d(52, 59, Math.toRadians(180)),Math.toRadians(15)) // To park
                         .build());
         // FAR
         Pose2d blueFarStart = new Pose2d(-35,60,Math.toRadians(90));
@@ -80,6 +81,20 @@ public class MeepMeepTesting {
                         .lineToSplineHeading(new Pose2d(25, 11, Math.toRadians(180)))
                         .splineToConstantHeading(new Vector2d(51, 29), Math.toRadians(0)) // To backboard
                         .waitSeconds(1) // Place yellow pixel
+                        // 2+2
+                        .splineToLinearHeading(new Pose2d(30, 11, Math.toRadians(180)), Math.toRadians(180)) // To stage door
+                        .lineToLinearHeading(new Pose2d(-60, 11, Math.toRadians(180))) // To stack across field
+                        .waitSeconds(1) // Intake from stack
+                        .lineToLinearHeading(new Pose2d(38, 11, Math.toRadians(180))) // Return across field
+                        .splineToLinearHeading(new Pose2d(50, 30, Math.toRadians(180)), Math.toRadians(90)) // To backboard
+                        .waitSeconds(1)
+                        // 2+4
+                        .splineToLinearHeading(new Pose2d(30, 11, Math.toRadians(180)), Math.toRadians(180)) // To stage door
+                        .lineToLinearHeading(new Pose2d(-60, 11, Math.toRadians(180))) // To stack across field
+                        .waitSeconds(1) // Intake from stack
+                        .lineToLinearHeading(new Pose2d(38, 11, Math.toRadians(180))) // Return across field
+                        .splineToLinearHeading(new Pose2d(50, 30, Math.toRadians(180)), Math.toRadians(90)) // To backboard
+                        .waitSeconds(1)
                         .splineToLinearHeading(new Pose2d(52, 11, Math.toRadians(180)),Math.toRadians(15)) // To park
                         .build());
         RoadRunnerBotEntity blueLeft2 = new DefaultBotBuilder(meepMeep)
@@ -87,7 +102,7 @@ public class MeepMeepTesting {
                 .setConstraints(60, 60, Math.toRadians(180), Math.toRadians(180), 15)
                 .followTrajectorySequence(drive -> drive.trajectorySequenceBuilder(blueFarStart)
                         // 2+1
-                        .lineToSplineHeading(new Pose2d(-46, 15, Math.toRadians(90))) // To spike mark
+                        .lineToSplineHeading(new Pose2d(-40, 15, Math.toRadians(0))) // To spike mark
                         .waitSeconds(0.5) // Place purple pixel
                         .splineToLinearHeading(new Pose2d(-35, 11, Math.toRadians(180)), Math.toRadians(0))
                         .forward(25)
@@ -99,7 +114,7 @@ public class MeepMeepTesting {
                         .build());
 
         meepMeep.setBackground(MeepMeep.Background.FIELD_CENTERSTAGE_OFFICIAL)
-                .addEntity(blueRight2)
+                .addEntity(blueRight1)
                 .start();
     }
 }

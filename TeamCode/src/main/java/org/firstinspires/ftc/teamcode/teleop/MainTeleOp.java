@@ -160,7 +160,6 @@ public class MainTeleOp extends LinearOpMode {
             // SLIDES
             // manual slides positioning with joystick
             bot.slides.runManual(gp2.getLeftY()*-0.5);
-
             // preset positions
             if (gp2.wasJustPressed(GamepadKeys.Button.DPAD_UP)) { // TOP
                 bot.claw.close();
