@@ -46,6 +46,7 @@ public class TestAutonomous extends LinearOpMode {
     public static int side = 1; // Side (1-close, 2-far)
     public static int alliance = 1; // Side (1-red, 2-blue)
     public static int spikeMark = 0; // Which spike mark randomization object is detected on (1-left, 2-center, 3-right)
+    public static int stackIterations = 0; // How many times go to stack (0-none, 1-2+2, 2-2+4, 3-2+5)
     // BOOLEANS
     public static boolean toBackboard = true; // Go to backboard or stop after scoring purple pixel on spike mark
     public static boolean toStack = false; // Go to pixel stack for extra points or stop after scoring yellow pixel
@@ -121,13 +122,13 @@ public class TestAutonomous extends LinearOpMode {
 
         // Configuration variables
         boolean dropped = false;
-        String allianceString = "RED", sideString = "CLOSE", spikeMarkString = "";
+        String allianceString = "RED", sideString = "CLOSE", spikeMarkString = "", stackString = "";
         //LIST OF CONFIGURATION CONTROLS: last updated 1/29/24 - zachery
         /*
             buttons
         Y - change alliance
         A - change side
-        X -
+        X - pixel stack config
         B -
             dpad
         UP - backboard delay
@@ -174,6 +175,17 @@ public class TestAutonomous extends LinearOpMode {
                 sideString = side == 1 ? "FAR" : "CLOSE";
             }
             telemetry.addData("side", sideString + " alliance: " + allianceString);
+
+            // Change pixel stack configurations
+            if (gp1.wasJustPressed(GamepadKeys.Button.B)) {
+                switch (stackIterations) {
+                    case 0: stackIterations = 1; toStack = true; stackString = "2+2"; break;
+                    case 1: stackIterations = 2; toStack = true; stackString = "2+4"; break;
+                    case 2: stackIterations = 3; toStack = true; stackString = "2+5"; break;
+                    case 3: stackIterations = 0; toStack = false; stackString = "2+0"; break;
+                }
+            }
+            telemetry.addData("pixel stack", stackString + " (iterations: " + stackIterations + ")");
 
             // DELAYS
             // Backboard
@@ -232,26 +244,30 @@ public class TestAutonomous extends LinearOpMode {
             // To spike mark
             // Define spike mark pose
             TrajectorySequence spikeTrajectory = null;
-            if (side == 1) { // Close side
-                switch (spikeMark) {
-                    case 1: spikeTrajectory = drive.trajectorySequenceBuilder(startPose)
-                            .lineToLinearHeading(new Pose2d(35, 35, Math.toRadians(180)))
-                            .build(); break;
-                    case 2: spikeTrajectory = drive.trajectorySequenceBuilder(startPose)
-                            .lineToLinearHeading(new Pose2d(28, 25, Math.toRadians(180)))
-                            .build(); break;
-                    case 3: spikeTrajectory = drive.trajectorySequenceBuilder(startPose).back(2)
-                            .splineToConstantHeading(new Vector2d(25, 40), Math.toRadians(225))
-                            .splineToSplineHeading(new Pose2d(12, 33, Math.toRadians(180)), Math.toRadians(180))
-                            .build(); break;
-                }
-            } else { // Far side
-                switch (spikeMark) {
-                    case 1: spikeTrajectory = drive.trajectorySequenceBuilder(startPose)
-                            .lineToSplineHeading(new Pose2d(-46, 15, Math.toRadians(90)))
-                            .build(); break;
-                    case 2:
-                    case 3:
+            if (alliance == 1) {
+
+            } else {
+                if (side == 1) { // Close side
+                    switch (spikeMark) {
+                        case 1: spikeTrajectory = drive.trajectorySequenceBuilder(startPose)
+                                .lineToLinearHeading(new Pose2d(35, 35, Math.toRadians(180)))
+                                .build(); break;
+                        case 2: spikeTrajectory = drive.trajectorySequenceBuilder(startPose)
+                                .lineToLinearHeading(new Pose2d(28, 25, Math.toRadians(180)))
+                                .build(); break;
+                        case 3: spikeTrajectory = drive.trajectorySequenceBuilder(startPose).back(2)
+                                .splineToConstantHeading(new Vector2d(25, 40), Math.toRadians(225))
+                                .splineToSplineHeading(new Pose2d(12, 33, Math.toRadians(180)), Math.toRadians(180))
+                                .build(); break;
+                    }
+                } else { // Far side
+                    switch (spikeMark) {
+                        case 1: spikeTrajectory = drive.trajectorySequenceBuilder(startPose)
+                                .lineToSplineHeading(new Pose2d(-46, 15, Math.toRadians(90)))
+                                .build(); break;
+                        case 2:
+                        case 3:
+                    }
                 }
             }
             sleep((long) spikeDelay * 100);
@@ -264,10 +280,18 @@ public class TestAutonomous extends LinearOpMode {
             if (toBackboard) {
                 // Define backboard y value
                 int backboardX = 51, backboardY = 0;
-                switch (spikeMark) {
-                    case 1: backboardY = 35; break;
-                    case 2: backboardY = 41; break;
-                    case 3: backboardY = 29; break;
+                if (alliance == 1) {
+                    switch (spikeMark) {
+                        case 1: backboardY = -30; break;
+                        case 2: backboardY = -36; break;
+                        case 3: backboardY = -41; break;
+                    }
+                } else {
+                    switch (spikeMark) {
+                        case 1: backboardY = 41; break;
+                        case 2: backboardY = 37; break;
+                        case 3: backboardY = 29; break;
+                    }
                 }
                 drive.followTrajectorySequence(drive.trajectorySequenceBuilder(drive.getPoseEstimate())
                         .waitSeconds(backboardDelay)
@@ -284,54 +308,61 @@ public class TestAutonomous extends LinearOpMode {
                 sleep(100);
 
                 // Pixel stack trajectory starts here
+                double [] stackHeights = {0.2, 0.26, 0.27}; // Array with preset stack heights
                 if (toStack) {
+                    int stackY1 = alliance == 1 ? -11 : 11;
+                    int stackY2 = alliance == 1 ? -30 : 30;
                     // Check if there is stack delay, if there is, run to corner
                     if (stackDelay != 0.0) {
                         drive.followTrajectorySequence(drive.trajectorySequenceBuilder(drive.getPoseEstimate())
-                                .splineToLinearHeading(new Pose2d(55, 11, Math.toRadians(180)),Math.toRadians(20))
+                                .splineToLinearHeading(new Pose2d(55, stackY1, Math.toRadians(180)),Math.toRadians(20))
                                 .waitSeconds(stackDelay)
                                 .build());
                     }
-                    // To pixel stack
-                    drive.followTrajectorySequence(drive.trajectorySequenceBuilder(drive.getPoseEstimate())
-                            .splineToLinearHeading(new Pose2d(30, 11, Math.toRadians(180)), Math.toRadians(180))
-                            .addDisplacementMarker(2, () -> {
-                                bot.storage();
-                                bot.claw.close();
-                            })
-                            .lineToLinearHeading(new Pose2d(-60, 11, Math.toRadians(180)))
-                            .build());
-                    // Intake from stack - 1 second
-                    bot.intake.setIntakeHeight(bot.intake.intakeStack1);
-                    bot.intake(false);
-                    sleep(1000);
-                    bot.intake.setIntakeHeight(bot.intake.intakeStorage);
-                    // To backboard
-                    drive.followTrajectorySequence(drive.trajectorySequenceBuilder(drive.getPoseEstimate())
-                            .lineToLinearHeading(new Pose2d(38, 11, Math.toRadians(180)))
-                            .splineToLinearHeading(new Pose2d(50, 30, Math.toRadians(180)), Math.toRadians(90))
-                            .addDisplacementMarker(5, () -> {
-                                bot.slides.runTo(-500.0);
-                                bot.outtakeOut(2);
-                                bot.fourbar.setArm(0.21);
-                            })
-                            .build());
-                    // Score pixels on backboard - 0.8 seconds
-                    bot.intake.stopIntake();
-                    bot.claw.halfOpen();
-                    sleep(500);
-                    bot.slides.runTo(-700.0);
-                    bot.outtakeOut(1);
-                    sleep(300);
-                    bot.claw.setPosition(0.66);
-                    sleep(200);
+                    for (int i = 0; i < stackIterations; i++) {
+                        // To pixel stack
+                        drive.followTrajectorySequence(drive.trajectorySequenceBuilder(drive.getPoseEstimate())
+                                .splineToLinearHeading(new Pose2d(30, stackY1, Math.toRadians(180)), Math.toRadians(180))
+                                .addDisplacementMarker(2, () -> {
+                                    bot.storage();
+                                    bot.claw.close();
+                                })
+                                .lineToLinearHeading(new Pose2d(-60, stackY1, Math.toRadians(180)))
+                                .build());
+                        // Intake from stack - 1 second
+                        bot.intake.setIntakeHeight(stackHeights[i]);
+                        bot.intake(false);
+                        sleep(1000);
+                        bot.intake.setIntakeHeight(bot.intake.intakeStorage);
+                        // To backboard
+                        double slidesHeight = -500.0 + (100.0 * i);
+                        drive.followTrajectorySequence(drive.trajectorySequenceBuilder(drive.getPoseEstimate())
+                                .lineToLinearHeading(new Pose2d(38, stackY1, Math.toRadians(180)))
+                                .splineToLinearHeading(new Pose2d(50, stackY2, Math.toRadians(180)), Math.toRadians(0))
+                                .addDisplacementMarker(5, () -> {
+                                    bot.slides.runTo(slidesHeight);
+                                    bot.outtakeOut(2);
+                                    bot.fourbar.setArm(0.21);
+                                })
+                                .build());
+                        // Score pixels on backboard - 0.8 seconds
+                        bot.intake.stopIntake();
+                        bot.claw.halfOpen();
+                        sleep(500);
+                        bot.slides.runTo(slidesHeight - 100.0);
+                        bot.outtakeOut(1);
+                        sleep(300);
+                        bot.claw.setPosition(0.66);
+                        sleep(200);
+                    }
                 }
 
                 // Parking trajectory
                 if (park != 0) {
                     // Define parking y value
                     int parkY = 0;
-                    if (park == 1) parkY = 59; else if (park == 2) parkY = 11;
+                    if (alliance == 1) { if (park == 1) parkY = -11; else if (park == 2) parkY = -59; }
+                    else { if (park == 1) parkY = 59; else if (park == 2) parkY = 11; }
                     // To park
                     drive.followTrajectorySequence(drive.trajectorySequenceBuilder(drive.getPoseEstimate())
                             .splineToLinearHeading(new Pose2d(52, parkY, Math.toRadians(180)),Math.toRadians(15))
