@@ -66,7 +66,7 @@ public class MainTeleOp extends LinearOpMode {
         // Initialize bot
         bot.stopMotors();
         bot.state = Bot.BotState.STORAGE;
-        bot.storage();
+        storage();
         bot.claw.fullOpen();
 
         /*
@@ -106,18 +106,19 @@ public class MainTeleOp extends LinearOpMode {
 
             // FINITE STATES
             if (bot.state == Bot.BotState.STORAGE) { // INITIALIZED
-                if (gp2.wasJustPressed(GamepadKeys.Button.A)) { // fix bottom pixel
+                if (gp2.wasJustPressed(GamepadKeys.Button.A)) { // fix pixels
                     thread = new Thread(() -> {
                         bot.slides.runToBottom();
                         bot.claw.fullOpen();
                         bot.intake.setIntakeHeight(0.1);
                         sleep(100);
                         bot.fourbar.bottomPixel();
-                        sleep(400);
-                        bot.claw.pickupClose();
                         sleep(300);
+                        bot.claw.pickupClose();
+                        sleep(250);
+                        storage();
+                        sleep(50);
                         bot.claw.fullOpen();
-                        bot.storage();
                     });
                     thread.start();
                 }
@@ -125,13 +126,12 @@ public class MainTeleOp extends LinearOpMode {
                     thread = new Thread(() -> {
                         bot.slides.runToBottom();
                         bot.claw.fullOpen();
-                        bot.intake.setIntakeHeight(0.1);
                         sleep(100);
                         bot.fourbar.pickup();
                         sleep(400);
                         bot.claw.pickupClose();
                         sleep(300);
-                        bot.storage();
+                        storage();
                     });
                     thread.start();
                 }
@@ -155,7 +155,7 @@ public class MainTeleOp extends LinearOpMode {
                     drop();
                 }
                 if (gp2.wasJustPressed(GamepadKeys.Button.B)) { // cancel and return to storage
-                    bot.storage();
+                    storage();
                 }
                 if (gp2.wasJustPressed(GamepadKeys.Button.X)) { // go to outtake ground position
                     bot.outtakeGround();
@@ -168,7 +168,7 @@ public class MainTeleOp extends LinearOpMode {
                     dropGround();
                 }
                 if (gp2.wasJustPressed(GamepadKeys.Button.A)) { // cancel and return to storage
-                    bot.storage();
+                    storage();
                 }
                 if (gp2.wasJustPressed(GamepadKeys.Button.Y)) { // go to outtake out position
                     bot.outtakeOut(bot.claw.getClawState());
@@ -187,7 +187,7 @@ public class MainTeleOp extends LinearOpMode {
                     bot.outtakeOut((bot.claw.getClawState()));
                 });
                 thread.start();
-            } else if (gp2.wasJustPressed(GamepadKeys.Button.DPAD_LEFT)) { // MIDDLE
+            } else if (gp2.wasJustPressed(GamepadKeys.Button.DPAD_RIGHT)) { // MIDDLE
                 bot.claw.close();
                 bot.slides.runToMiddle();
                 thread = new Thread(() -> {
@@ -195,13 +195,13 @@ public class MainTeleOp extends LinearOpMode {
                     bot.outtakeOut((bot.claw.getClawState()));
                 });
                 thread.start();
-            } else if (gp2.wasJustPressed(GamepadKeys.Button.DPAD_RIGHT)) { // LOW
+            } else if (gp2.wasJustPressed(GamepadKeys.Button.DPAD_LEFT)) { // LOW
                 bot.claw.close();
                 bot.slides.runToLow();
                 bot.outtakeOut(bot.claw.getClawState());
             } else if (gp2.wasJustPressed(GamepadKeys.Button.DPAD_DOWN)) { // BOTTOM
                 bot.slides.runToBottom();
-                bot.storage();
+                storage();
             }
 
             // DRIVE
@@ -279,6 +279,19 @@ public class MainTeleOp extends LinearOpMode {
         }
     }
 
+    // Storage thread
+    public void storage() {
+        thread = new Thread(() -> {
+            bot.fourbar.setWrist(bot.fourbar.wristStorage);
+            sleep(500);
+            bot.fourbar.setArm(bot.fourbar.armStorage);
+            bot.slides.runToBottom();
+            bot.intake.setIntakeHeight(bot.intake.intakeStorage);
+            bot.state = Bot.BotState.STORAGE;
+        });
+        thread.start();
+    }
+
     // Drop pixel thread
     private void drop() {
         thread = new Thread(() -> {
@@ -286,8 +299,9 @@ public class MainTeleOp extends LinearOpMode {
             sleep(300);
             if (bot.state == Bot.BotState.OUTTAKE_OUT) {
                 if (bot.claw.getClawState() == 0) {
-                    bot.storage();// if claw is empty go to storage
+                    storage();
                 } else if (bot.claw.getClawState() == 1) {
+                    bot.fourbar.setArm(0.3);
                     bot.fourbar.setWrist(0.22);
                     if (bot.slides.getPosition() > -1700) {
                         bot.slides.runTo(bot.slides.getPosition() - 500);
@@ -295,11 +309,11 @@ public class MainTeleOp extends LinearOpMode {
                         bot.slides.runTo(-2300);
                     }
                     sleep(300);
-                    bot.claw.close();
                     bot.fourbar.topOuttake(false);
+                    bot.claw.close();
                 }
             } else {
-                bot.storage();
+                storage();
             }
             //bot.claw.close();
         });
@@ -312,12 +326,12 @@ public class MainTeleOp extends LinearOpMode {
             sleep(300);
             if (bot.state == Bot.BotState.OUTTAKE_DOWN) {
                 if (bot.claw.getClawState() == 0) {
-                    bot.storage();// if claw is empty go to storage
+                    storage();
                 } else if (bot.claw.getClawState() == 1) {
                     bot.fourbar.ground();
                 }
             } else {
-                bot.storage();
+                storage();
             }
             //bot.claw.close();
         });
