@@ -135,6 +135,15 @@ public class MainAutonomous extends LinearOpMode {
         });
         pickup.start();
 
+        Thread stopAuto = new Thread(() -> {
+            while (opModeIsActive() && !isStopRequested()) {
+                if (drive.getExternalHeadingVelocity() > (0.2 * DriveConstants.MAX_ANG_VEL)) {
+                    telemetry.addLine("SHUTTING DOWN!!!");
+                    requestOpModeStop();
+                }
+            }
+        });
+
         int spikeMark = 0;
         boolean dropped = false;
 
@@ -312,6 +321,7 @@ public class MainAutonomous extends LinearOpMode {
         // Auto start
         if (opModeIsActive() && !isStopRequested()) {
             trackTime.start();
+            stopAuto.start();
 
             // Set starting poses
             Pose2d blueCloseStart = new Pose2d(12,60,Math.toRadians(90));
