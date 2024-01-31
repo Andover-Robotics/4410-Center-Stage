@@ -110,6 +110,7 @@ public class MainTeleOp extends LinearOpMode {
                     thread = new Thread(() -> {
                         bot.slides.runToBottom();
                         bot.claw.fullOpen();
+                        bot.intake.setIntakeHeight(0.1);
                         sleep(100);
                         bot.fourbar.bottomPixel();
                         sleep(400);
@@ -124,6 +125,7 @@ public class MainTeleOp extends LinearOpMode {
                     thread = new Thread(() -> {
                         bot.slides.runToBottom();
                         bot.claw.fullOpen();
+                        bot.intake.setIntakeHeight(0.1);
                         sleep(100);
                         bot.fourbar.pickup();
                         sleep(400);
@@ -134,7 +136,8 @@ public class MainTeleOp extends LinearOpMode {
                     thread.start();
                 }
                 if (gp2.wasJustPressed(GamepadKeys.Button.RIGHT_BUMPER)) { // drop pixel while in storage
-                    bot.fourbar.setArm(0.95);
+                    bot.fourbar.setArm(0.93);
+                    bot.intake.setIntakeHeight(0.1);
                     sleep(100);
                     bot.claw.open();
                     sleep(100);
