@@ -10,8 +10,8 @@ import com.acmerobotics.dashboard.config.Config;
 public class V4B {
     public final Servo armLeft, armRight, wrist;
 
-    public static double armBottomOuttake = 0.26, armTopOuttake = 0.23, armStorage = 0.82, armGround = 0.10, armDualPickup = 0.95, armBlock = 0.84;
-    public static double wristBottomOuttake = 0.12, wristTopOuttake = 0.12,  wristStorage = 0.98, wristGround = 0.0, wristDualPickup = 0.94, wristBlock = 0.08;
+    public static double armBottomOuttake = 0.26, armTopOuttake = 0.24, armStorage = 0.82, armGround = 0.10, armDualPickup = 0.95, armBlock = 0.84;
+    public static double wristBottomOuttake = 0.12, wristTopOuttake = 0.13,  wristStorage = 0.99, wristGround = 0.0, wristDualPickup = 0.94, wristBlock = 0.08;
 
     public V4B(OpMode opMode) {
         armLeft = opMode.hardwareMap.servo.get("armLeft");
@@ -59,6 +59,11 @@ public class V4B {
     public void pickup() {
         setWrist(wristDualPickup);
         setArm(armDualPickup);
+    }
+
+    public void bottomPixel() {
+        setWrist(0.96);
+        setArm(0.94);
     }
 
     public void runArm(double manual) {

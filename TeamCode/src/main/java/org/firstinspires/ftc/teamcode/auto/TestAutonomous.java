@@ -237,9 +237,18 @@ public class TestAutonomous extends LinearOpMode {
             periodic.start();
 
             // Define starting pose
-            // TODO: TUNE THIS STARTING POSE
-            Pose2d startPose = new Pose2d();
-            startPose = new Pose2d(12,60,Math.toRadians(90));
+            // TODO: TUNE EACH STARTING POSE
+            Pose2d blueCloseStart = new Pose2d(12,60,Math.toRadians(90));
+            Pose2d redCloseStart = new Pose2d(12,-60,Math.toRadians(-90));
+            if (alliance == 1 && side == 1) {
+                drive.setPoseEstimate(blueCloseStart);
+            } else if (alliance == 2 && side == 1) {
+                drive.setPoseEstimate(redCloseStart);
+            } else if (alliance == 1 && side == 2) {
+                drive.setPoseEstimate(null);
+            } else if (alliance == 2 && side == 2) {
+                drive.setPoseEstimate(null);
+            }
 
             // To spike mark
             // Define spike mark pose
@@ -249,20 +258,20 @@ public class TestAutonomous extends LinearOpMode {
             } else {
                 if (side == 1) { // Close side
                     switch (spikeMark) {
-                        case 1: spikeTrajectory = drive.trajectorySequenceBuilder(startPose)
+                        case 1: spikeTrajectory = drive.trajectorySequenceBuilder(drive.getPoseEstimate())
                                 .lineToLinearHeading(new Pose2d(35, 35, Math.toRadians(180)))
                                 .build(); break;
-                        case 2: spikeTrajectory = drive.trajectorySequenceBuilder(startPose)
+                        case 2: spikeTrajectory = drive.trajectorySequenceBuilder(drive.getPoseEstimate())
                                 .lineToLinearHeading(new Pose2d(28, 25, Math.toRadians(180)))
                                 .build(); break;
-                        case 3: spikeTrajectory = drive.trajectorySequenceBuilder(startPose).back(2)
+                        case 3: spikeTrajectory = drive.trajectorySequenceBuilder(drive.getPoseEstimate()).back(2)
                                 .splineToConstantHeading(new Vector2d(25, 40), Math.toRadians(225))
                                 .splineToSplineHeading(new Pose2d(12, 33, Math.toRadians(180)), Math.toRadians(180))
                                 .build(); break;
                     }
                 } else { // Far side
                     switch (spikeMark) {
-                        case 1: spikeTrajectory = drive.trajectorySequenceBuilder(startPose)
+                        case 1: spikeTrajectory = drive.trajectorySequenceBuilder(drive.getPoseEstimate())
                                 .lineToSplineHeading(new Pose2d(-46, 15, Math.toRadians(90)))
                                 .build(); break;
                         case 2:
@@ -359,10 +368,7 @@ public class TestAutonomous extends LinearOpMode {
 
                 // Parking trajectory
                 if (park != 0) {
-                    // Define parking y value
-                    int parkY = 0;
-                    if (alliance == 1) { if (park == 1) parkY = -11; else if (park == 2) parkY = -59; }
-                    else { if (park == 1) parkY = 59; else if (park == 2) parkY = 11; }
+                    int parkY = alliance == 1 ? (park == 1 ? -11 : -59) : (park == 1 ? 59 : 11);
                     // To park
                     drive.followTrajectorySequence(drive.trajectorySequenceBuilder(drive.getPoseEstimate())
                             .splineToLinearHeading(new Pose2d(52, parkY, Math.toRadians(180)),Math.toRadians(15))

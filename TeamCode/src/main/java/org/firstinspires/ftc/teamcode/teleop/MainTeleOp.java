@@ -106,6 +106,20 @@ public class MainTeleOp extends LinearOpMode {
 
             // FINITE STATES
             if (bot.state == Bot.BotState.STORAGE) { // INITIALIZED
+                if (gp2.wasJustPressed(GamepadKeys.Button.A)) { // fix bottom pixel
+                    thread = new Thread(() -> {
+                        bot.slides.runToBottom();
+                        bot.claw.fullOpen();
+                        sleep(100);
+                        bot.fourbar.bottomPixel();
+                        sleep(400);
+                        bot.claw.pickupClose();
+                        sleep(300);
+                        bot.claw.fullOpen();
+                        bot.storage();
+                    });
+                    thread.start();
+                }
                 if (gp2.wasJustPressed(GamepadKeys.Button.B)) { // pickup pixel
                     thread = new Thread(() -> {
                         bot.slides.runToBottom();
@@ -120,6 +134,7 @@ public class MainTeleOp extends LinearOpMode {
                     thread.start();
                 }
                 if (gp2.wasJustPressed(GamepadKeys.Button.RIGHT_BUMPER)) { // drop pixel while in storage
+                    bot.fourbar.setArm(0.95);
                     sleep(100);
                     bot.claw.open();
                     sleep(100);
@@ -203,12 +218,12 @@ public class MainTeleOp extends LinearOpMode {
             }
 
             // INTAKE (driver 1)
-            if (gp1.isDown(GamepadKeys.Button.LEFT_BUMPER)) { // intake
+            if (gp1.isDown(GamepadKeys.Button.RIGHT_BUMPER)) { // intake
                 bot.intake(false);
                 if (bot.intake.getIntakeHeight() != bot.intake.intakeOut) {
                     bot.intake.setIntakeHeight(bot.intake.intakeOut);
                 }
-            } else if (gp1.isDown(GamepadKeys.Button.RIGHT_BUMPER)) { // reverse intake
+            } else if (gp1.isDown(GamepadKeys.Button.LEFT_BUMPER)) { // reverse intake
                 bot.intake(true);
                 if (bot.intake.getIntakeHeight() != bot.intake.intakeOut) {
                     bot.intake.setIntakeHeight(bot.intake.intakeOut);
@@ -270,11 +285,13 @@ public class MainTeleOp extends LinearOpMode {
                 if (bot.claw.getClawState() == 0) {
                     bot.storage();// if claw is empty go to storage
                 } else if (bot.claw.getClawState() == 1) {
-                    if (bot.slides.getPosition() > -1850) {
-                        bot.slides.runTo(bot.slides.getPosition() - 250);
-                    } else if (bot.slides.getPosition() <=-1850){
+                    bot.fourbar.setWrist(0.22);
+                    if (bot.slides.getPosition() > -1700) {
+                        bot.slides.runTo(bot.slides.getPosition() - 500);
+                    } else if (bot.slides.getPosition() <=-1700){
                         bot.slides.runTo(-2300);
                     }
+                    sleep(300);
                     bot.fourbar.topOuttake(false);
                 }
             } else {

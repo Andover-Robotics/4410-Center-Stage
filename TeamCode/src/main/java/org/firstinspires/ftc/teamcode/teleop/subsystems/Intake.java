@@ -32,14 +32,14 @@ public class Intake {
     }
 
     public void runIntake(){
-        noodles.setInverted(false);
+        noodles.setInverted(true);
         noodles.set(Math.abs(power));
         counterRoller.set(counterPower);
         isRunning = true;
     }
 
     public void runReverseIntake(){
-        noodles.setInverted(true);
+        noodles.setInverted(false);
         noodles.set(Math.abs(-0.28));
         counterRoller.set(-1*counterPower);
         isRunning = true;
