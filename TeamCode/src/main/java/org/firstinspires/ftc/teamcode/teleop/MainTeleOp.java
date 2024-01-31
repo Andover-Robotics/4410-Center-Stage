@@ -295,6 +295,7 @@ public class MainTeleOp extends LinearOpMode {
                         bot.slides.runTo(-2300);
                     }
                     sleep(300);
+                    bot.claw.close();
                     bot.fourbar.topOuttake(false);
                 }
             } else {

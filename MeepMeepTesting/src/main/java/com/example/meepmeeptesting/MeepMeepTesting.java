@@ -73,27 +73,28 @@ public class MeepMeepTesting {
                 .setConstraints(60, 60, Math.toRadians(180), Math.toRadians(180), 15)
                 .followTrajectorySequence(drive -> drive.trajectorySequenceBuilder(redCloseStart)
                         // 2+0
-                        .lineToLinearHeading(new Pose2d(28, -25, Math.toRadians(180))) // To spike mark
+                        .splineToConstantHeading(new Vector2d(25, -40), Math.toRadians(45))
+                        .splineToSplineHeading(new Pose2d(12, -33, Math.toRadians(180)), Math.toRadians(180))
                         .waitSeconds(0.5) // Place purple pixel
                         .lineToLinearHeading(new Pose2d(51, -35, Math.toRadians(180))) // To backboard
                         .waitSeconds(1) // Place yellow pixel
-                        .splineToLinearHeading(new Pose2d(55, -11, Math.toRadians(180)),Math.toRadians(20))
-                        .waitSeconds(1)
-                        // 2+2
-                        .splineToLinearHeading(new Pose2d(30, -11, Math.toRadians(180)), Math.toRadians(180)) // To stage door
-                        .lineToLinearHeading(new Pose2d(-60, -11, Math.toRadians(180))) // To stack across field
-                        .waitSeconds(1) // Intake from stack
-                        .lineToLinearHeading(new Pose2d(38, -11, Math.toRadians(180))) // Return across field
-                        .splineToLinearHeading(new Pose2d(50, -30, Math.toRadians(180)), Math.toRadians(0)) // To backboard
-                        .waitSeconds(1) // Place pixels on backboard
-                        // 2+4
-                        .splineToLinearHeading(new Pose2d(30, -11, Math.toRadians(180)), Math.toRadians(180)) // To stage door
-                        .lineToLinearHeading(new Pose2d(-60, -11, Math.toRadians(180))) // To stack across field
-                        .waitSeconds(1) // Intake from stack
-                        .lineToLinearHeading(new Pose2d(38, -11, Math.toRadians(180))) // Return across field
-                        .splineToLinearHeading(new Pose2d(50, -30, Math.toRadians(180)), Math.toRadians(0)) // To backboard
-                        .waitSeconds(1) // Place pixels on backboard
-                        .splineToLinearHeading(new Pose2d(52, -11, Math.toRadians(180)),Math.toRadians(15)) // To park
+//                        .splineToLinearHeading(new Pose2d(55, -11, Math.toRadians(180)),Math.toRadians(20))
+//                        .waitSeconds(1)
+//                        // 2+2
+//                        .splineToLinearHeading(new Pose2d(30, -11, Math.toRadians(180)), Math.toRadians(180)) // To stage door
+//                        .lineToLinearHeading(new Pose2d(-60, -11, Math.toRadians(180))) // To stack across field
+//                        .waitSeconds(1) // Intake from stack
+//                        .lineToLinearHeading(new Pose2d(38, -11, Math.toRadians(180))) // Return across field
+//                        .splineToLinearHeading(new Pose2d(50, -30, Math.toRadians(180)), Math.toRadians(0)) // To backboard
+//                        .waitSeconds(1) // Place pixels on backboard
+//                        // 2+4
+//                        .splineToLinearHeading(new Pose2d(30, -11, Math.toRadians(180)), Math.toRadians(180)) // To stage door
+//                        .lineToLinearHeading(new Pose2d(-60, -11, Math.toRadians(180))) // To stack across field
+//                        .waitSeconds(1) // Intake from stack
+//                        .lineToLinearHeading(new Pose2d(38, -11, Math.toRadians(180))) // Return across field
+//                        .splineToLinearHeading(new Pose2d(50, -30, Math.toRadians(180)), Math.toRadians(0)) // To backboard
+//                        .waitSeconds(1) // Place pixels on backboard
+//                        .splineToLinearHeading(new Pose2d(52, -11, Math.toRadians(180)),Math.toRadians(15)) // To park
                         .build());
 
         // FAR
@@ -145,7 +146,6 @@ public class MeepMeepTesting {
 
         meepMeep.setBackground(MeepMeep.Background.FIELD_CENTERSTAGE_OFFICIAL)
                 .addEntity(redCenter1)
-                .addEntity(blueCenter1)
                 .start();
     }
 }
