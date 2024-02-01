@@ -15,6 +15,7 @@ import com.arcrobotics.ftclib.hardware.motors.MotorEx;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.auto.MainAutonomous;
 import org.firstinspires.ftc.teamcode.auto.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.auto.trajectorysequence.TrajectorySequence;
@@ -26,6 +27,7 @@ import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.trajectory.Trajectory;
 import com.acmerobotics.roadrunner.util.Angle;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.Gamepad;
 
 import java.lang.*;
@@ -36,11 +38,12 @@ import java.util.Map;
 public class MainTeleOp extends LinearOpMode {
 
     private Bot bot;
-    private double driveSpeed = 1;
+    private double driveSpeed = 1, driveMultiplier = 1;
     private GamepadEx gp1, gp2;
     private boolean fieldCentric = false;
     double leftX, rightX, leftY, rightY;
     Thread thread;
+    DistanceSensor distance;
 
     double ikCoefficient = 1;
 
@@ -62,6 +65,8 @@ public class MainTeleOp extends LinearOpMode {
         rightX = gp2.getRightX();
         leftY = gp2.getLeftY();
         rightY = gp2.getRightY();
+
+        distance = hardwareMap.get(DistanceSensor.class, "Distance");
 
         // Initialize bot
         bot.stopMotors();
@@ -173,6 +178,13 @@ public class MainTeleOp extends LinearOpMode {
                 if (gp2.wasJustPressed(GamepadKeys.Button.Y)) { // go to outtake out position
                     bot.outtakeOut(bot.claw.getClawState());
                 }
+            }
+
+            //distance sensor code
+            if (distance.getDistance(DistanceUnit.CM) < 8) {
+                driveMultiplier = 0.5;
+            } else {
+                driveMultiplier = 1;
             }
 
             // SLIDES
@@ -345,8 +357,8 @@ public class MainTeleOp extends LinearOpMode {
     }
 
     // Driving
-    private void driveRobotCentric() { // Robot centric
-        driveSpeed = 1 - 0.8 * gp1.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER);
+    private void driveRobotCentric() { // Robot centric, drive multiplier default 1, 1/2 when distance sensor
+        driveSpeed = driveMultiplier - 0.5 * gp1.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER);
         driveSpeed = Math.max(0, driveSpeed);
         bot.fixMotors();
 
@@ -360,8 +372,8 @@ public class MainTeleOp extends LinearOpMode {
 
     }
 
-    public void driveFieldCentric() { // Field centric
-        driveSpeed = 1 - 0.8 * gp1.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER);
+    public void driveFieldCentric() { // Field centric, drive multiplier default 1, 1/2 when distance sensor
+        driveSpeed = driveMultiplier - 0.5 * gp1.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER);
         driveSpeed = Math.max(0, driveSpeed);
         bot.fixMotors();
 
