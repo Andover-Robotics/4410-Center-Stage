@@ -72,7 +72,7 @@ public class Bot {
     }
 
     // BOT STATES
-    public void storage() {
+    public void storage() { // go to storage position
         fourbar.storage();
         slides.runToBottom();
         intake.setIntakeHeight(intake.intakeStorage);
@@ -90,7 +90,101 @@ public class Bot {
         state = BotState.OUTTAKE_DOWN;
     }
 
-    public void intake(boolean isReverse) {
+    public void pickup() { // pick up pixel from storage
+        Thread thread = new Thread(() -> {
+            slides.runToBottom();
+            claw.fullOpen();
+            try { Thread.sleep(100); } catch (InterruptedException ignored) {}
+            fourbar.pickup();
+            try { Thread.sleep(400); } catch (InterruptedException ignored) {}
+            claw.pickupClose();
+            try { Thread.sleep(300); } catch (InterruptedException ignored) {}
+            storage();
+        });
+        thread.start();
+    }
+
+    public void fixPixels() { // align pixels in storage
+        Thread thread = new Thread(() -> {
+            slides.runToBottom();
+            claw.fullOpen();
+            intake.setIntakeHeight(0.1);
+            try { Thread.sleep(100); } catch (InterruptedException ignored) {}
+            fourbar.bottomPixel();
+            try { Thread.sleep(300); } catch (InterruptedException ignored) {}
+            claw.pickupClose();
+            try { Thread.sleep(250); } catch (InterruptedException ignored) {}
+            storage();
+            try { Thread.sleep(50); } catch (InterruptedException ignored) {}
+            claw.fullOpen();
+        });
+        thread.start();
+    }
+
+    public void presetSlides(int pos) { // run to preset slide position, the pos variable has a range of 1-4, representing bottom, low, middle, and top
+        claw.close();
+        switch (pos) {
+            case 1: slides.runToBottom(); storage(); break;
+            case 2: slides.runToLow(); outtakeOut(claw.getClawState()); break;
+            case 3: slides.runToMiddle(); break;
+            case 4: slides.runToTop(); break;
+        }
+        if (pos == 4) {
+            Thread thread = new Thread(() -> {
+                try { Thread.sleep(900); } catch (InterruptedException ignored) {}
+                outtakeOut((claw.getClawState()));
+            });
+            thread.start();
+        } else if (pos == 3) {
+            Thread thread = new Thread(() -> {
+                try { Thread.sleep(500); } catch (InterruptedException ignored) {}
+                outtakeOut((claw.getClawState()));
+            });
+            thread.start();
+        }
+    }
+
+    public void drop() { // drop pixel in outtake or storage position
+        Thread thread = new Thread(() -> {
+            claw.open();
+            try { Thread.sleep(300); } catch (InterruptedException ignored) {}
+            if (state == Bot.BotState.OUTTAKE_OUT) {
+                if (claw.getClawState() == 0) {
+                    storage();
+                } else if (claw.getClawState() == 1) {
+                    fourbar.setArm(0.3);
+                    fourbar.setWrist(0.22);
+                    if (slides.getPosition() > -1700) {
+                        slides.runTo(slides.getPosition() - 500);
+                    } else if (slides.getPosition() <=-1700){
+                        slides.runTo(-2300);
+                    }
+                    try { Thread.sleep(300); } catch (InterruptedException ignored) {}
+                    fourbar.topOuttake(false);
+                    claw.close();
+                }
+            } else if (state == BotState.OUTTAKE_DOWN) {
+                if (claw.getClawState() == 0) {
+                    storage();
+                } else if (claw.getClawState() == 1) {
+                    fourbar.ground();
+                }
+            } else if (state == BotState.STORAGE) {
+                fourbar.setArm(0.93);
+                intake.setIntakeHeight(0.1);
+                try { Thread.sleep(100); } catch (InterruptedException ignored) {}
+                claw.open();
+                try { Thread.sleep(100); } catch (InterruptedException ignored) {}
+                fourbar.storage();
+            } else {
+                storage();
+            }
+            //bot.claw.close();
+        });
+        thread.start();
+    }
+
+    public void intake(boolean isReverse) { // intake/reverse intake
         if (intake.getIntakeHeight() != intake.intakeOut) intake.setIntakeHeight(intake.intakeOut);
         if (!isReverse) {
             intake.runIntake();
@@ -99,13 +193,11 @@ public class Bot {
         }
     }
 
-    public void launch() {
-        launcher.launch();
-    }
-
+    // IK DEMOS?
     public void ikDemo1() { fourbar.setArm(0.35); slides.runTo(slides.getPosition()+600);}
     public void ikDemo2() { fourbar.setArm(0.18); slides.runTo(slides.getPosition()-600);}
 
+    // MOTORS
     public void fixMotors() {
         fl.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
         fr.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
@@ -122,19 +214,17 @@ public class Bot {
         bl.setRunMode(Motor.RunMode.RawPower);
         br.setRunMode(Motor.RunMode.RawPower);
     }
-
     public void stopMotors() {
         fl.set(0.0);
         fr.set(0.0);
         bl.set(0.0);
         br.set(0.0);
     }
-
     public double getMotorCurrent() {
         return fl.motorEx.getCurrent(CurrentUnit.MILLIAMPS) + fr.motorEx.getCurrent(CurrentUnit.MILLIAMPS) + bl.motorEx.getCurrent(CurrentUnit.MILLIAMPS) + br.motorEx.getCurrent(CurrentUnit.MILLIAMPS);
     }
 
-
+    // DRIVE METHODS
     public void driveRobotCentric(double strafeSpeed, double forwardBackSpeed, double turnSpeed) {
         double[] speeds = {
                 forwardBackSpeed - strafeSpeed - turnSpeed,
@@ -156,7 +246,6 @@ public class Bot {
         bl.set(speeds[2]);
         br.set(speeds[3]);
     }
-
     public void driveFieldCentric(double strafeSpeed, double forwardBackSpeed, double turnSpeed) {
         double magnitude = Math.sqrt(strafeSpeed * strafeSpeed + forwardBackSpeed * forwardBackSpeed);
         double theta = (Math.atan2(forwardBackSpeed, strafeSpeed) - heading) % (2 * Math.PI);
@@ -166,36 +255,19 @@ public class Bot {
                 magnitude * Math.sin(theta - Math.PI / 4) + turnSpeed,
                 magnitude * Math.sin(theta + Math.PI / 4) - turnSpeed
         };
-
         double maxSpeed = 0;
-
         for (int i = 0; i < 4; i++) {
             maxSpeed = Math.max(maxSpeed, speeds[i]);
         }
-
         if (maxSpeed > 1) {
             for (int i = 0; i < 4; i++) {
                 speeds[i] /= maxSpeed;
             }
         }
-
-        //        for (int i = 0; i < 4; i++) {
-        //            driveTrainMotors[i].set(speeds[i]);
-        //        }
-        // manually invert the left side
-
         fl.set(speeds[0]);
         fr.set(speeds[1]);
         bl.set(speeds[2]);
         br.set(speeds[3]);
-    }
-
-    public void calculateWristPos() {
-        if (claw.clawState == Claw.ClawState.SINGLE) {
-            this.wristUpPos = 0.03;
-        } else {
-            this.wristUpPos = 0.0;
-        }
     }
 
     public void setHeading (double heading) {

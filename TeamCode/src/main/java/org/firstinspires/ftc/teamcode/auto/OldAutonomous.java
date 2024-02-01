@@ -296,7 +296,7 @@ public class OldAutonomous extends LinearOpMode {
             sleep(600);
             bot.storage();
             bot.claw.close();
-            bot.calculateWristPos();
+            //bot.calculateWristPos();
             bot.fourbar.wrist.setPosition(bot.fourbar.wrist.getPosition()+ bot.wristUpPos);
             sleep(200);
 
@@ -509,7 +509,7 @@ public class OldAutonomous extends LinearOpMode {
                 sleep(800);
                 bot.storage();
                 bot.claw.close();
-                bot.calculateWristPos();
+                //bot.calculateWristPos();
                 bot.fourbar.wrist.setPosition(bot.fourbar.wrist.getPosition()+ bot.wristUpPos);
                 sleep(200);
 

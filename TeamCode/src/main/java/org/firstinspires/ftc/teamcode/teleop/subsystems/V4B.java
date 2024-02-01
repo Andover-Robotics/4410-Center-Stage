@@ -54,7 +54,7 @@ public class V4B {
     public void storage() {
         Thread thread = new Thread(() -> {
             setWrist(wristStorage);
-            try { Thread.sleep(500); } catch (InterruptedException ignored) {  }
+            try { Thread.sleep(500); } catch (InterruptedException ignored) {}
             setArm(armStorage);
         });
         thread.start();

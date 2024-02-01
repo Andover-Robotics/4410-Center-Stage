@@ -41,7 +41,6 @@ public class MainTeleOp extends LinearOpMode {
     private double driveSpeed = 1, driveMultiplier = 1;
     private GamepadEx gp1, gp2;
     private boolean fieldCentric = false;
-    double leftX, rightX, leftY, rightY;
     Thread thread;
     DistanceSensor distance;
 
@@ -61,10 +60,6 @@ public class MainTeleOp extends LinearOpMode {
 
         gp1 = new GamepadEx(gamepad1);
         gp2 = new GamepadEx(gamepad2);
-        leftX = gp2.getLeftX();
-        rightX = gp2.getRightX();
-        leftY = gp2.getLeftY();
-        rightY = gp2.getRightY();
 
         distance = hardwareMap.get(DistanceSensor.class, "Distance");
 
@@ -112,41 +107,13 @@ public class MainTeleOp extends LinearOpMode {
             // FINITE STATES
             if (bot.state == Bot.BotState.STORAGE) { // INITIALIZED
                 if (gp2.wasJustPressed(GamepadKeys.Button.A)) { // fix pixels
-                    thread = new Thread(() -> {
-                        bot.slides.runToBottom();
-                        bot.claw.fullOpen();
-                        bot.intake.setIntakeHeight(0.1);
-                        sleep(100);
-                        bot.fourbar.bottomPixel();
-                        sleep(300);
-                        bot.claw.pickupClose();
-                        sleep(250);
-                        bot.storage();
-                        sleep(50);
-                        bot.claw.fullOpen();
-                    });
-                    thread.start();
+                    bot.fixPixels();
                 }
                 if (gp2.wasJustPressed(GamepadKeys.Button.B)) { // pickup pixel
-                    thread = new Thread(() -> {
-                        bot.slides.runToBottom();
-                        bot.claw.fullOpen();
-                        sleep(100);
-                        bot.fourbar.pickup();
-                        sleep(400);
-                        bot.claw.pickupClose();
-                        sleep(300);
-                        bot.storage();
-                    });
-                    thread.start();
+                    bot.pickup();
                 }
                 if (gp2.wasJustPressed(GamepadKeys.Button.RIGHT_BUMPER)) { // drop pixel while in storage
-                    bot.fourbar.setArm(0.93);
-                    bot.intake.setIntakeHeight(0.1);
-                    sleep(100);
-                    bot.claw.open();
-                    sleep(100);
-                    bot.fourbar.storage();
+                    bot.drop();
                 }
                 if (gp2.wasJustPressed(GamepadKeys.Button.Y)) { // go to outtake out position
                     bot.outtakeOut(bot.claw.getClawState());
@@ -157,7 +124,7 @@ public class MainTeleOp extends LinearOpMode {
             } else if (bot.state == Bot.BotState.OUTTAKE_OUT) { // SCORING BACKBOARD
                 bot.slides.runManual(gp2.getRightY()*-0.5);
                 if (gp2.wasJustPressed(GamepadKeys.Button.Y)) { // drop and return to storage
-                    drop();
+                    bot.drop();
                 }
                 if (gp2.wasJustPressed(GamepadKeys.Button.B)) { // cancel and return to storage
                     bot.storage() ;
@@ -170,7 +137,7 @@ public class MainTeleOp extends LinearOpMode {
                 }
             } else if (bot.state == Bot.BotState.OUTTAKE_DOWN) { // SCORING GROUND
                 if (gp2.wasJustPressed(GamepadKeys.Button.X)) {
-                    dropGround();
+                    bot.drop();
                 }
                 if (gp2.wasJustPressed(GamepadKeys.Button.A)) { // cancel and return to storage
                     bot.storage();
@@ -180,7 +147,7 @@ public class MainTeleOp extends LinearOpMode {
                 }
             }
 
-            // distance sensor code
+            // Distance sensor
             if (distance.getDistance(DistanceUnit.CM) < 8) {
                 driveMultiplier = 0.5;
             } else {
@@ -192,32 +159,17 @@ public class MainTeleOp extends LinearOpMode {
             bot.slides.runManual(gp2.getLeftY()*-0.5);
             // preset positions
             if (gp2.wasJustPressed(GamepadKeys.Button.DPAD_UP)) { // TOP
-                bot.claw.close();
-                bot.slides.runToTop();
-                thread = new Thread(() -> {
-                    sleep(900);
-                    bot.outtakeOut((bot.claw.getClawState()));
-                });
-                thread.start();
+                bot.presetSlides(4);
             } else if (gp2.wasJustPressed(GamepadKeys.Button.DPAD_RIGHT)) { // MIDDLE
-                bot.claw.close();
-                bot.slides.runToMiddle();
-                thread = new Thread(() -> {
-                    sleep(500);
-                    bot.outtakeOut((bot.claw.getClawState()));
-                });
-                thread.start();
+                bot.presetSlides(3);
             } else if (gp2.wasJustPressed(GamepadKeys.Button.DPAD_LEFT)) { // LOW
-                bot.claw.close();
-                bot.slides.runToLow();
-                bot.outtakeOut(bot.claw.getClawState());
+                bot.presetSlides(2);
             } else if (gp2.wasJustPressed(GamepadKeys.Button.DPAD_DOWN)) { // BOTTOM
-                bot.slides.runToBottom();
-                bot.storage();
+                bot.presetSlides(1);
             }
 
             // DRIVE
-            if (fieldCentric) driveFieldCentric(); else driveRobotCentric();
+            drive();
             if (gp1.wasJustPressed(GamepadKeys.Button.START)) { // Toggle field/robot centric
                 fieldCentric = !fieldCentric;
             }
@@ -232,7 +184,7 @@ public class MainTeleOp extends LinearOpMode {
                         .build());
             }
 
-            // INTAKE (driver 1)
+            // INTAKE
             if (gp1.isDown(GamepadKeys.Button.RIGHT_BUMPER)) { // intake
                 bot.intake(false);
                 if (bot.intake.getIntakeHeight() != bot.intake.intakeOut) {
@@ -243,16 +195,16 @@ public class MainTeleOp extends LinearOpMode {
                 if (bot.intake.getIntakeHeight() != bot.intake.intakeOut) {
                     bot.intake.setIntakeHeight(bot.intake.intakeOut);
                 }
-            } else {
+            } else { // stop intake
                 bot.intake.stopIntake();
                 bot.intake.setIntakeHeight(bot.intake.intakeStorage);
             }
 
             // LAUNCH DRONE
             if (gp1.wasJustPressed(GamepadKeys.Button.B)) {
-                bot.launch();
+                bot.launcher.launch();
             }
-            //Dock Drone
+            // DOCK DRONE
             if (gp1.wasJustPressed(GamepadKeys.Button.A)) {
                 bot.launcher.reset();
             }
@@ -291,86 +243,32 @@ public class MainTeleOp extends LinearOpMode {
         }
     }
 
-    // Drop pixel thread
-    private void drop() {
-        thread = new Thread(() -> {
-            bot.claw.open();
-            sleep(300);
-            if (bot.state == Bot.BotState.OUTTAKE_OUT) {
-                if (bot.claw.getClawState() == 0) {
-                    bot.storage();
-                } else if (bot.claw.getClawState() == 1) {
-                    bot.fourbar.setArm(0.3);
-                    bot.fourbar.setWrist(0.22);
-                    if (bot.slides.getPosition() > -1700) {
-                        bot.slides.runTo(bot.slides.getPosition() - 500);
-                    } else if (bot.slides.getPosition() <=-1700){
-                        bot.slides.runTo(-2300);
-                    }
-                    sleep(300);
-                    bot.fourbar.topOuttake(false);
-                    bot.claw.close();
-                }
-            } else {
-                bot.storage();
-            }
-            //bot.claw.close();
-        });
-        thread.start();
-    }
-
-    private void dropGround() {
-        thread = new Thread(() -> {
-            bot.claw.open();
-            sleep(300);
-            if (bot.state == Bot.BotState.OUTTAKE_DOWN) {
-                if (bot.claw.getClawState() == 0) {
-                    bot.storage();
-                } else if (bot.claw.getClawState() == 1) {
-                    bot.fourbar.ground();
-                }
-            } else {
-                bot.storage();
-            }
-            //bot.claw.close();
-        });
-        thread.start();
-    }
-
     public void inverseKinematics(double manual, double ikCoefficient) {
         //bot.slides.runManual(ikCoefficient * -manual * -0.5);//-0.5 and coefficient and - on the manual arent doing anything
         bot.fourbar.runArm(manual);
-
     }
 
     // Driving
-    private void driveRobotCentric() { // Robot centric, drive multiplier default 1, 1/2 when distance sensor
+    private void drive() { // Robot centric, drive multiplier default 1, 1/2 when distance sensor
         driveSpeed = driveMultiplier - 0.5 * gp1.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER);
         driveSpeed = Math.max(0, driveSpeed);
         bot.fixMotors();
 
-        Vector2d driveVector = new Vector2d(gp1.getLeftX(), -gp1.getLeftY()),
-                turnVector = new Vector2d(gp1.getRightX(), 0);
-
-        bot.driveRobotCentric(driveVector.getX() * driveSpeed,
-                driveVector.getY() * driveSpeed,
-                turnVector.getX() * driveSpeed
-        );
-
-    }
-
-    public void driveFieldCentric() { // Field centric, drive multiplier default 1, 1/2 when distance sensor
-        driveSpeed = driveMultiplier - 0.5 * gp1.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER);
-        driveSpeed = Math.max(0, driveSpeed);
-        bot.fixMotors();
-
-        Vector2d driveVector = new Vector2d(-gp1.getLeftX(), -gp1.getLeftY()),
-                turnVector = new Vector2d(-gp1.getRightX(), 0);
-
-        bot.driveFieldCentric(driveVector.getX() * driveSpeed,
-                driveVector.getY() * driveSpeed,
-                turnVector.getX() * driveSpeed
-        );
+        if (fieldCentric) {
+            Vector2d driveVector = new Vector2d(-gp1.getLeftX(), -gp1.getLeftY()),
+                    turnVector = new Vector2d(-gp1.getRightX(), 0);
+            bot.driveFieldCentric(driveVector.getX() * driveSpeed,
+                    driveVector.getY() * driveSpeed,
+                    turnVector.getX() * driveSpeed
+            );
+        } else {
+            Vector2d driveVector = new Vector2d(gp1.getLeftX(), -gp1.getLeftY()),
+                    turnVector = new Vector2d(gp1.getRightX(), 0);
+            bot.driveRobotCentric(driveVector.getX() * driveSpeed,
+                    driveVector.getY() * driveSpeed,
+                    turnVector.getX() * driveSpeed
+            );
+        }
     }
 
 }
