@@ -48,7 +48,6 @@ public class MainTeleOp extends LinearOpMode {
 
     @Override
     public void runOpMode() throws InterruptedException {
-
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
 
         Bot.instance = null;
@@ -97,7 +96,6 @@ public class MainTeleOp extends LinearOpMode {
         */
 
         waitForStart();
-
         while (opModeIsActive() && !isStopRequested()) {
             drive.update();
 
@@ -158,26 +156,25 @@ public class MainTeleOp extends LinearOpMode {
             // manual slides positioning with joystick
             bot.slides.runManual(gp2.getLeftY()*-0.5);
             // preset positions
-            if (gp2.wasJustPressed(GamepadKeys.Button.DPAD_UP)) { // TOP
+            if (gp2.wasJustPressed(GamepadKeys.Button.DPAD_UP)) { // top
                 bot.presetSlides(4);
-            } else if (gp2.wasJustPressed(GamepadKeys.Button.DPAD_RIGHT)) { // MIDDLE
+            } else if (gp2.wasJustPressed(GamepadKeys.Button.DPAD_RIGHT)) { // middle
                 bot.presetSlides(3);
-            } else if (gp2.wasJustPressed(GamepadKeys.Button.DPAD_LEFT)) { // LOW
+            } else if (gp2.wasJustPressed(GamepadKeys.Button.DPAD_LEFT)) { // low
                 bot.presetSlides(2);
-            } else if (gp2.wasJustPressed(GamepadKeys.Button.DPAD_DOWN)) { // BOTTOM
+            } else if (gp2.wasJustPressed(GamepadKeys.Button.DPAD_DOWN)) { // bottom
                 bot.presetSlides(1);
             }
 
             // DRIVE
             drive();
-            if (gp1.wasJustPressed(GamepadKeys.Button.START)) { // Toggle field/robot centric
+            if (gp1.wasJustPressed(GamepadKeys.Button.START)) { // toggle field/robot centric
                 fieldCentric = !fieldCentric;
             }
-            if (gp1.wasJustReleased(GamepadKeys.Button.LEFT_STICK_BUTTON)) { // Reset heading
+            if (gp1.wasJustReleased(GamepadKeys.Button.LEFT_STICK_BUTTON)) { // reset heading
                 drive.setPoseEstimate(PoseStorage.currentPose);
             }
-            // AUTO ALIGN??????????
-            if (gp1.wasJustPressed(GamepadKeys.Button.BACK)) {
+            if (gp1.wasJustPressed(GamepadKeys.Button.BACK)) { // auto align????
                 drive.setPoseEstimate(PoseStorage.currentPose);
                 drive.followTrajectory(drive.trajectoryBuilder(drive.getPoseEstimate())
                         .splineToSplineHeading(new Pose2d(drive.getPoseEstimate().getX(), drive.getPoseEstimate().getY()+1, drive.getPoseEstimate().getHeading()), Math.toRadians(180))
@@ -199,40 +196,41 @@ public class MainTeleOp extends LinearOpMode {
                 bot.intake.stopIntake();
                 bot.intake.setIntakeHeight(bot.intake.intakeStorage);
             }
-
-            // LAUNCH DRONE
-            if (gp1.wasJustPressed(GamepadKeys.Button.B)) {
-                bot.launcher.launch();
+            if (gp1.wasJustPressed(GamepadKeys.Button.DPAD_RIGHT)) { // increment power
+                bot.intake.changePower(true);
+            } else if (gp1.wasJustPressed(GamepadKeys.Button.DPAD_LEFT)) { // decrement power
+                bot.intake.changePower(false);
             }
-            // DOCK DRONE
-            if (gp1.wasJustPressed(GamepadKeys.Button.A)) {
+
+            // DRONE
+            if (gp1.wasJustPressed(GamepadKeys.Button.B)) { // launch drone
+                bot.launcher.launch();
+            } else if (gp1.wasJustPressed(GamepadKeys.Button.A)) { // dock drone
                 bot.launcher.reset();
             }
 
-            // IK
+            // IK?
             if (gp1.wasJustPressed(GamepadKeys.Button.DPAD_UP)){
                 if (bot.slides.getPosition() < -630 ){
-                    bot.ikDemo1();
+                    bot.fourbar.setArm(0.35);
+                    bot.slides.runTo(bot.slides.getPosition()+600);
                 }
-            } else if (gp1.wasJustPressed(GamepadKeys.Button.DPAD_DOWN)){
-                if (bot.slides.getPosition() > - 1700){
-                    bot.ikDemo2();
+            } else if (gp1.wasJustPressed(GamepadKeys.Button.DPAD_DOWN)) {
+                if (bot.slides.getPosition() > -1700) {
+                    bot.fourbar.setArm(0.18);
+                    bot.slides.runTo(bot.slides.getPosition()-600);
                 }
-            } else if (gp1.wasJustPressed(GamepadKeys.Button.DPAD_LEFT)){
-                bot.intake.power = bot.intake.power - 0.01;
-            } else if (gp1.wasJustPressed(GamepadKeys.Button.DPAD_RIGHT)){
-                bot.intake.power = bot.intake.power + 0.01;
             }
-            inverseKinematics(gp2.getRightY(), ikCoefficient);
+            bot.fourbar.runArm(gp2.getRightY());
 
             // TELEMETRY
-            telemetry.addData("Field Centric",fieldCentric + "Heading: " + Math.toDegrees(drive.getPoseEstimate().getHeading()));
-            bot.setHeading(drive.getPoseEstimate().getHeading());
+            telemetry.addData("Field Centric",fieldCentric + " Heading: " + Math.toDegrees(drive.getPoseEstimate().getHeading()));;
 
             telemetry.addData("Bot State",bot.state);
-            telemetry.addData("Slides Position", bot.slides.getPosition() + " (pos: " + bot.slides.position + " current: " + bot.slides.getCurrent() + ")");
-            telemetry.addData("Intake Power", bot.intake.power +"(running: " + bot.intake.getIsRunning() + ")");
             telemetry.addData("Pixels", bot.claw.getClawState());
+            telemetry.addData("Slides Position", bot.slides.getPosition() + " (pos: " + bot.slides.position + " current: " + bot.slides.getCurrent() + ")");
+
+            telemetry.addData("Intake Power", bot.intake.power +"(running: " + bot.intake.getIsRunning() + ")");
 
             telemetry.addData("X = ", gp1.getLeftX());
             telemetry.addData("Y = ", gp1.getLeftY());
@@ -240,12 +238,8 @@ public class MainTeleOp extends LinearOpMode {
 
             telemetry.update();
             bot.slides.periodic();
+            bot.setHeading(drive.getPoseEstimate().getHeading());
         }
-    }
-
-    public void inverseKinematics(double manual, double ikCoefficient) {
-        //bot.slides.runManual(ikCoefficient * -manual * -0.5);//-0.5 and coefficient and - on the manual arent doing anything
-        bot.fourbar.runArm(manual);
     }
 
     // Driving

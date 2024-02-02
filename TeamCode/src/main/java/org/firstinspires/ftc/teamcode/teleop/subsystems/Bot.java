@@ -154,9 +154,9 @@ public class Bot {
                 } else if (claw.getClawState() == 1) {
                     fourbar.setArm(0.3);
                     fourbar.setWrist(0.22);
-                    if (slides.getPosition() > -1700) {
+                    if (slides.getPosition() > -2400) {
                         slides.runTo(slides.getPosition() - 500);
-                    } else if (slides.getPosition() <=-1700){
+                    } else if (slides.getPosition() <= -2400){
                         slides.runTo(-2300);
                     }
                     try { Thread.sleep(300); } catch (InterruptedException ignored) {}
@@ -192,10 +192,6 @@ public class Bot {
             intake.runReverseIntake();
         }
     }
-
-    // IK DEMOS?
-    public void ikDemo1() { fourbar.setArm(0.35); slides.runTo(slides.getPosition()+600);}
-    public void ikDemo2() { fourbar.setArm(0.18); slides.runTo(slides.getPosition()-600);}
 
     // MOTORS
     public void fixMotors() {

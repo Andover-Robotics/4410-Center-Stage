@@ -13,7 +13,7 @@ public class Intake {
     private final CRServo counterRoller;
     private final Servo intakeLeft, intakeRight;
 
-    public double power = 0.24, counterPower = 1.0; // optimal speed for intake
+    public static double power = 0.24, counterPower = 1.0; // optimal speed for intake
     public double intakeStorage = 0.0, intakeOut = 0.27, intakeStack1 = 0.2, intakeStack2 = 0.26; // TODO: TUNE THESE VALUES
     private boolean isRunning = false;
 
@@ -49,6 +49,11 @@ public class Intake {
         noodles.set(0);
         counterRoller.set(0);
         isRunning = false;
+    }
+
+    public void changePower(boolean increment) {
+        if (increment) power+=0.01;
+        else power-=0.01;
     }
 
     public void setIntakeHeight(double position) {
