@@ -42,8 +42,8 @@ public class TestAutonomous extends LinearOpMode {
     private int secondsElapsed = 0; // Track how many seconds have passed
 
     // CONFIGURATION VARIABLES
-    enum Side {CLOSE, FAR} public static Side side = Side.CLOSE;
-    enum Alliance {BLUE, RED} public static Alliance alliance = Alliance.BLUE;
+    enum Side {CLOSE, FAR} public static Side side = Side.CLOSE; // Side relative to backboard, defaults close
+    enum Alliance {BLUE, RED} public static Alliance alliance = Alliance.BLUE; // Alliance, defaults blue
     public static int park = 0; // Parking position (0-none, 1-left, 2-right)
     public static int spikeMark = 0; // Which spike mark randomization object is detected on (1-left, 2-center, 3-right)
     public static int stackIterations = 0; // How many times go to stack (0-none, 1-2+2, 2-2+4, 3-2+5)

@@ -144,7 +144,7 @@ public class Bot {
         }
     }
 
-    public void drop() { // drop pixel in outtake or storage position
+    public void drop()  { // drop pixel in outtake or storage position
         Thread thread = new Thread(() -> {
             claw.open();
             try { Thread.sleep(300); } catch (InterruptedException ignored) {}
@@ -155,11 +155,11 @@ public class Bot {
                     fourbar.setArm(0.3);
                     fourbar.setWrist(0.22);
                     if (slides.getPosition() > -2400) {
-                        slides.runTo(slides.getPosition() - 500);
+                        slides.runTo(slides.getPosition() - 300);
                     } else if (slides.getPosition() <= -2400){
                         slides.runTo(-2300);
                     }
-                    try { Thread.sleep(300); } catch (InterruptedException ignored) {}
+                    try { Thread.sleep(900); } catch (InterruptedException ignored) {}
                     fourbar.topOuttake(false);
                     claw.close();
                 }
@@ -179,7 +179,6 @@ public class Bot {
             } else {
                 storage();
             }
-            //bot.claw.close();
         });
         thread.start();
     }
