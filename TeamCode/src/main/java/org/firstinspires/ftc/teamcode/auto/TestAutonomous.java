@@ -372,7 +372,11 @@ public class TestAutonomous extends LinearOpMode {
                 sleep(100);
 
                 // Pixel stack trajectory starts here
-                double [] stackHeights = {0.2, 0.26, 0.27}; // Array with preset stack heights
+                double [] stackHeights = {
+                        0.2,
+                        0.26,
+                        0.27
+                };
                 if (toStack) {
                     int stackY1 = alliance == Alliance.RED ? -11 : 11;
                     int stackY2 = alliance == Alliance.RED ? -30 : 30;

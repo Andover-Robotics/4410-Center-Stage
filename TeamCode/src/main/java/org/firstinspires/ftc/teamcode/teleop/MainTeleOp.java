@@ -112,15 +112,7 @@ public class MainTeleOp extends LinearOpMode {
                     bot.pickup();
                 }
                 if (gp2.wasJustPressed(GamepadKeys.Button.RIGHT_BUMPER)) { // drop pixel while in storage
-                    thread = new Thread(() -> {
-                        bot.fourbar.setArm(0.93);
-                        bot.intake.setIntakeHeight(0.1);
-                        sleep(100);
-                        bot.claw.open();
-                        sleep(100);
-                        bot.fourbar.storage();
-                    });
-                    thread.start();
+                    bot.drop();
                 }
                 if (gp2.wasJustPressed(GamepadKeys.Button.Y)) { // go to outtake out position
                     bot.outtakeOut(bot.claw.getClawState());
@@ -131,25 +123,7 @@ public class MainTeleOp extends LinearOpMode {
             } else if (bot.state == Bot.BotState.OUTTAKE_OUT) { // SCORING BACKBOARD
                 bot.slides.runManual(gp2.getRightY()*-0.5);
                 if (gp2.wasJustPressed(GamepadKeys.Button.Y)) { // drop and return to storage
-                    bot.claw.open();
-                    sleep(300);
-                    thread = new Thread(() -> {
-                        if (bot.claw.getClawState() == 0) {
-                            bot.storage();
-                        } else if (bot.claw.getClawState() == 1) {
-                            bot.fourbar.setArm(0.3);
-                            bot.fourbar.setWrist(0.22);
-                            if (bot.slides.getPosition() > -2400) {
-                                bot.slides.runTo(bot.slides.getPosition() - 300);
-                            } else if (bot.slides.getPosition() <= -2400){
-                                bot.slides.runTo(-2300);
-                            }
-                            sleep(900);
-                            bot.fourbar.topOuttake(false);
-                            bot.claw.close();
-                        }
-                    });
-                    thread.start();
+                    bot.drop();
                 }
                 if (gp2.wasJustPressed(GamepadKeys.Button.B)) { // cancel and return to storage
                     bot.storage() ;
@@ -162,14 +136,7 @@ public class MainTeleOp extends LinearOpMode {
                 }
             } else if (bot.state == Bot.BotState.OUTTAKE_DOWN) { // SCORING GROUND
                 if (gp2.wasJustPressed(GamepadKeys.Button.X)) {
-                    thread = new Thread(() -> {
-                        if (bot.claw.getClawState() == 0) {
-                            bot.storage();
-                        } else if (bot.claw.getClawState() == 1) {
-                            bot.fourbar.ground();
-                        }
-                    });
-                    thread.start();
+                    bot.drop();
                 }
                 if (gp2.wasJustPressed(GamepadKeys.Button.A)) { // cancel and return to storage
                     bot.storage();
@@ -275,45 +242,6 @@ public class MainTeleOp extends LinearOpMode {
             bot.slides.periodic();
             bot.setHeading(drive.getPoseEstimate().getHeading());
         }
-    }
-
-    public void drop() {
-        Thread thread = new Thread(() -> {
-            bot.claw.open();
-            sleep(300);
-            if (bot.state == Bot.BotState.OUTTAKE_OUT) {
-                if (bot.claw.getClawState() == 0) {
-                    bot.storage();
-                } else if (bot.claw.getClawState() == 1) {
-                    bot.fourbar.setArm(0.3);
-                    bot.fourbar.setWrist(0.22);
-                    if (bot.slides.getPosition() > -2400) {
-                        bot.slides.runTo(bot.slides.getPosition() - 300);
-                    } else if (bot.slides.getPosition() <= -2400){
-                        bot.slides.runTo(-2300);
-                    }
-                    sleep(900);
-                    bot.fourbar.topOuttake(false);
-                    bot.claw.close();
-                }
-            } else if (bot.state == Bot.BotState.OUTTAKE_DOWN) {
-                if (bot.claw.getClawState() == 0) {
-                    bot.storage();
-                } else if (bot.claw.getClawState() == 1) {
-                    bot.fourbar.ground();
-                }
-            } else if (bot.state == Bot.BotState.STORAGE) {
-                bot.fourbar.setArm(0.93);
-                bot.intake.setIntakeHeight(0.1);
-                sleep(100);
-                bot.claw.open();
-                sleep(100);
-                bot.fourbar.storage();
-            } else {
-                bot.storage();
-            }
-        });
-        thread.start();
     }
 
     // Driving
