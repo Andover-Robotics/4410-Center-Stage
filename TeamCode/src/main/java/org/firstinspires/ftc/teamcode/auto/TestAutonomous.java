@@ -121,6 +121,16 @@ public class TestAutonomous extends LinearOpMode {
         });
         pickup.start();
 
+        Thread stopAuto = new Thread(() -> {
+            while (opModeIsActive() && !isStopRequested()) {
+                if (drive.getExternalHeadingVelocity() > (0.2 * DriveConstants.MAX_ANG_VEL)) {
+                    telemetry.addLine("SHUTTING DOWN!!!");
+                    requestOpModeStop();
+                }
+            }
+        });
+
+
         // Configuration variables
         boolean dropped = false;
         String spikeMarkString = "", stackString = "";
@@ -247,6 +257,7 @@ public class TestAutonomous extends LinearOpMode {
         if (opModeIsActive() && !isStopRequested()) {
             // Run threads
             trackTime.start();
+            stopAuto.start();
             periodic.start();
 
             // Define starting pose
@@ -281,6 +292,7 @@ public class TestAutonomous extends LinearOpMode {
                 } else { // Far side
                     switch (spikeMark) {
                         case 1:
+
                         case 2:
                         case 3:
                     }
@@ -300,9 +312,13 @@ public class TestAutonomous extends LinearOpMode {
                                 .build(); break;
                     }
                 } else { // Far side
-                    switch (spikeMark) {
+                    switch (spikeMark) { // left, center, right
                         case 1:
+                            spikeTrajectory = drive.trajectorySequenceBuilder(drive.getPoseEstimate())
+                                    .lineToSplineHeading(new Pose2d(-42, 46, Math.toRadians(130)))
+                                    .splineToSplineHeading(new Pose2d(-36, 32, Math.toRadians(180)), Math.toRadians(1)).build();break;
                         case 2:
+                            spikeTrajectory = drive.trajectorySequenceBuilder(drive.getPoseEstimate()).lineTo(new Vector2d(-38,13)).build();break;
                         case 3: spikeTrajectory = drive.trajectorySequenceBuilder(drive.getPoseEstimate()).back(2)
                                 .lineToSplineHeading(new Pose2d(-46, 15, Math.toRadians(90)))
                                 .build(); break;
@@ -331,7 +347,11 @@ public class TestAutonomous extends LinearOpMode {
                     } else {
                         switch (spikeMark) {
                             case 1:
+                                farTrajectory = drive.trajectorySequenceBuilder(drive.getPoseEstimate()).lineToSplineHeading(new Pose2d(25, 11, Math.toRadians(180)))
+                                    .splineToConstantHeading(new Vector2d(51, 29), Math.toRadians(0)).build();break;
                             case 2:
+                                farTrajectory = drive.trajectorySequenceBuilder(drive.getPoseEstimate()).lineToSplineHeading(new Pose2d(25, 11, Math.toRadians(180)))
+                                        .splineToConstantHeading(new Vector2d(51, 29), Math.toRadians(0)).build();break;
                             case 3: farTrajectory = drive.trajectorySequenceBuilder(drive.getPoseEstimate()).back(2)
                                     .lineToLinearHeading(new Pose2d(-30, 11, Math.toRadians(180)))
                                     .lineToSplineHeading(new Pose2d(25, 11, Math.toRadians(180)))

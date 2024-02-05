@@ -66,37 +66,6 @@ public class MeepMeepTesting {
                         .waitSeconds(1) // Place yellow pixel
                         .splineToLinearHeading(new Pose2d(52, 59, Math.toRadians(180)),Math.toRadians(15)) // To park
                         .build());
-        // CLOSE RED
-        Pose2d redCloseStart = new Pose2d(12,-60,Math.toRadians(90));
-        RoadRunnerBotEntity redCenter1 = new DefaultBotBuilder(meepMeep)
-                .setColorScheme(new ColorSchemeRedLight())
-                .setConstraints(60, 60, Math.toRadians(180), Math.toRadians(180), 13)
-                .followTrajectorySequence(drive -> drive.trajectorySequenceBuilder(redCloseStart)
-                        // 2+0
-                        .splineToConstantHeading(new Vector2d(25, -40), Math.toRadians(45))
-                        .splineToSplineHeading(new Pose2d(12, -33, Math.toRadians(180)), Math.toRadians(180))
-                        .waitSeconds(0.5) // Place purple pixel
-                        .lineToLinearHeading(new Pose2d(51, -35, Math.toRadians(180))) // To backboard
-                        .waitSeconds(1) // Place yellow pixel
-//                        .splineToLinearHeading(new Pose2d(55, -11, Math.toRadians(180)),Math.toRadians(20))
-//                        .waitSeconds(1)
-//                        // 2+2
-//                        .splineToLinearHeading(new Pose2d(30, -11, Math.toRadians(180)), Math.toRadians(180)) // To stage door
-//                        .lineToLinearHeading(new Pose2d(-60, -11, Math.toRadians(180))) // To stack across field
-//                        .waitSeconds(1) // Intake from stack
-//                        .lineToLinearHeading(new Pose2d(38, -11, Math.toRadians(180))) // Return across field
-//                        .splineToLinearHeading(new Pose2d(50, -30, Math.toRadians(180)), Math.toRadians(0)) // To backboard
-//                        .waitSeconds(1) // Place pixels on backboard
-//                        // 2+4
-//                        .splineToLinearHeading(new Pose2d(30, -11, Math.toRadians(180)), Math.toRadians(180)) // To stage door
-//                        .lineToLinearHeading(new Pose2d(-60, -11, Math.toRadians(180))) // To stack across field
-//                        .waitSeconds(1) // Intake from stack
-//                        .lineToLinearHeading(new Pose2d(38, -11, Math.toRadians(180))) // Return across field
-//                        .splineToLinearHeading(new Pose2d(50, -30, Math.toRadians(180)), Math.toRadians(0)) // To backboard
-//                        .waitSeconds(1) // Place pixels on backboard
-//                        .splineToLinearHeading(new Pose2d(52, -11, Math.toRadians(180)),Math.toRadians(15)) // To park
-                        .build());
-
         // FAR
         Pose2d blueFarStart = new Pose2d(-35,60,Math.toRadians(90));
         RoadRunnerBotEntity blueRight2 = new DefaultBotBuilder(meepMeep)
@@ -141,10 +110,72 @@ public class MeepMeepTesting {
                         .splineToConstantHeading(new Vector2d(51, 29), Math.toRadians(0)) // To backboard
                         .waitSeconds(1) // Place yellow pixel
                         .build());
+        RoadRunnerBotEntity blueLeft2 = new DefaultBotBuilder(meepMeep)
+                .setColorScheme(new ColorSchemeBlueDark())
+                .setConstraints(60, 60, Math.toRadians(180), Math.toRadians(180), 13)
+                .followTrajectorySequence(drive -> drive.trajectorySequenceBuilder(blueFarStart)
+                        // 2+1
+                        .lineToSplineHeading(new Pose2d(-42, 46, Math.toRadians(130))) // -25, 32
+                        .splineToSplineHeading(new Pose2d(-36, 32, Math.toRadians(180)), Math.toRadians(1)) // -25, 32
+                        .waitSeconds(0.5) // Place purple pixel
+                        .splineToConstantHeading(new Vector2d(-60, 11), Math.toRadians(180))
+//                        .lineToSplineHeading(new Pose2d(-30, 30, Math.toRadians(180))) // To spike mark
+//                        .waitSeconds(0.5) // Place purple pixel
+//
+//                        .lineToLinearHeading(new Pose2d(-37,20, Math.toRadians(0)))
+//                        .splineToSplineHeading(new Pose2d(-60, 11, Math.toRadians(180)), Math.toRadians(180))
+//                        .splineToConstantHeading(new Vector2d(-60,11), Math.toRadians(180))// to stack
+//                        .splineToSplineHeading(new Pose2d(-60, 11, Math.toRadians(180)), Math.toRadians(180))
+//                        .forward(10)
+                        .waitSeconds(1) // Intake from stack
+                        .lineToSplineHeading(new Pose2d(25, 11, Math.toRadians(180)))
+                        .splineToConstantHeading(new Vector2d(51, 29), Math.toRadians(0)) // To backboard
+                        .waitSeconds(1) // Place yellow pixel
+                        .splineToLinearHeading(new Pose2d(52, 11, Math.toRadians(180)),Math.toRadians(15)) // To park
+                        .build());
+        // CLOSE RED
+        Pose2d redCloseStart = new Pose2d(12,-60,Math.toRadians(90));
+        RoadRunnerBotEntity redCenter1 = new DefaultBotBuilder(meepMeep)
+                .setColorScheme(new ColorSchemeRedLight())
+                .setConstraints(60, 60, Math.toRadians(180), Math.toRadians(180), 13)
+                .followTrajectorySequence(drive -> drive.trajectorySequenceBuilder(redCloseStart)
+                        // 2+0
+                        .splineToConstantHeading(new Vector2d(25, -40), Math.toRadians(45))
+                        .splineToSplineHeading(new Pose2d(12, -33, Math.toRadians(180)), Math.toRadians(180))
+                        .waitSeconds(0.5) // Place purple pixel
+                        .lineToLinearHeading(new Pose2d(51, -35, Math.toRadians(180))) // To backboard
+                        .waitSeconds(1) // Place yellow pixel
+//                        .splineToLinearHeading(new Pose2d(55, -11, Math.toRadians(180)),Math.toRadians(20))
+//                        .waitSeconds(1)
+//                        // 2+2
+//                        .splineToLinearHeading(new Pose2d(30, -11, Math.toRadians(180)), Math.toRadians(180)) // To stage door
+//                        .lineToLinearHeading(new Pose2d(-60, -11, Math.toRadians(180))) // To stack across field
+//                        .waitSeconds(1) // Intake from stack
+//                        .lineToLinearHeading(new Pose2d(38, -11, Math.toRadians(180))) // Return across field
+//                        .splineToLinearHeading(new Pose2d(50, -30, Math.toRadians(180)), Math.toRadians(0)) // To backboard
+//                        .waitSeconds(1) // Place pixels on backboard
+//                        // 2+4
+//                        .splineToLinearHeading(new Pose2d(30, -11, Math.toRadians(180)), Math.toRadians(180)) // To stage door
+//                        .lineToLinearHeading(new Pose2d(-60, -11, Math.toRadians(180))) // To stack across field
+//                        .waitSeconds(1) // Intake from stack
+//                        .lineToLinearHeading(new Pose2d(38, -11, Math.toRadians(180))) // Return across field
+//                        .splineToLinearHeading(new Pose2d(50, -30, Math.toRadians(180)), Math.toRadians(0)) // To backboard
+//                        .waitSeconds(1) // Place pixels on backboard
+//                        .splineToLinearHeading(new Pose2d(52, -11, Math.toRadians(180)),Math.toRadians(15)) // To park
+                        .build());
+        // RED FAR
+        Pose2d redFarStart = new Pose2d(-36,-60,Math.toRadians(90));
+        RoadRunnerBotEntity redCenter2 = new DefaultBotBuilder(meepMeep)
+                .setColorScheme(new ColorSchemeRedLight())
+                .setConstraints(60, 60, Math.toRadians(180), Math.toRadians(180), 13)
+                .followTrajectorySequence(drive -> drive.trajectorySequenceBuilder(redFarStart)
+                        .splineToSplineHeading(new Pose2d(0,0,Math.toRadians(90)),Math.toRadians(90))
+                        .build());
+
 
         meepMeep.setBackground(MeepMeep.Background.FIELD_CENTERSTAGE_OFFICIAL)
                 .addEntity(blueCenter2)
-                .addEntity(blueRight2)
+//                .addEntity(blueRight2)
                 .start();
     }
 }
