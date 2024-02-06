@@ -133,14 +133,14 @@ public class TestAutonomous extends LinearOpMode {
 
         // Configuration variables
         boolean dropped = false;
-        String spikeMarkString = "", stackString = "";
+        String spikeMarkString = "", stackString = "", parkString = "";
         /*
         LIST OF CONFIGURATION CONTROLS: last updated 1/29/24 - zachery
 
         Y - change alliance
         A - change side
-        X - pixel stack config
-        B -
+        X - change park
+        B - change pixel stack configurations
 
         dpad up - backboard delay
         dpad down - spike mark delay
@@ -205,6 +205,16 @@ public class TestAutonomous extends LinearOpMode {
                 }
             }
             telemetry.addData("pixel stack", stackString + " (x" + stackIterations + ")");
+
+            // Change park
+            if (gp1.wasJustPressed(GamepadKeys.Button.X)) {
+                switch (park) {
+                    case 0: park = 1; parkString = "Left"; break;
+                    case 1: park = 2; parkString = "Right"; break;
+                    case 2: park = 0; parkString = "None"; break;
+                }
+            }
+            telemetry.addData("Parking (X)", parkString);
 
             // DELAYS
             // Backboard
