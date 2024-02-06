@@ -183,6 +183,20 @@ public class Bot {
         thread.start();
     }
 
+    public void drop(boolean manual) { // Extra manual drop open for tele-op in case only 1 pixel
+        if (manual) {
+            fourbar.setArm(0.3);
+            fourbar.setWrist(0.22);
+            if (slides.getPosition() > -2400) {
+                slides.runTo(slides.getPosition() - 300);
+            } else if (slides.getPosition() <= -2400){
+                slides.runTo(-2300);
+            }
+            try { Thread.sleep(900); } catch (InterruptedException ignored) {}
+            storage();
+        }
+    }
+
     public void intake(boolean isReverse) { // intake/reverse intake
         if (intake.getIntakeHeight() != intake.intakeOut) intake.setIntakeHeight(intake.intakeOut);
         if (!isReverse) {
