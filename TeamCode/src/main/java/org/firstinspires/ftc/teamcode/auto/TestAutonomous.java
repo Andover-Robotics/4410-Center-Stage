@@ -189,14 +189,22 @@ public class TestAutonomous extends LinearOpMode {
 
             // Change pixel stack configurations
             if (gp1.wasJustPressed(GamepadKeys.Button.B)) {
-                switch (stackIterations) {
-                    case 0: stackIterations = 1; toStack = true; stackString = "2+2"; break;
-                    case 1: stackIterations = 2; toStack = true; stackString = "2+4"; break;
-                    case 2: stackIterations = 3; toStack = true; stackString = "2+5"; break;
-                    case 3: stackIterations = 0; toStack = false; stackString = "2+0"; break;
+                if (side == Side.CLOSE) {
+                    switch (stackIterations) {
+                        case 0: stackIterations = 1; toStack = true; stackString = "2+2"; break;
+                        case 1: stackIterations = 2; toStack = true; stackString = "2+4"; break;
+                        case 2: stackIterations = 3; toStack = true; stackString = "2+5"; break;
+                        case 3: stackIterations = 0; toStack = false; stackString = "2+0"; break;
+                    }
+                } else {
+                    switch (stackIterations) {
+                        case 0: stackIterations = 1; toStack = true; stackString = "2+3"; break;
+                        case 1: stackIterations = 2; toStack = true; stackString = "2+5"; break;
+                        case 2: stackIterations = 0; toStack = false; stackString = "2+0"; break;
+                    }
                 }
             }
-            telemetry.addData("pixel stack", stackString + " (" + stackIterations + "x)");
+            telemetry.addData("pixel stack", stackString + " (x" + stackIterations + ")");
 
             // DELAYS
             // Backboard
@@ -278,7 +286,8 @@ public class TestAutonomous extends LinearOpMode {
             if (alliance == Alliance.RED) {
                 if (side == Side.CLOSE) { // Close side
                     switch (spikeMark) {
-                        case 1: spikeTrajectory = drive.trajectorySequenceBuilder(drive.getPoseEstimate()).back(2)
+                        case 1: spikeTrajectory = drive.trajectorySequenceBuilder(drive.getPoseEstimate())
+                                .back(2)
                                 .splineToConstantHeading(new Vector2d(25, -40), Math.toRadians(45))
                                 .splineToSplineHeading(new Pose2d(12, -33, Math.toRadians(180)), Math.toRadians(180))
                                 .build(); break;
@@ -291,10 +300,17 @@ public class TestAutonomous extends LinearOpMode {
                     }
                 } else { // Far side
                     switch (spikeMark) {
-                        case 1:
-
-                        case 2:
-                        case 3:
+                        case 1: spikeTrajectory = drive.trajectorySequenceBuilder(drive.getPoseEstimate())
+                                .lineToSplineHeading(new Pose2d(-44, -45, Math.toRadians(130)))
+                                .splineToSplineHeading(new Pose2d(-35, -35, Math.toRadians(180)), Math.toRadians(1))
+                                .build(); break;
+                        case 2: spikeTrajectory = drive.trajectorySequenceBuilder(drive.getPoseEstimate())
+                                .lineTo(new Vector2d(-38,-14))
+                                .build(); break;
+                        case 3: spikeTrajectory = drive.trajectorySequenceBuilder(drive.getPoseEstimate())
+                                .lineToSplineHeading(new Pose2d(-42, -46, Math.toRadians(130)))
+                                .splineToSplineHeading(new Pose2d(-36, -32, Math.toRadians(180)), Math.toRadians(1))
+                                .build(); break;
                     }
                 }
             } else {
@@ -312,15 +328,17 @@ public class TestAutonomous extends LinearOpMode {
                                 .build(); break;
                     }
                 } else { // Far side
-                    switch (spikeMark) { // left, center, right
-                        case 1:
-                            spikeTrajectory = drive.trajectorySequenceBuilder(drive.getPoseEstimate())
-                                    .lineToSplineHeading(new Pose2d(-42, 46, Math.toRadians(130)))
-                                    .splineToSplineHeading(new Pose2d(-36, 32, Math.toRadians(180)), Math.toRadians(1)).build();break;
-                        case 2:
-                            spikeTrajectory = drive.trajectorySequenceBuilder(drive.getPoseEstimate()).lineTo(new Vector2d(-38,13)).build();break;
-                        case 3: spikeTrajectory = drive.trajectorySequenceBuilder(drive.getPoseEstimate()).back(2)
-                                .lineToSplineHeading(new Pose2d(-46, 15, Math.toRadians(90)))
+                    switch (spikeMark) {
+                        case 1: spikeTrajectory = drive.trajectorySequenceBuilder(drive.getPoseEstimate())
+                                .lineToSplineHeading(new Pose2d(-42, 46, Math.toRadians(130)))
+                                .splineToSplineHeading(new Pose2d(-36, 32, Math.toRadians(180)), Math.toRadians(1))
+                                .build(); break;
+                        case 2: spikeTrajectory = drive.trajectorySequenceBuilder(drive.getPoseEstimate())
+                                .lineTo(new Vector2d(-38,14))
+                                .build(); break;
+                        case 3: spikeTrajectory = drive.trajectorySequenceBuilder(drive.getPoseEstimate())
+                                .lineToSplineHeading(new Pose2d(-44, 45, Math.toRadians(130)))
+                                .splineToSplineHeading(new Pose2d(-35, 35, Math.toRadians(180)), Math.toRadians(1))
                                 .build(); break;
                     }
                 }
@@ -335,30 +353,50 @@ public class TestAutonomous extends LinearOpMode {
 
             // To backboard
             if (toBackboard) {
-                // Extra movement through stage door for far side
+                // Extra movements for pixel stack on far side
                 if (side == Side.FAR) {
-                    TrajectorySequence farTrajectory = null;
+                    TrajectorySequence stackTrajectory = null;
+                    int stackX = -59;
                     if (alliance == Alliance.RED) {
                         switch (spikeMark) {
-                            case 1:
-                            case 2:
-                            case 3:
+                            case 1: stackTrajectory = drive.trajectorySequenceBuilder(drive.getPoseEstimate())
+                                    .lineToLinearHeading(new Pose2d(-37, -24, Math.toRadians(180)))
+                                    .splineToConstantHeading(new Vector2d(stackX, -11), Math.toRadians(225))
+                                    .build(); break;
+                            case 2: stackTrajectory = drive.trajectorySequenceBuilder(drive.getPoseEstimate())
+                                    .lineToSplineHeading(new Pose2d(stackX, -11, Math.toRadians(180)))
+                                    .build(); break;
+                            case 3: stackTrajectory = drive.trajectorySequenceBuilder(drive.getPoseEstimate())
+                                    .lineToSplineHeading(new Pose2d(-36, -16, Math.toRadians(180)))
+                                    .splineToConstantHeading(new Vector2d(stackX, -11), Math.toRadians(180))
+                                    .build(); break;
                         }
                     } else {
                         switch (spikeMark) {
-                            case 1:
-                                farTrajectory = drive.trajectorySequenceBuilder(drive.getPoseEstimate()).lineToSplineHeading(new Pose2d(25, 11, Math.toRadians(180)))
-                                    .splineToConstantHeading(new Vector2d(51, 29), Math.toRadians(0)).build();break;
-                            case 2:
-                                farTrajectory = drive.trajectorySequenceBuilder(drive.getPoseEstimate()).lineToSplineHeading(new Pose2d(25, 11, Math.toRadians(180)))
-                                        .splineToConstantHeading(new Vector2d(51, 29), Math.toRadians(0)).build();break;
-                            case 3: farTrajectory = drive.trajectorySequenceBuilder(drive.getPoseEstimate()).back(2)
-                                    .lineToLinearHeading(new Pose2d(-30, 11, Math.toRadians(180)))
-                                    .lineToSplineHeading(new Pose2d(25, 11, Math.toRadians(180)))
+                            case 1: stackTrajectory = drive.trajectorySequenceBuilder(drive.getPoseEstimate())
+                                    .lineToSplineHeading(new Pose2d(-36, 16, Math.toRadians(180)))
+                                    .splineToConstantHeading(new Vector2d(stackX, 11), Math.toRadians(180))
+                                    .build(); break;
+                            case 2: stackTrajectory = drive.trajectorySequenceBuilder(drive.getPoseEstimate())
+                                    .lineToSplineHeading(new Pose2d(stackX, 11, Math.toRadians(180)))
+                                    .build(); break;
+                            case 3: stackTrajectory = drive.trajectorySequenceBuilder(drive.getPoseEstimate())
+                                    .lineToLinearHeading(new Pose2d(-37, 24, Math.toRadians(180)))
+                                    .splineToConstantHeading(new Vector2d(stackX, 11), Math.toRadians(225))
                                     .build(); break;
                         }
                     }
-                    drive.followTrajectorySequence(farTrajectory);
+                    drive.followTrajectorySequence(stackTrajectory);
+                    // Intake from stack
+                    bot.intake.setIntakeHeight(0.18);
+                    bot.intake(false);
+                    sleep(1000);
+                    bot.intake.setIntakeHeight(bot.intake.intakeStorage);
+                    // Across the field
+                    int farY = alliance == Alliance.RED ? -11 : 11;
+                    drive.followTrajectorySequence(drive.trajectorySequenceBuilder(drive.getPoseEstimate())
+                            .lineToSplineHeading(new Pose2d(25, farY, Math.toRadians(180)))
+                            .build());
                 }
 
                 // Define backboard y value
@@ -386,17 +424,27 @@ public class TestAutonomous extends LinearOpMode {
                         })
                         .build());
                 // Place yellow pixel
-                bot.claw.setPosition(0.66);
-                sleep(400);
-                bot.fourbar.setWrist(0.65);
-                sleep(100);
+                if (side == Side.CLOSE) {
+                    bot.claw.setPosition(0.66);
+                    sleep(400);
+                    bot.fourbar.setWrist(0.65);
+                    sleep(100);
+                } else { // Place both white and yellow
+                    bot.intake.stopIntake();
+                    bot.claw.halfOpen();
+                    sleep(400);
+                    bot.fourbar.setWrist(0.22);
+                    bot.slides.runTo(-800);
+                    bot.outtakeOut(1);
+                    sleep(300);
+                    bot.fourbar.setWrist(0.13);
+                    sleep(100);
+                    bot.claw.setPosition(0.66);
+                    sleep(200);
+                }
 
                 // Pixel stack trajectory starts here
-                double [] stackHeights = {
-                        0.2,
-                        0.26,
-                        0.27
-                };
+                double [] stackHeights = side == Side.FAR ? new double [] {0.2, 0.24, 0.27} : new double [] {0.22, 0.27};
                 if (toStack) {
                     int stackY1 = alliance == Alliance.RED ? -11 : 11;
                     int stackY2 = alliance == Alliance.RED ? -30 : 30;
@@ -417,7 +465,7 @@ public class TestAutonomous extends LinearOpMode {
                                 })
                                 .lineToLinearHeading(new Pose2d(-60, stackY1, Math.toRadians(180)))
                                 .build());
-                        // Intake from stack - 1 second
+                        // Intake from stack
                         bot.intake.setIntakeHeight(stackHeights[i]);
                         bot.intake(false);
                         sleep(1000);

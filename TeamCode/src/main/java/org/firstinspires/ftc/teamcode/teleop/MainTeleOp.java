@@ -202,6 +202,11 @@ public class MainTeleOp extends LinearOpMode {
             } else if (gp1.wasJustPressed(GamepadKeys.Button.DPAD_LEFT)) { // decrement power
                 bot.intake.changePower(false);
             }
+            if (gp1.wasJustPressed(GamepadKeys.Button.DPAD_UP)){ // increase height
+                bot.intake.setIntakeHeight(bot.intake.getIntakeHeight());
+            } else if (gp1.wasJustPressed(GamepadKeys.Button.DPAD_DOWN)) { // lower height
+
+            }
 
             // DRONE
             if (gp1.wasJustPressed(GamepadKeys.Button.B)) { // launch drone
@@ -210,18 +215,6 @@ public class MainTeleOp extends LinearOpMode {
                 bot.launcher.reset();
             }
 
-            // IK?
-            if (gp1.wasJustPressed(GamepadKeys.Button.DPAD_UP)){
-                if (bot.slides.getPosition() < -630 ){
-                    bot.fourbar.setArm(0.35);
-                    bot.slides.runTo(bot.slides.getPosition()+600);
-                }
-            } else if (gp1.wasJustPressed(GamepadKeys.Button.DPAD_DOWN)) {
-                if (bot.slides.getPosition() > -1700) {
-                    bot.fourbar.setArm(0.18);
-                    bot.slides.runTo(bot.slides.getPosition()-600);
-                }
-            }
             bot.fourbar.runArm(gp2.getRightY());
 
             // TELEMETRY
