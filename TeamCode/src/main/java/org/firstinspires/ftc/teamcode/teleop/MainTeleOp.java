@@ -43,9 +43,7 @@ public class MainTeleOp extends LinearOpMode {
     private GamepadEx gp1, gp2;
     private boolean fieldCentric = false;
     Thread thread;
-    DistanceSensor distance;
-
-    double ikCoefficient = 1;
+    DistanceSensor distanceSensor;
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -61,7 +59,7 @@ public class MainTeleOp extends LinearOpMode {
         gp1 = new GamepadEx(gamepad1);
         gp2 = new GamepadEx(gamepad2);
 
-        distance = hardwareMap.get(DistanceSensor.class, "Distance");
+        distanceSensor = hardwareMap.get(DistanceSensor.class, "Distance");
 
         // Initialize bot
         bot.stopMotors();
@@ -147,7 +145,7 @@ public class MainTeleOp extends LinearOpMode {
             }
 
             // Distance sensor
-            if (distance.getDistance(DistanceUnit.CM) < 9) {
+            if (distanceSensor.getDistance(DistanceUnit.CM) < 9) { // Slows down driving when approaching object
                 driveMultiplier = 0.3;
             } else {
                 driveMultiplier = 1;
@@ -202,10 +200,10 @@ public class MainTeleOp extends LinearOpMode {
             } else if (gp1.wasJustPressed(GamepadKeys.Button.DPAD_LEFT)) { // decrement power
                 bot.intake.changePower(false);
             }
-            if (gp1.wasJustPressed(GamepadKeys.Button.DPAD_UP)){ // increase height
-                bot.intake.setIntakeHeight(bot.intake.getIntakeHeight());
-            } else if (gp1.wasJustPressed(GamepadKeys.Button.DPAD_DOWN)) { // lower height
-
+            if (gp1.wasJustPressed(GamepadKeys.Button.DPAD_UP)){ // go to storage position
+                bot.intake.setIntakeHeight(bot.intake.intakeStorage);
+            } else if (gp1.wasJustPressed(GamepadKeys.Button.DPAD_DOWN)) { // go to out position
+                bot.intake.setIntakeHeight(bot.intake.intakeOut);
             }
 
             // DRONE
@@ -225,7 +223,7 @@ public class MainTeleOp extends LinearOpMode {
             telemetry.addData("Slides Position", bot.slides.getPosition() + " (pos: " + bot.slides.position + " current: " + bot.slides.getCurrent() + ")");
 
             telemetry.addData("Intake Power", Intake.power +"(running: " + bot.intake.getIsRunning() + ")");
-            telemetry.addData("Distance to wall (cm)", distance.getDistance(DistanceUnit.CM));
+            telemetry.addData("Distance to wall (cm)", distanceSensor.getDistance(DistanceUnit.CM));
 
             telemetry.addData("X = ", gp1.getLeftX());
             telemetry.addData("Y = ", gp1.getLeftY());

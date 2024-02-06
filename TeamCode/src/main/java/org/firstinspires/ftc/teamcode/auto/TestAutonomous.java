@@ -193,8 +193,7 @@ public class TestAutonomous extends LinearOpMode {
                     switch (stackIterations) {
                         case 0: stackIterations = 1; toStack = true; stackString = "2+2"; break;
                         case 1: stackIterations = 2; toStack = true; stackString = "2+4"; break;
-                        case 2: stackIterations = 3; toStack = true; stackString = "2+5"; break;
-                        case 3: stackIterations = 0; toStack = false; stackString = "2+0"; break;
+                        case 2: stackIterations = 0; toStack = false; stackString = "2+0"; break;
                     }
                 } else {
                     switch (stackIterations) {
@@ -454,7 +453,7 @@ public class TestAutonomous extends LinearOpMode {
                 }
 
                 // Pixel stack trajectory starts here
-                double [] stackHeights = side == Side.FAR ? new double [] {0.2, 0.24, 0.27} : new double [] {0.22, 0.27};
+                double [] stackHeights = side == Side.FAR ? new double [] {0.2, 0.24} : new double [] {0.22, 0.27};
                 if (toStack) {
                     int stackY1 = alliance == Alliance.RED ? -11 : 11;
                     int stackY2 = alliance == Alliance.RED ? -30 : 30;
@@ -476,7 +475,7 @@ public class TestAutonomous extends LinearOpMode {
                                 .lineToLinearHeading(new Pose2d(-60, stackY1, Math.toRadians(180)))
                                 .build());
                         // Intake from stack
-                        bot.intake.setIntakeHeight(stackHeights[i]);
+                        bot.intake.setIntakeHeight(stackHeights[i-1]);
                         bot.intake(false);
                         sleep(1000);
                         bot.intake.setIntakeHeight(bot.intake.intakeStorage);

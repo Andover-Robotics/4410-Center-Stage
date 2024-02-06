@@ -132,8 +132,7 @@ public class MeepMeepTesting {
                 .setConstraints(60, 60, Math.toRadians(180), Math.toRadians(180), 13)
                 .followTrajectorySequence(drive -> drive.trajectorySequenceBuilder(redCloseStart)
                         // 2+0
-                        .splineToConstantHeading(new Vector2d(25, -40), Math.toRadians(45))
-                        .splineToSplineHeading(new Pose2d(12, -33, Math.toRadians(180)), Math.toRadians(180)) // To spike mark
+                        .lineToLinearHeading(new Pose2d(28, -25, Math.toRadians(180))) // To spike mark
                         .waitSeconds(0.5) // Place purple pixel
                         .lineToLinearHeading(new Pose2d(51, -35, Math.toRadians(180))) // To backboard
                         .waitSeconds(1) // Place yellow pixel
@@ -186,10 +185,26 @@ public class MeepMeepTesting {
                         .splineToLinearHeading(new Pose2d(50, -30, Math.toRadians(180)), Math.toRadians(0)) // To backboard
                         .waitSeconds(1)
                         .build());
+        RoadRunnerBotEntity redCenter2 = new DefaultBotBuilder(meepMeep)
+                .setColorScheme(new ColorSchemeRedLight())
+                .setConstraints(60, 60, Math.toRadians(180), Math.toRadians(180), 13)
+                .followTrajectorySequence(drive -> drive.trajectorySequenceBuilder(redFarStart)
+                        // 2+1
+                        .lineTo(new Vector2d(-38,-14)) // To spike mark
+                        .waitSeconds(0.5) // Place purple pixel
+                        .lineToSplineHeading(new Pose2d(-59, -11, Math.toRadians(180)))
+                        .waitSeconds(1) // Intake from stack
+                        .lineToSplineHeading(new Pose2d(25, -11, Math.toRadians(180)))
+                        .splineToConstantHeading(new Vector2d(51, -29), Math.toRadians(0)) // To backboard
+                        .waitSeconds(1) // Place yellow pixel
+                        .build());
 
 
         meepMeep.setBackground(MeepMeep.Background.FIELD_CENTERSTAGE_OFFICIAL)
-                .addEntity(redLeft2)
+                .addEntity(redCenter1)
+                .addEntity(redCenter2)
+                .addEntity(blueCenter1)
+                .addEntity(blueCenter2)
                 .start();
     }
 }
