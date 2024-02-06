@@ -317,8 +317,8 @@ public class TestAutonomous extends LinearOpMode {
                                 .lineTo(new Vector2d(-38,-14))
                                 .build(); break;
                         case 3: spikeTrajectory = drive.trajectorySequenceBuilder(drive.getPoseEstimate())
-                                .lineToSplineHeading(new Pose2d(-42, -46, Math.toRadians(130)))
-                                .splineToSplineHeading(new Pose2d(-36, -32, Math.toRadians(180)), Math.toRadians(1))
+                                .lineToSplineHeading(new Pose2d(-42, -46, Math.toRadians(0)))
+                                .splineToSplineHeading(new Pose2d(-35, -34, Math.toRadians(0)), Math.toRadians(1))
                                 .build(); break;
                     }
                 }
@@ -339,8 +339,8 @@ public class TestAutonomous extends LinearOpMode {
                 } else { // Far side
                     switch (spikeMark) {
                         case 1: spikeTrajectory = drive.trajectorySequenceBuilder(drive.getPoseEstimate())
-                                .lineToSplineHeading(new Pose2d(-42, 46, Math.toRadians(130)))
-                                .splineToSplineHeading(new Pose2d(-36, 32, Math.toRadians(180)), Math.toRadians(1))
+                                .lineToSplineHeading(new Pose2d(-42, 46, Math.toRadians(0)))
+                                .splineToSplineHeading(new Pose2d(-35, 34, Math.toRadians(0)), Math.toRadians(1))
                                 .build(); break;
                         case 2: spikeTrajectory = drive.trajectorySequenceBuilder(drive.getPoseEstimate())
                                 .lineTo(new Vector2d(-38,14))
@@ -376,14 +376,14 @@ public class TestAutonomous extends LinearOpMode {
                                     .lineToSplineHeading(new Pose2d(stackX, -11, Math.toRadians(180)))
                                     .build(); break;
                             case 3: stackTrajectory = drive.trajectorySequenceBuilder(drive.getPoseEstimate())
-                                    .lineToSplineHeading(new Pose2d(-36, -16, Math.toRadians(180)))
+                                    .lineToSplineHeading(new Pose2d(-48, -16, Math.toRadians(180)))
                                     .splineToConstantHeading(new Vector2d(stackX, -11), Math.toRadians(180))
                                     .build(); break;
                         }
                     } else {
                         switch (spikeMark) {
                             case 1: stackTrajectory = drive.trajectorySequenceBuilder(drive.getPoseEstimate())
-                                    .lineToSplineHeading(new Pose2d(-36, 16, Math.toRadians(180)))
+                                    .lineToSplineHeading(new Pose2d(-48, 16, Math.toRadians(180)))
                                     .splineToConstantHeading(new Vector2d(stackX, 11), Math.toRadians(180))
                                     .build(); break;
                             case 2: stackTrajectory = drive.trajectorySequenceBuilder(drive.getPoseEstimate())
@@ -509,7 +509,7 @@ public class TestAutonomous extends LinearOpMode {
                     int parkY = alliance == Alliance.RED ? (park == 1 ? -11 : -59) : (park == 1 ? 59 : 11);
                     // To park
                     drive.followTrajectorySequence(drive.trajectorySequenceBuilder(drive.getPoseEstimate())
-                            .splineToLinearHeading(new Pose2d(52, parkY, Math.toRadians(180)),Math.toRadians(15))
+                            .splineToLinearHeading(new Pose2d(50, parkY, Math.toRadians(180)),Math.toRadians(15))
                             .addDisplacementMarker(2, () -> {
                                 bot.storage();
                                 bot.claw.close();

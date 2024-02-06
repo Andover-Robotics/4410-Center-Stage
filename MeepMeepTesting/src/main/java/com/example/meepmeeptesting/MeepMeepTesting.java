@@ -115,10 +115,10 @@ public class MeepMeepTesting {
                 .setConstraints(60, 60, Math.toRadians(180), Math.toRadians(180), 13)
                 .followTrajectorySequence(drive -> drive.trajectorySequenceBuilder(blueFarStart)
                         // 2+1
-                        .lineToSplineHeading(new Pose2d(-42, 46, Math.toRadians(130)))
-                        .splineToSplineHeading(new Pose2d(-36, 32, Math.toRadians(180)), Math.toRadians(1)) // To spike mark
+                        .lineToSplineHeading(new Pose2d(-42, 46, Math.toRadians(0)))
+                        .splineToSplineHeading(new Pose2d(-35, 34, Math.toRadians(0)), Math.toRadians(1)) // To spike mark
                         .waitSeconds(0.5) // Place purple pixel
-                        .lineToSplineHeading(new Pose2d(-36, 16, Math.toRadians(180)))
+                        .lineToSplineHeading(new Pose2d(-48, 16, Math.toRadians(180)))
                         .splineToConstantHeading(new Vector2d(-60, 11), Math.toRadians(180)) // To stack
                         .waitSeconds(1) // Intake from stack
                         .lineToSplineHeading(new Pose2d(25, 11, Math.toRadians(180)))
@@ -201,10 +201,7 @@ public class MeepMeepTesting {
 
 
         meepMeep.setBackground(MeepMeep.Background.FIELD_CENTERSTAGE_OFFICIAL)
-                .addEntity(redCenter1)
-                .addEntity(redCenter2)
-                .addEntity(blueCenter1)
-                .addEntity(blueCenter2)
+                .addEntity(blueLeft2)
                 .start();
     }
 }
