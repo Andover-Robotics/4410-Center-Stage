@@ -203,7 +203,7 @@ public class MainTeleOp extends LinearOpMode {
             if (gp1.wasJustPressed(GamepadKeys.Button.DPAD_UP)){ // go to storage position
                 bot.intake.setIntakeHeight(bot.intake.intakeStorage);
             } else if (gp1.wasJustPressed(GamepadKeys.Button.DPAD_DOWN)) { // go to out position
-                bot.intake.setIntakeHeight(bot.intake.intakeOut);
+                bot.intake.setIntakeHeight(bot.intake.intakeUp);
             }
 
             // DRONE
