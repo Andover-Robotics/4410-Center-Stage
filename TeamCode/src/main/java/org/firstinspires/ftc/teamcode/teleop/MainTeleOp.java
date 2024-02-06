@@ -191,6 +191,11 @@ public class MainTeleOp extends LinearOpMode {
                 if (bot.intake.getIntakeHeight() != bot.intake.intakeOut) {
                     bot.intake.setIntakeHeight(bot.intake.intakeOut);
                 }
+            } else if (gp1.wasJustPressed(GamepadKeys.Button.DPAD_UP)){ // up intake
+                bot.intake(false);
+                if (bot.intake.getIntakeHeight() != bot.intake.intakeUp) {
+                    bot.intake.setIntakeHeight(bot.intake.intakeUp);
+                }
             } else { // stop intake
                 bot.intake.stopIntake();
                 bot.intake.setIntakeHeight(bot.intake.intakeStorage);
@@ -199,11 +204,6 @@ public class MainTeleOp extends LinearOpMode {
                 bot.intake.changePower(true);
             } else if (gp1.wasJustPressed(GamepadKeys.Button.DPAD_LEFT)) { // decrement power
                 bot.intake.changePower(false);
-            }
-            if (gp1.wasJustPressed(GamepadKeys.Button.DPAD_UP)){ // go to storage position
-                bot.intake.setIntakeHeight(bot.intake.intakeStorage);
-            } else if (gp1.wasJustPressed(GamepadKeys.Button.DPAD_DOWN)) { // go to out position
-                bot.intake.setIntakeHeight(bot.intake.intakeUp);
             }
 
             // DRONE
