@@ -86,10 +86,11 @@ public class V4B {
     }
 
     public void runAngle(double slidePosition) {
-        double desiredAngle = 180 - 60.001 - Math.toDegrees(Math.asin((Math.sin(60.001) * 268.754 - (slidePosition / 8.558)) / 170.0));
-        double newPosition = 0.00333 * desiredAngle;
+        double desiredAngle = 119.999 - Math.toDegrees(Math.asin((Math.sin(60.001) * 268.754 - (slidePosition / 8.558)) / 170.0));
+        double newPosition = 0.0033 * desiredAngle;
         if (slidePosition > -1500) {
             setArm(newPosition);
+
         }
     }
 

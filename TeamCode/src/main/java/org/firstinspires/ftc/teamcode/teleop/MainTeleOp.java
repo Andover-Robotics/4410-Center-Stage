@@ -145,8 +145,12 @@ public class MainTeleOp extends LinearOpMode {
             }
 
             // Distance sensor
-            if (distanceSensor.getDistance(DistanceUnit.CM) < 9) { // Slows down driving when approaching object
+            if (distanceSensor.getDistance(DistanceUnit.CM) < 30) { // Slows down driving when approaching object
                 driveMultiplier = 0.3;
+                if ((gp1.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER) > 0.2))
+                {
+                    driveMultiplier = 0.6;
+                }
             } else {
                 driveMultiplier = 1;
             }
