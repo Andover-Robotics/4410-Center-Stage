@@ -14,23 +14,18 @@ public class ColorDetectionPipeline2 extends OpenCvPipeline {
     Telemetry telemetry;
 
     // Processing frames
-    private Mat matYCrCb = new Mat();;
-    private Mat spikeCenter = new Mat();
-    private Mat spikeLeft = new Mat();
+    private Mat matYCrCb = new Mat();
+    private Mat spikeCenter = new Mat(), spikeLeft = new Mat();
 
     // Cb and Cr predetermined Mats
-    private Mat matCbCenter = new Mat();
-    private Mat matCbLeft = new Mat();
-    private Mat matCrCenter = new Mat();
-    private Mat matCrLeft = new Mat();
+    private Mat matCbCenter = new Mat(), matCbLeft = new Mat(), matCrCenter = new Mat(), matCrLeft = new Mat();
 
     // Average Cb and Cr values
-    public double avgCenter = 0;
-    public double avgLeft = 0;
-    public double minimumAvg = 50;
+    public double avgCenter = 0, avgLeft = 0;
+    public static double minimumAvg = 50;
 
     // Configurations
-    public enum SpikeMark{
+    enum SpikeMark{
         LEFT, MIDDLE, RIGHT, NONE
     }
     public SpikeMark spikeMark = SpikeMark.NONE;

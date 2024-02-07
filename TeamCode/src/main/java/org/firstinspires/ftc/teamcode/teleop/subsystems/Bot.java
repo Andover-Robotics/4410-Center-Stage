@@ -90,33 +90,38 @@ public class Bot {
         state = BotState.OUTTAKE_DOWN;
     }
 
-    public void pickup() { // pick up pixel from storage
+
+    public void pickup() throws InterruptedException { // pick up pixel from storage
         Thread thread = new Thread(() -> {
-            slides.runToBottom();
-            claw.fullOpen();
-            try { Thread.sleep(100); } catch (InterruptedException ignored) {}
-            fourbar.pickup();
-            try { Thread.sleep(400); } catch (InterruptedException ignored) {}
-            claw.pickupClose();
-            try { Thread.sleep(300); } catch (InterruptedException ignored) {}
-            storage();
+            try {
+                slides.runToBottom();
+                claw.fullOpen();
+                Thread.sleep(100);
+                fourbar.pickup();
+                Thread.sleep(400);
+                claw.pickupClose();
+                Thread.sleep(300);
+                storage();
+            } catch (InterruptedException ignored) {}
         });
         thread.start();
     }
 
     public void fixPixels() { // align pixels in storage
         Thread thread = new Thread(() -> {
-            slides.runToBottom();
-            claw.fullOpen();
-            intake.setIntakeHeight(0.1);
-            try { Thread.sleep(100); } catch (InterruptedException ignored) {}
-            fourbar.bottomPixel();
-            try { Thread.sleep(300); } catch (InterruptedException ignored) {}
-            claw.pickupClose();
-            try { Thread.sleep(250); } catch (InterruptedException ignored) {}
-            storage();
-            try { Thread.sleep(50); } catch (InterruptedException ignored) {}
-            claw.fullOpen();
+            try {
+                slides.runToBottom();
+                claw.fullOpen();
+                intake.setIntakeHeight(0.1);
+                Thread.sleep(100);
+                fourbar.bottomPixel();
+                Thread.sleep(300);
+                claw.pickupClose();
+                Thread.sleep(250);
+                storage();
+                Thread.sleep(50);
+                claw.fullOpen();
+            } catch (InterruptedException ignored) {}
         });
         thread.start();
     }
@@ -131,54 +136,60 @@ public class Bot {
         }
         if (pos == 4) {
             Thread thread = new Thread(() -> {
-                try { Thread.sleep(900); } catch (InterruptedException ignored) {}
-                outtakeOut((claw.getClawState()));
+                try {
+                    Thread.sleep(900);
+                    outtakeOut((claw.getClawState()));
+                } catch (InterruptedException ignored) {}
             });
             thread.start();
         } else if (pos == 3) {
             Thread thread = new Thread(() -> {
-                try { Thread.sleep(500); } catch (InterruptedException ignored) {}
-                outtakeOut((claw.getClawState()));
+                try {
+                    Thread.sleep(500);
+                    outtakeOut((claw.getClawState()));
+                } catch (InterruptedException ignored) {}
             });
             thread.start();
         }
     }
 
-    public void drop()  { // drop pixel in outtake or storage position
+    public void drop() { // drop pixel in outtake or storage position
         Thread thread = new Thread(() -> {
-            claw.open();
-            try { Thread.sleep(300); } catch (InterruptedException ignored) {}
-            if (state == Bot.BotState.OUTTAKE_OUT) {
-                if (claw.getClawState() == 0) {
-                    storage();
-                } else if (claw.getClawState() == 1) {
-                    fourbar.setArm(0.3);
-                    fourbar.setWrist(0.22);
-                    if (slides.getPosition() > -2400) {
-                        slides.runTo(slides.getPosition() - 300);
-                    } else if (slides.getPosition() <= -2400){
-                        slides.runTo(-2300);
-                    }
-                    try { Thread.sleep(900); } catch (InterruptedException ignored) {}
-                    fourbar.topOuttake(false);
-                    claw.close();
-                }
-            } else if (state == BotState.OUTTAKE_DOWN) {
-                if (claw.getClawState() == 0) {
-                    storage();
-                } else if (claw.getClawState() == 1) {
-                    fourbar.ground();
-                }
-            } else if (state == BotState.STORAGE) {
-                fourbar.setArm(0.93);
-                intake.setIntakeHeight(0.1);
-                try { Thread.sleep(100); } catch (InterruptedException ignored) {}
+            try {
                 claw.open();
-                try { Thread.sleep(100); } catch (InterruptedException ignored) {}
-                fourbar.storage();
-            } else {
-                storage();
-            }
+                Thread.sleep(300);
+                if (state == Bot.BotState.OUTTAKE_OUT) { // drop pixel on backboard
+                    if (claw.getClawState() == 0) {
+                        storage();
+                    } else if (claw.getClawState() == 1) {
+                        fourbar.setArm(0.3);
+                        fourbar.setWrist(0.22);
+                        if (slides.getPosition() > -2400) {
+                            slides.runTo(slides.getPosition() - 300);
+                        } else if (slides.getPosition() <= -2400){
+                            slides.runTo(-2300);
+                        }
+                        Thread.sleep(900);
+                        fourbar.topOuttake(false);
+                        claw.close();
+                    }
+                } else if (state == BotState.OUTTAKE_DOWN) { // drop pixel on ground
+                    if (claw.getClawState() == 0) {
+                        storage();
+                    } else if (claw.getClawState() == 1) {
+                        fourbar.ground();
+                    }
+                } else if (state == BotState.STORAGE) { // drop pixel in storage
+                    fourbar.setArm(0.93);
+                    intake.setIntakeHeight(0.1);
+                    Thread.sleep(100);
+                    claw.open();
+                    Thread.sleep(100);
+                    fourbar.storage();
+                } else {
+                    storage();
+                }
+            } catch (InterruptedException ignored) {}
         });
         thread.start();
     }
@@ -192,7 +203,9 @@ public class Bot {
             } else if (slides.getPosition() <= -2400){
                 slides.runTo(-2300);
             }
-            try { Thread.sleep(900); } catch (InterruptedException ignored) {}
+            try {
+                Thread.sleep(900);
+            } catch (InterruptedException ignored) {}
             storage();
         }
     }

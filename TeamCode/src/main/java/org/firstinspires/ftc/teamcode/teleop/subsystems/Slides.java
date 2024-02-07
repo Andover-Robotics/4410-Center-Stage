@@ -135,32 +135,6 @@ public class Slides {
         }
     }
 
-    public void runAngle(double desiredAngle) {
-//        double desiredAngle = 180 - 60.001 - Math.toDegrees(Math.asin((Math.sin(60.001) * 268.754 - (slidePosition / 8.558)) / 170.0));
-        double slidePosition = 8.558*(Math.sin(60.001)*268.754 - Math.sin(170*Math.toRadians(desiredAngle+119.999)));
-        if (position == Position.BOTTOM)
-        {
-            heightConstant = 0.5;
-        }
-        else if (position == Position.LOW)
-        {
-            heightConstant = 1.3;
-        }
-        else if (position == Position.MID)
-        {
-            heightConstant = 2.2;
-        }
-        else
-        {
-            heightConstant = 3.3;
-        }
-
-        runTo(slidePosition * heightConstant);
-//        double newPosition = 0.00333 * desiredAngle;
-//        if (slidePosition > -1500) {
-//            setArm(newPosition);
-//        }
-    }
 
     public double getCurrent() {
         return motorLeft.motorEx.getCurrent(CurrentUnit.MILLIAMPS) + motorRight.motorEx.getCurrent(CurrentUnit.MILLIAMPS);

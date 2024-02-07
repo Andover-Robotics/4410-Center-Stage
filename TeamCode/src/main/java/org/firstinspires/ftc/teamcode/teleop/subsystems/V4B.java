@@ -4,8 +4,6 @@ import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.acmerobotics.dashboard.config.Config;
 
-// TODO: Set servo values for four bar
-
 @Config
 public class V4B {
     public final Servo armLeft, armRight, wrist;
@@ -53,9 +51,14 @@ public class V4B {
 
     public void storage() {
         Thread thread = new Thread(() -> {
-            setWrist(wristStorage);
-            try { Thread.sleep(500); } catch (InterruptedException ignored) {}
-            setArm(armStorage);
+            try {
+                setWrist(wristStorage);
+                Thread.sleep(500);
+                setArm(armStorage);
+            } catch (InterruptedException ex) {
+                setWrist(wristStorage);
+                setArm(armStorage);
+            }
         });
         thread.start();
     }
@@ -79,6 +82,14 @@ public class V4B {
             if (armLeft.getPosition() > 0.16 && armLeft.getPosition() < 0.38) {
                 setArm(armLeft.getPosition() - 0.005);
             }
+        }
+    }
+
+    public void runAngle(double slidePosition) {
+        double desiredAngle = 180 - 60.001 - Math.toDegrees(Math.asin((Math.sin(60.001) * 268.754 - (slidePosition / 8.558)) / 170.0));
+        double newPosition = 0.00333 * desiredAngle;
+        if (slidePosition > -1500) {
+            setArm(newPosition);
         }
     }
 
