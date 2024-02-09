@@ -14,11 +14,13 @@ public class ColorDetectionPipeline2 extends OpenCvPipeline {
     Telemetry telemetry;
 
     // Processing frames
-    private Mat matYCrCb = new Mat();
-    private Mat spikeCenter = new Mat(), spikeLeft = new Mat();
+    private final Mat matYCrCb = new Mat();
 
     // Cb and Cr predetermined Mats
-    private Mat matCbCenter = new Mat(), matCbLeft = new Mat(), matCrCenter = new Mat(), matCrLeft = new Mat();
+    private final Mat matCbCenter = new Mat();
+    private final Mat matCbLeft = new Mat();
+    private final Mat matCrCenter = new Mat();
+    private final Mat matCrLeft = new Mat();
 
     // Average Cb and Cr values
     public double avgCenter = 0, avgLeft = 0;
@@ -31,7 +33,7 @@ public class ColorDetectionPipeline2 extends OpenCvPipeline {
     public SpikeMark spikeMark = SpikeMark.NONE;
     public static int alliance = 0; // Alliance: 0 - NONE, 1 - RED, 2 - BLUE
     public void setAlliance(int alliance) {
-        this.alliance = alliance;
+        ColorDetectionPipeline2.alliance = alliance;
     }
 
     // CONSTRUCTOR
@@ -65,8 +67,8 @@ public class ColorDetectionPipeline2 extends OpenCvPipeline {
         Imgproc.rectangle(input, rectLeft, new Scalar(0, 255, 0), 5);
 
         // Create mats for each rectangle
-        spikeCenter = matYCrCb.submat(rectCenter);
-        spikeLeft = matYCrCb.submat(rectLeft);
+        Mat spikeCenter = matYCrCb.submat(rectCenter);
+        Mat spikeLeft = matYCrCb.submat(rectLeft);
 
         // Extract color based off of alliance
         if (alliance == 1) { // Blue
@@ -93,4 +95,7 @@ public class ColorDetectionPipeline2 extends OpenCvPipeline {
 
     public double getAvgCenter() { return avgCenter; }
     public double getAvgLeft() { return avgLeft; }
+
+    public void setMinAvg(double minimumAvg) { ColorDetectionPipeline2.minimumAvg = minimumAvg; }
+    public double getMinAvg() { return minimumAvg; }
 }

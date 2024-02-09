@@ -121,7 +121,7 @@ public class TestAutonomous extends LinearOpMode {
         });
         pickup.start();
 
-        Thread stopAuto = new Thread(() -> {
+        Thread trackHeading = new Thread(() -> {
             while (opModeIsActive() && !isStopRequested()) {
                 if (drive.getExternalHeadingVelocity() > (0.2 * DriveConstants.MAX_ANG_VEL)) {
                     telemetry.addLine("SHUTTING DOWN!!!");
@@ -133,7 +133,8 @@ public class TestAutonomous extends LinearOpMode {
 
         // Configuration variables
         boolean dropped = false;
-        String spikeMarkString = "", stackString = "", parkString = "";
+        String spikeMarkString = "", stackString = "", parkString = "", bumperFunction = "";
+        int bumperCycle = 0;
         /*
         LIST OF CONFIGURATION CONTROLS: last updated 2/9/24 - zachery
 
@@ -154,6 +155,7 @@ public class TestAutonomous extends LinearOpMode {
         left bumper - decrement slides height
 
         start - drop/pickup
+        back - switch bumper functions (default: slides height -> minimumAvg (color detection))
          */
         // Initialized configurations start
         while (!isStarted()) {
@@ -176,6 +178,15 @@ public class TestAutonomous extends LinearOpMode {
                     dropped = false;
                 }
             }
+
+            // Switch bumper functions
+            if (gp1.wasJustPressed(GamepadKeys.Button.BACK)) {
+                switch (bumperCycle) {
+                    case 0: bumperCycle = 1; bumperFunction = "change color detection minAvg"; break;
+                    case 1: bumperCycle = 0; bumperFunction = "change slides height"; break;
+                }
+            }
+            telemetry.addData("bumpers", bumperFunction);
 
             // Change alliance
             if (gp1.wasJustPressed(GamepadKeys.Button.Y)) {
@@ -231,7 +242,7 @@ public class TestAutonomous extends LinearOpMode {
                 if (stackDelay < 10.0) stackDelay+=1.0;
                 else stackDelay = 0.0;
             }
-            telemetry.addData("delays(s): backboard", backboardDelay + " spike: " + spikeDelay + " stack: " + stackDelay);
+            telemetry.addData("delays: backboard", backboardDelay + " spike: " + spikeDelay + " stack: " + stackDelay);
 
             // BOOLEANS
             // Toggle to backboard
@@ -240,16 +251,24 @@ public class TestAutonomous extends LinearOpMode {
             if (gp1.wasJustPressed(GamepadKeys.Button.RIGHT_STICK_BUTTON)) toStack = !toStack;
             telemetry.addData("to backboard", toBackboard + " to stack: " + toStack);
 
-            // SLIDE HEIGHT
-            // Increment
+            // BUMPER FUNCTIONS
             if (gp1.wasJustPressed(GamepadKeys.Button.RIGHT_BUMPER)) {
-                slidesHeight += slidesHeight < 1000 ? 200 : 0;
+                if (bumperCycle == 0) { // increment slides height
+                    slidesHeight += slidesHeight < 1000 ? 200 : 0;
+                } else if (bumperCycle == 1) { // increment color minAvg
+                    colorDetection.setMinAvg(colorDetection.getMinAvg()+1);
+                }
             }
             // Decrement
             if (gp1.wasJustPressed(GamepadKeys.Button.LEFT_BUMPER)) {
-                slidesHeight -= slidesHeight > 0 ? 200 : 0;
+                if (bumperCycle == 0) { // decrement slides height
+                    slidesHeight -= slidesHeight > 0 ? 200 : 0;
+                } else if (bumperCycle == 1) { // decrement color minAvg
+                    colorDetection.setMinAvg(colorDetection.getMinAvg()-1);
+                }
             }
             telemetry.addData("slides height", slidesHeight);
+            telemetry.addData("color minAvg", colorDetection.getMinAvg());
 
             // Initiate color detection
             if (alliance == Alliance.RED) colorDetection.setAlliance(1);
@@ -274,7 +293,7 @@ public class TestAutonomous extends LinearOpMode {
         if (opModeIsActive() && !isStopRequested()) {
             // Run threads
             trackTime.start();
-            stopAuto.start();
+            trackHeading.start();
             periodic.start();
 
             // Define starting pose
@@ -362,7 +381,7 @@ public class TestAutonomous extends LinearOpMode {
 
             // To backboard
             if (toBackboard) {
-                // Extra movements for pixel stack on far side
+                // Extra movements on far side
                 if (side == Side.FAR) {
                     TrajectorySequence stackTrajectory = null;
                     int stackX = -59;
@@ -464,7 +483,7 @@ public class TestAutonomous extends LinearOpMode {
                                 .waitSeconds(stackDelay)
                                 .build());
                     }
-                    for (int i = 1; i < stackIterations; i++) {
+                    for (int i = 1; i <= stackIterations; i++) {
                         // To pixel stack
                         drive.followTrajectorySequence(drive.trajectorySequenceBuilder(drive.getPoseEstimate())
                                 .splineToLinearHeading(new Pose2d(30, stackY1, Math.toRadians(180)), Math.toRadians(180))
