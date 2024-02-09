@@ -135,7 +135,7 @@ public class TestAutonomous extends LinearOpMode {
         boolean dropped = false;
         String spikeMarkString = "", stackString = "", parkString = "";
         /*
-        LIST OF CONFIGURATION CONTROLS: last updated 1/29/24 - zachery
+        LIST OF CONFIGURATION CONTROLS: last updated 2/9/24 - zachery
 
         Y - change alliance
         A - change side
@@ -425,7 +425,7 @@ public class TestAutonomous extends LinearOpMode {
                 }
                 drive.followTrajectorySequence(drive.trajectorySequenceBuilder(drive.getPoseEstimate())
                         .lineToLinearHeading(new Pose2d(backboardX, backboardY, Math.toRadians(180)))
-                        .addDisplacementMarker(10, () -> {
+                        .addTemporalMarker(2, () -> {
                             bot.fourbar.topOuttake(true);
                             bot.fourbar.setArm(0.21);
                             if (slidesHeight != 0) bot.slides.runTo(-slidesHeight);
@@ -483,7 +483,7 @@ public class TestAutonomous extends LinearOpMode {
                         drive.followTrajectorySequence(drive.trajectorySequenceBuilder(drive.getPoseEstimate())
                                 .lineToLinearHeading(new Pose2d(38, stackY1, Math.toRadians(180)))
                                 .splineToLinearHeading(new Pose2d(50, stackY2, Math.toRadians(180)), Math.toRadians(0))
-                                .addDisplacementMarker(5, () -> {
+                                .addTemporalMarker(2, () -> {
                                     bot.slides.runTo(-1000);
                                     bot.outtakeOut(2);
                                     bot.fourbar.setArm(0.21);
@@ -510,7 +510,7 @@ public class TestAutonomous extends LinearOpMode {
                     // To park
                     drive.followTrajectorySequence(drive.trajectorySequenceBuilder(drive.getPoseEstimate())
                             .splineToLinearHeading(new Pose2d(50, parkY, Math.toRadians(180)),Math.toRadians(15))
-                            .addDisplacementMarker(2, () -> {
+                            .addTemporalMarker(1, () -> {
                                 bot.storage();
                                 bot.claw.close();
                             })
