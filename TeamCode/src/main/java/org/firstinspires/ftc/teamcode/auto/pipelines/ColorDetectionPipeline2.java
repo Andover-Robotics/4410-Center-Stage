@@ -24,7 +24,7 @@ public class ColorDetectionPipeline2 extends OpenCvPipeline {
 
     // Average Cb and Cr values
     public double avgCenter = 0, avgLeft = 0;
-    public static double minimumAvg = 2;
+    public static double minimumAvg = 0.125;
 
     // Configurations
     enum SpikeMark{
@@ -62,9 +62,6 @@ public class ColorDetectionPipeline2 extends OpenCvPipeline {
         // Draw rectangles of left and center positions
         Rect rectCenter = new Rect(600, 50, 680, 240);
         Rect rectLeft = new Rect(100, 0, 325, 400);
-        // Display rectangles
-        Imgproc.rectangle(input, rectCenter, new Scalar(0, 255, 0), 5);
-        Imgproc.rectangle(input, rectLeft, new Scalar(0, 255, 0), 5);
 
         // Create mats for each rectangle
         Mat spikeCenter = matYCrCb.submat(rectCenter);
@@ -74,19 +71,45 @@ public class ColorDetectionPipeline2 extends OpenCvPipeline {
         if (alliance == 1) { // Blue
             Core.extractChannel(spikeCenter, matCbCenter, 1);
             Core.extractChannel(spikeLeft, matCbLeft, 1);
-            // Calculate average
-            Scalar meanCenter = Core.mean(matCbCenter);
-            Scalar meanLeft = Core.mean(matCbLeft);
-            avgCenter = meanCenter.val[0];
-            avgLeft = meanLeft.val[0];
+
         } else if (alliance == 2) { // Red
             Core.extractChannel(spikeCenter, matCrCenter, 2);
             Core.extractChannel(spikeLeft, matCrLeft, 2);
-            // Calculate average
-            Scalar meanCenter = Core.mean(matCrCenter);
-            Scalar meanLeft = Core.mean(matCrLeft);
-            avgCenter = meanCenter.val[0];
-            avgLeft = meanLeft.val[0];
+        }
+        // Calculate average
+        Scalar meanCenter = Core.mean(matCbCenter);
+        Scalar meanLeft = Core.mean(matCbLeft);
+        avgCenter = meanCenter.val[0];
+        avgLeft = meanLeft.val[0];
+
+        // normalize values
+        avgCenter /= 240;
+        avgLeft /= 240;
+
+        // Display rectangles
+        // Left turns red if active
+        // Center turns red if active
+        // Left and Center turn yellow if right
+        // any inactive stay green
+
+        if (getSpikeMark() == 1) {
+            Imgproc.rectangle(input, rectLeft, new Scalar(255, 0, 0), 5);
+        } else {
+            Imgproc.rectangle(input, rectLeft, new Scalar(0, 255, 0), 5);
+        }
+
+        if (getSpikeMark() == 2) {
+            Imgproc.rectangle(input, rectCenter, new Scalar(0, 255, 0), 5);
+        } else {
+            Imgproc.rectangle(input, rectCenter, new Scalar(255, 0, 0), 5);
+        }
+
+        if (getSpikeMark() == 3) {
+            Imgproc.rectangle(input, rectCenter, new Scalar(255, 255, 0), 5);
+            Imgproc.rectangle(input, rectLeft, new Scalar(255, 255, 0), 5);
+        } else {
+            Imgproc.rectangle(input, rectCenter, new Scalar(0, 255, 0), 5);
+            Imgproc.rectangle(input, rectLeft, new Scalar(0, 255, 0), 5);
         }
 
         // Return img frame

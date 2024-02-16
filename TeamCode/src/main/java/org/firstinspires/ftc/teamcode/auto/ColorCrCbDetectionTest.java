@@ -54,49 +54,49 @@ public class ColorCrCbDetectionTest extends LinearOpMode {
                 spike = (spike == 1) ? 0 : 1;
             }
 
-            if (gp1.wasJustPressed(GamepadKeys.Button.DPAD_UP)) {
-                switch(spike) {
-                    case 0:
-                        colorPipeline.avgCenter+=delta;
-                        break;
-                    case 1:
-                        colorPipeline.avgCenter+=delta;
-                        colorPipeline.avgLeft+=delta;
-                        break;
-                }
-            } else if (gp1.wasJustPressed(GamepadKeys.Button.DPAD_DOWN)) {
-                switch(spike) {
-                    case 0:
-                        colorPipeline.avgCenter-=delta;
-                        break;
-                    case 1:
-                        colorPipeline.avgCenter-=delta;
-                        colorPipeline.avgLeft-=delta;
-                        break;
-                }
-            }
+//            if (gp1.wasJustPressed(GamepadKeys.Button.DPAD_UP)) {
+//                switch(spike) {
+//                    case 0:
+//                        colorPipeline.avgCenter+=delta;
+//                        break;
+//                    case 1:
+//                        colorPipeline.avgCenter+=delta;
+//                        colorPipeline.avgLeft+=delta;
+//                        break;
+//                }
+//            } else if (gp1.wasJustPressed(GamepadKeys.Button.DPAD_DOWN)) {
+//                switch(spike) {
+//                    case 0:
+//                        colorPipeline.avgCenter-=delta;
+//                        break;
+//                    case 1:
+//                        colorPipeline.avgCenter-=delta;
+//                        colorPipeline.avgLeft-=delta;
+//                        break;
+//                }
+//            }
 
-            if (gp1.wasJustPressed(GamepadKeys.Button.DPAD_LEFT)) {
-                switch(spike) {
-                    case 0:
-                        colorPipeline.avgLeft+=delta;
-                        break;
-                    case 1:
-                        colorPipeline.avgCenter+=delta;
-                        colorPipeline.avgLeft+=delta;
-                        break;
-                }
-            } else if (gp1.wasJustPressed(GamepadKeys.Button.DPAD_RIGHT)) {
-                switch(spike) {
-                    case 0:
-                        colorPipeline.avgLeft-=delta;
-                        break;
-                    case 1:
-                        colorPipeline.avgCenter-=delta;
-                        colorPipeline.avgLeft-=delta;
-                        break;
-                }
-            }
+//            if (gp1.wasJustPressed(GamepadKeys.Button.DPAD_LEFT)) {
+//                switch(spike) {
+//                    case 0:
+//                        colorPipeline.avgLeft+=delta;
+//                        break;
+//                    case 1:
+//                        colorPipeline.avgCenter+=delta;
+//                        colorPipeline.avgLeft+=delta;
+//                        break;
+//                }
+//            } else if (gp1.wasJustPressed(GamepadKeys.Button.DPAD_RIGHT)) {
+//                switch(spike) {
+//                    case 0:
+//                        colorPipeline.avgLeft-=delta;
+//                        break;
+//                    case 1:
+//                        colorPipeline.avgCenter-=delta;
+//                        colorPipeline.avgLeft-=delta;
+//                        break;
+//                }
+//            }
 
             if (gp1.wasJustPressed(GamepadKeys.Button.Y)) {
                 colorPipeline.minimumAvg+=delta;
@@ -106,12 +106,8 @@ public class ColorCrCbDetectionTest extends LinearOpMode {
 
             telemetry.addData("Alliance", whichAlliance[alliance]);
             telemetry.addData("Spike Mark", whichSpike[spike]);
-            telemetry.addData("Center Average (UP - DPAD UP, DOWN - DPAD DOWN)", colorPipeline.getAvgCenter());
-            if (spike == 1) {
-                telemetry.addData("Left Average", colorPipeline.getAvgLeft());
-            } else {
-                telemetry.addData("Left Average (UP = DPAD RIGHT, DOWN - DPAD LEFT", colorPipeline.getAvgLeft());
-            }
+            telemetry.addData("Center Average", colorPipeline.getAvgCenter());
+            telemetry.addData("Left Average", colorPipeline.getAvgLeft());
             telemetry.addData("Minimum Average (UP - Y, DOWN - A)",colorPipeline.minimumAvg);
             telemetry.update();
         }
