@@ -129,9 +129,9 @@ public class MainTeleOp extends LinearOpMode {
                 if (gp2.wasJustPressed(GamepadKeys.Button.X)) {
                     bot.drop(true);
                 }
-                if (Math.abs(gp2.getLeftY()) > 0.01) {
-                    bot.fourbar.runAngle(bot.slides.motorLeft.getCurrentPosition());
-                }
+//                if (Math.abs(gp2.getLeftY()) > 0.01) {
+//                    bot.fourbar.runAngle(bot.slides.motorLeft.getCurrentPosition());
+//                }
             } else if (bot.state == Bot.BotState.OUTTAKE_DOWN) { // SCORING GROUND
                 if (gp2.wasJustPressed(GamepadKeys.Button.X)) {
                     bot.drop();
@@ -227,6 +227,9 @@ public class MainTeleOp extends LinearOpMode {
             telemetry.addData("Slides Position", bot.slides.getPosition() + " (pos: " + bot.slides.position + " current: " + bot.slides.getCurrent() + ")");
 
             telemetry.addData("Intake Power", Intake.power +"(running: " + bot.intake.getIsRunning() + ")");
+            telemetry.addData("arm Left Position", bot.fourbar.armLeft.getPosition());
+            telemetry.addData("arm Right Position", bot.fourbar.armRight.getPosition());
+            telemetry.addData("wrist Position", bot.fourbar.wrist.getPosition());
             telemetry.addData("Distance to wall (cm)", distanceSensor.getDistance(DistanceUnit.CM));
 
             telemetry.addData("X = ", gp1.getLeftX());

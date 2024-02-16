@@ -47,7 +47,7 @@ public class TestAutonomous extends LinearOpMode {
     public static int park = 0; // Parking position (0-none, 1-left, 2-right)
     public static int spikeMark = 0; // Which spike mark randomization object is detected on (1-left, 2-center, 3-right)
     public static int stackIterations = 0; // How many times go to stack (0-none, 1-2+2, 2-2+4, 3-2+5)
-    public static int slidesHeight = 0; // Height of slides when scoring yellow pixel on backboard
+    public static int slidesHeight = 0; // Height of slides when scoring yellow pixel on backboard (0-1000)
     // BOOLEANS
     public static boolean toBackboard = true; // Go to backboard or stop after scoring purple pixel on spike mark
     public static boolean toStack = false; // Go to pixel stack for extra points or stop after scoring yellow pixel

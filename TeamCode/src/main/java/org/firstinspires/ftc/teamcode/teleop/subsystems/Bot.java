@@ -90,7 +90,6 @@ public class Bot {
         state = BotState.OUTTAKE_DOWN;
     }
 
-
     public void pickup() throws InterruptedException { // pick up pixel from storage
         Thread thread = new Thread(() -> {
             try {
@@ -129,7 +128,7 @@ public class Bot {
     public void presetSlides(int pos) { // run to preset slide position, the pos variable has a range of 1-4, representing bottom, low, middle, and top
         claw.close();
         switch (pos) {
-            case 1: slides.runToBottom(); storage(); break;
+            case 1: slides.runToBottom(); storage();  break;
             case 2: slides.runToLow(); outtakeOut(claw.getClawState()); break;
             case 3: slides.runToMiddle(); break;
             case 4: slides.runToTop(); break;
@@ -162,14 +161,14 @@ public class Bot {
                     if (claw.getClawState() == 0) {
                         storage();
                     } else if (claw.getClawState() == 1) {
-                        fourbar.setArm(0.3);
-                        fourbar.setWrist(0.22);
+                        fourbar.setArm(0.65);
+                        fourbar.setWrist(0.72);
                         if (slides.getPosition() > -2400) {
                             slides.runTo(slides.getPosition() - 300);
                         } else if (slides.getPosition() <= -2400){
                             slides.runTo(-2300);
                         }
-                        Thread.sleep(900);
+                        Thread.sleep(500);
                         fourbar.topOuttake(false);
                         claw.close();
                     }
@@ -180,7 +179,8 @@ public class Bot {
                         fourbar.ground();
                     }
                 } else if (state == BotState.STORAGE) { // drop pixel in storage
-                    fourbar.setArm(0.93);
+                    fourbar.setArm(0.165);
+                    fourbar.setWrist(0.03);
                     intake.setIntakeHeight(0.1);
                     Thread.sleep(100);
                     claw.open();
@@ -196,8 +196,8 @@ public class Bot {
 
     public void drop(boolean manual) { // Extra manual drop open for tele-op in case only 1 pixel
         if (manual) {
-            fourbar.setArm(0.3);
-            fourbar.setWrist(0.22);
+            fourbar.setArm(0.65);
+            fourbar.setWrist(0.72);
             if (slides.getPosition() > -2400) {
                 slides.runTo(slides.getPosition() - 300);
             } else if (slides.getPosition() <= -2400){

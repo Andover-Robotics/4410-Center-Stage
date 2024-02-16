@@ -8,8 +8,8 @@ import com.acmerobotics.dashboard.config.Config;
 public class V4B {
     public final Servo armLeft, armRight, wrist;
 
-    public static double armBottomOuttake = 0.28, armTopOuttake = 0.26, armStorage = 0.82, armGround = 0.10, armDualPickup = 0.98, armBlock = 0.84;
-    public static double wristBottomOuttake = 0.12, wristTopOuttake = 0.15,  wristStorage = 0.97, wristGround = 0.0, wristDualPickup = 0.95, wristBlock = 0.08;
+    public static double armBottomOuttake = 0.73, armTopOuttake = 0.7, armStorage = 0.3, armGround = 0.88, armDualPickup = 0.19, armBlock = 0.3;
+    public static double wristBottomOuttake = 0.74, wristTopOuttake = 0.71,  wristStorage = 0.025, wristGround = 0.82, wristDualPickup = 0.03, wristBlock = 0.03;
 
     public V4B(OpMode opMode) {
         armLeft = opMode.hardwareMap.servo.get("armLeft");
@@ -22,7 +22,7 @@ public class V4B {
 
     public void setArm(double position) {
         armLeft.setPosition(position);
-        armRight.setPosition(1 - position);
+        armRight.setPosition(1 - position + 0.025);
     }
 
     public void setWrist(double position) {
@@ -53,7 +53,7 @@ public class V4B {
         Thread thread = new Thread(() -> {
             try {
                 setWrist(wristStorage);
-                Thread.sleep(500);
+                Thread.sleep(250);
                 setArm(armStorage);
             } catch (InterruptedException ex) {
                 setWrist(wristStorage);
@@ -69,8 +69,8 @@ public class V4B {
     }
 
     public void bottomPixel() {
-        setWrist(0.96);
-        setArm(0.94);
+        setWrist(wristDualPickup);
+        setArm(armDualPickup);
     }
 
     public void runArm(double manual) {

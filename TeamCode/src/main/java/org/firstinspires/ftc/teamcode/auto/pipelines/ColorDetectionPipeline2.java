@@ -24,7 +24,7 @@ public class ColorDetectionPipeline2 extends OpenCvPipeline {
 
     // Average Cb and Cr values
     public double avgCenter = 0, avgLeft = 0;
-    public static double minimumAvg = 50;
+    public static double minimumAvg = 2;
 
     // Configurations
     enum SpikeMark{
