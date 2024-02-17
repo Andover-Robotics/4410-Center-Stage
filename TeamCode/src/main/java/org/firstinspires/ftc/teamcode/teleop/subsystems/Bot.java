@@ -179,7 +179,7 @@ public class Bot {
                         fourbar.ground();
                     }
                 } else if (state == BotState.STORAGE) { // drop pixel in storage
-                    fourbar.setArm(0.165);
+                    fourbar.setArm(0.2);
                     fourbar.setWrist(0.03);
                     intake.setIntakeHeight(0.1);
                     Thread.sleep(100);

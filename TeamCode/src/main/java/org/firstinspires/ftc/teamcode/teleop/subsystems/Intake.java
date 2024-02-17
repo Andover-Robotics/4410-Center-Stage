@@ -13,8 +13,8 @@ public class Intake {
     private final CRServo counterRoller;
     private final Servo intakeLeft, intakeRight;
 
-    public static double power = 0.24, counterPower = 1.0; // optimal speed for intake
-    public double intakeStorage = 0.03, intakeOut = 0.33, intakeUp = 0.2, intakeStack1 = 0.2, intakeStack2 = 0.26; // TODO: TUNE THESE VALUES
+    public static double power = 0.4, counterPower = 1.0; // optimal speed for intake
+    public double intakeStorage = 0.05, intakeOut = 0.33, intakeUp = 0.2, intakeStack1 = 0.2, intakeStack2 = 0.26; // TODO: TUNE THESE VALUES
     private boolean isRunning = false;
 
     public Intake(OpMode opMode){

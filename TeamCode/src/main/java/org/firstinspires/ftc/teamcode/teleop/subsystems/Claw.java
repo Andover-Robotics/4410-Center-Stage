@@ -8,7 +8,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 public class Claw {
     private final Servo claw;
 
-    public static double fullOpen = 0.8, close = 0.6, halfOpen = 0.7;
+    public static double fullOpen = 0.8, close = 0.6, halfOpen = 0.71;
 
 
     public enum ClawState{

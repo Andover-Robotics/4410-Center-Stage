@@ -16,12 +16,12 @@ import org.openftc.easyopencv.OpenCvCameraRotation;
 @Autonomous(name = "Test CrCb Color", group = "competition")
 public class ColorCrCbDetectionTest extends LinearOpMode {
     public static int alliance = 0;
-    public static int spike = 0; // 0 - Center, Left, 1 - Center and Left
-    public static final double delta = 0.2;
+    public static int spike = 0; // 0 - Center,1 - Left, 2 - Right
+    public static final double delta = 0.5;
     @Override
     public void runOpMode() throws InterruptedException {
         GamepadEx gp1 = new GamepadEx(gamepad1);
-        String[] whichSpike = new String[]{"Center, Left", "Center and Left"};
+        String[] whichSpike = new String[]{"Left", "Center", "Right"};
         String[] whichAlliance = new String[]{"None", "Red", "Blue"};
 
         WebcamName camName = hardwareMap.get(WebcamName.class, "Webcam 1");
@@ -49,10 +49,6 @@ public class ColorCrCbDetectionTest extends LinearOpMode {
             }
 
             colorPipeline.setAlliance(alliance);
-
-            if (gp1.wasJustPressed(GamepadKeys.Button.BACK)) {
-                spike = (spike == 1) ? 0 : 1;
-            }
 
 //            if (gp1.wasJustPressed(GamepadKeys.Button.DPAD_UP)) {
 //                switch(spike) {
@@ -105,7 +101,7 @@ public class ColorCrCbDetectionTest extends LinearOpMode {
             }
 
             telemetry.addData("Alliance", whichAlliance[alliance]);
-            telemetry.addData("Spike Mark", whichSpike[spike]);
+            telemetry.addData("Spike Mark", whichSpike[colorPipeline.getSpikeMark()-1]);
             telemetry.addData("Center Average", colorPipeline.getAvgCenter());
             telemetry.addData("Left Average", colorPipeline.getAvgLeft());
             telemetry.addData("Minimum Average (UP - Y, DOWN - A)",colorPipeline.minimumAvg);
