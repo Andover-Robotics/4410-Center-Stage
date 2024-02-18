@@ -17,7 +17,7 @@ import org.openftc.easyopencv.OpenCvCameraRotation;
 public class ColorCrCbDetectionTest extends LinearOpMode {
     public static int alliance = 0;
     public static int spike = 0; // 0 - Center,1 - Left, 2 - Right
-    public static final double delta = 0.5;
+    public static final double delta = 0.02;
     @Override
     public void runOpMode() throws InterruptedException {
         GamepadEx gp1 = new GamepadEx(gamepad1);
@@ -104,6 +104,7 @@ public class ColorCrCbDetectionTest extends LinearOpMode {
             telemetry.addData("Spike Mark", whichSpike[colorPipeline.getSpikeMark()-1]);
             telemetry.addData("Center Average", colorPipeline.getAvgCenter());
             telemetry.addData("Left Average", colorPipeline.getAvgLeft());
+            telemetry.addData("Percent Diff", colorPipeline.percent_diff);
             telemetry.addData("Minimum Average (UP - Y, DOWN - A)",colorPipeline.minimumAvg);
             telemetry.update();
         }

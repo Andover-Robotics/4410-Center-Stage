@@ -24,7 +24,8 @@ public class ColorDetectionPipeline2 extends OpenCvPipeline {
 
     // Average Cb and Cr values
     public double avgCenter = 0, avgLeft = 0;
-    public static double minimumAvg = 0.125;
+    public double percent_diff = 0;
+    public static double minimumAvg = 2;
 
     // Configurations
     enum SpikeMark{
@@ -44,14 +45,15 @@ public class ColorDetectionPipeline2 extends OpenCvPipeline {
 
     // Execute logic
     public int getSpikeMark() {
-        if (getAvgLeft() < minimumAvg && getAvgCenter() < minimumAvg) { // Right, both avgs is too small
+        if(percent_diff < minimumAvg){
             return 3;
-        } else if (getAvgCenter() < getAvgLeft()) { // Left, left avg greater than center avg
-            return 1;
-        } else if (getAvgLeft() < getAvgCenter()) { // Center, center avg greater than left avg
-            return 2;
+        }else{
+            if(avgLeft>avgCenter){
+                return 1;
+            }else{
+                return 2;
+            }
         }
-        return 3;
     }
 
     // PROCESSING FRAMES
@@ -60,8 +62,8 @@ public class ColorDetectionPipeline2 extends OpenCvPipeline {
         Imgproc.cvtColor(input, matYCrCb, Imgproc.COLOR_RGB2YCrCb);
 
         // Draw rectangles of left and center positions
-        Rect rectCenter = new Rect(600, 50, 680, 240);
-        Rect rectLeft = new Rect(100, 0, 325, 400);
+        Rect rectCenter = new Rect(600, 450, 680, 240);
+        Rect rectLeft = new Rect(100, 250, 325, 400);
 
         // Create mats for each rectangle
         Mat spikeCenter = matYCrCb.submat(rectCenter);
@@ -69,12 +71,12 @@ public class ColorDetectionPipeline2 extends OpenCvPipeline {
 
         // Extract color based off of alliance
         if (alliance == 1) { // Blue
-            Core.extractChannel(spikeCenter, matCbCenter, 1);
-            Core.extractChannel(spikeLeft, matCbLeft, 1);
+            Core.extractChannel(spikeCenter, matCbCenter, 2);
+            Core.extractChannel(spikeLeft, matCbLeft, 2);
 
         } else if (alliance == 2) { // Red
-            Core.extractChannel(spikeCenter, matCrCenter, 2);
-            Core.extractChannel(spikeLeft, matCrLeft, 2);
+            Core.extractChannel(spikeCenter, matCrCenter, 0);
+            Core.extractChannel(spikeLeft, matCrLeft, 0);
         }
         // Calculate average
         Scalar meanCenter = Core.mean(matCbCenter);
@@ -83,8 +85,8 @@ public class ColorDetectionPipeline2 extends OpenCvPipeline {
         avgLeft = meanLeft.val[0];
 
         // normalize values
-        avgCenter /= 240;
-        avgLeft /= 240;
+        percent_diff = Math.abs(avgLeft-avgCenter)/((avgLeft+avgCenter)/2.0)*100;
+
 
         // Display rectangles
         // Left turns red if active

@@ -270,8 +270,20 @@ public class TestAutonomous extends LinearOpMode {
             telemetry.addData("color minAvg", colorDetection.getMinAvg());
 
             // Initiate color detection
-            if (alliance == Alliance.RED) colorDetection.setAlliance(1);
-            else colorDetection.setAlliance(2);
+            if (alliance == Alliance.RED)  {
+                colorDetection.setAlliance(1);
+                colorDetection.setAlliance(2);
+                colorDetection.setAlliance(1);
+                colorDetection.setAlliance(2);
+                colorDetection.setAlliance(1);
+            }
+            else {
+                colorDetection.setAlliance(2);
+                colorDetection.setAlliance(1);
+                colorDetection.setAlliance(2);
+                colorDetection.setAlliance(1);
+                colorDetection.setAlliance(2);
+            }
             spikeMark = colorDetection.getSpikeMark();
             switch (spikeMark) {
                 case 1: spikeMarkString = "LEFT"; break;
@@ -318,8 +330,6 @@ public class TestAutonomous extends LinearOpMode {
                                 .build(); break;
                         case 2: spikeTrajectory = drive.trajectorySequenceBuilder(drive.getPoseEstimate())
                                 .lineToLinearHeading(new Pose2d(23, 32, Math.toRadians(60)))
-                                .waitSeconds(1)
-                                .lineToLinearHeading(new Pose2d(51, 35, Math.toRadians(180)))
                                 .build(); break;
                         case 3: spikeTrajectory = drive.trajectorySequenceBuilder(drive.getPoseEstimate())
                                 .lineToSplineHeading(new Pose2d(13,58,Math.toRadians(90)))
@@ -374,9 +384,10 @@ public class TestAutonomous extends LinearOpMode {
                 }
             }
             sleep((long) spikeDelay * 1000);
-            bot.outtakeGround(); // Go to outtake ground before trajectory
             drive.followTrajectorySequence(spikeTrajectory);
             // Place purple pixel
+            bot.outtakeGround(); // Go to outtake ground before trajectory
+            sleep(250);
             bot.claw.halfOpen();
             sleep(300);
             bot.outtakeOut(1);
@@ -451,9 +462,8 @@ public class TestAutonomous extends LinearOpMode {
                 if ((alliance == Alliance.BLUE && side == Side.CLOSE && spikeMark == 1) || (alliance == Alliance.RED) && side == Side.CLOSE && spikeMark == 3) {
                     drive.followTrajectorySequence(drive.trajectorySequenceBuilder(drive.getPoseEstimate())
                             .splineToLinearHeading(backboardPose, Math.toRadians(0))
-                            .addTemporalMarker(2, () -> {
+                            .addTemporalMarker(0.5, () -> {
                                 bot.fourbar.topOuttake(true);
-                                bot.fourbar.setArm(0.21);
                                 if (slidesHeight != 0) bot.slides.runTo(-slidesHeight);
                                 else bot.slides.runToBottom();
                             })
@@ -461,9 +471,8 @@ public class TestAutonomous extends LinearOpMode {
                 } else {
                     drive.followTrajectorySequence(drive.trajectorySequenceBuilder(drive.getPoseEstimate())
                             .lineToLinearHeading(backboardPose)
-                            .addTemporalMarker(2, () -> {
+                            .addTemporalMarker(0.5, () -> {
                                 bot.fourbar.topOuttake(true);
-                                bot.fourbar.setArm(0.21);
                                 if (slidesHeight != 0) bot.slides.runTo(-slidesHeight);
                                 else bot.slides.runToBottom();
                             })
@@ -471,10 +480,9 @@ public class TestAutonomous extends LinearOpMode {
                 }
                 // Place yellow pixel
                 if (side == Side.CLOSE) {
-                    bot.claw.setPosition(0.66);
-                    sleep(400);
-                    bot.fourbar.setWrist(0.65);
-                    sleep(100);
+                    bot.claw.open();
+                    sleep(250);
+                    bot.storage();
                 } else { // Place both white and yellow
                     bot.intake.stopIntake();
                     bot.claw.halfOpen();
@@ -501,7 +509,7 @@ public class TestAutonomous extends LinearOpMode {
                                 .waitSeconds(stackDelay)
                                 .build());
                     }
-                    for (int i = 1; i <= stackIterations; i++) {
+                    for (int i = 0; i < stackIterations; i++) {
                         // To pixel stack
                         drive.followTrajectorySequence(drive.trajectorySequenceBuilder(drive.getPoseEstimate())
                                 .splineToLinearHeading(new Pose2d(30, stackY1, Math.toRadians(180)), Math.toRadians(180))

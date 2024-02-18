@@ -2,6 +2,8 @@ package org.firstinspires.ftc.teamcode.auto.drive;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.arcrobotics.ftclib.hardware.motors.Motor;
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 
@@ -17,7 +19,8 @@ import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
  * and op modes themselves.
  */
 @Config
-public class DriveConstants {
+@Autonomous(group = "drive")
+public class DriveConstants extends OpMode {
 
 
     public static final double TICKS_PER_REV = Motor.GoBILDA.RPM_435.getCPR();
@@ -45,7 +48,7 @@ public class DriveConstants {
      */
     public static double WHEEL_RADIUS = 1.8898; // in
     public static double GEAR_RATIO = 1; // output (wheel) speed / input (motor) speed
-    public static double TRACK_WIDTH = 13; // in
+    public static double TRACK_WIDTH = 13.925; // in
 
     /*
      * These are the feedforward parameters used to model the drive motor behavior. If you are using
@@ -53,9 +56,24 @@ public class DriveConstants {
      * motor encoders or have elected not to use them for velocity control, these values should be
      * empirically tuned.
      */
-    public static double kV = 0.013;
-    public static double kA = 0.0033;
-    public static double kStatic = 0.003;
+    public static double kV = 0.019;
+    public static double kA = 0.005;
+    public static double kStatic = 0.002;
+
+    /*don't frame me for adding sus comments to your code, I would never do that.
+     -Anushka
+     also, your robot is gay
+     -Anushka
+     */
+
+    /*
+    Roses are red
+    Violets are blue
+    Tuning auto is fun
+    Is a lie they'll all tell you
+    -Anushka
+     */
+
 
     /*
      * These values are used to generate the trajectories for you robot. To ensure proper operation,
@@ -87,7 +105,7 @@ public class DriveConstants {
      */
     public static double MAX_VEL = ((MAX_RPM / 60) * GEAR_RATIO * WHEEL_RADIUS * 2 * Math.PI) * 0.85;
     public static double MAX_ACCEL = ((MAX_RPM / 60) * GEAR_RATIO * WHEEL_RADIUS * 2 * Math.PI) * 0.85;
-    public static double MAX_ANG_VEL = 7.4;
+    public static double MAX_ANG_VEL = 5.250979082957352;
     public static double MAX_ANG_ACCEL = 1.3;
 
     public static RevHubOrientationOnRobot.LogoFacingDirection LOGO_FACING_DIR =
@@ -107,5 +125,15 @@ public class DriveConstants {
     public static double getMotorVelocityF(double ticksPerSecond) {
         // see https://docs.google.com/document/d/1tyWrXDfMidwYyP_5H4mZyVgaEswhOC35gvdmP-V-5hA/edit#heading=h.61g9ixenznbx
         return 32767 / ticksPerSecond;
+    }
+
+    @Override
+    public void init() {
+
+    }
+
+    @Override
+    public void loop() {
+
     }
 }
