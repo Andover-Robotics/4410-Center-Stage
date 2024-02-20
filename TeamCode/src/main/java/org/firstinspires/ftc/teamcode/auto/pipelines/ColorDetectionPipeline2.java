@@ -81,8 +81,8 @@ public class ColorDetectionPipeline2 extends OpenCvPipeline {
         // Calculate average
         Scalar meanCenter = Core.mean(matCbCenter);
         Scalar meanLeft = Core.mean(matCbLeft);
-        avgCenter = meanCenter.val[0];
-        avgLeft = meanLeft.val[0];
+        avgCenter = meanCenter.val[0] / rectCenter.area();
+        avgLeft = meanLeft.val[0] / rectLeft.area();
 
         // normalize values
         percent_diff = Math.abs(avgLeft-avgCenter)/((avgLeft+avgCenter)/2.0)*100;
