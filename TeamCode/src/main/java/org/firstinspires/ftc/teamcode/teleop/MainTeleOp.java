@@ -28,6 +28,7 @@ import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.trajectory.Trajectory;
 import com.acmerobotics.roadrunner.util.Angle;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.Gamepad;
 
@@ -44,6 +45,7 @@ public class MainTeleOp extends LinearOpMode {
     private boolean fieldCentric = false;
     Thread thread;
     DistanceSensor distanceSensor;
+    DigitalChannel breakBeam;
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -60,6 +62,8 @@ public class MainTeleOp extends LinearOpMode {
         gp2 = new GamepadEx(gamepad2);
 
         distanceSensor = hardwareMap.get(DistanceSensor.class, "Distance");
+        breakBeam = hardwareMap.get(DigitalChannel.class, "BreakBeam");
+
 
         // Initialize bot
         bot.stopMotors();
@@ -235,6 +239,7 @@ public class MainTeleOp extends LinearOpMode {
             telemetry.addData("X = ", gp1.getLeftX());
             telemetry.addData("Y = ", gp1.getLeftY());
             telemetry.addData("RX = ", gp1.getRightX());
+            telemetry.addData("Break Beam: ", breakBeam.getState());
 
             telemetry.update();
             bot.slides.periodic();
