@@ -56,8 +56,8 @@ public class DriveConstants extends OpMode {
      * motor encoders or have elected not to use them for velocity control, these values should be
      * empirically tuned.
      */
-    public static double kV = 0.019;
-    public static double kA = 0.005;
+    public static double kV = 0.0128;
+    public static double kA = 0.004;
     public static double kStatic = 0.002;
 
     /*don't frame me for adding sus comments to your code, I would never do that.
@@ -103,10 +103,10 @@ public class DriveConstants extends OpMode {
      * You are free to raise this on your own if you would like. It is best determined through experimentation.
 
      */
-    public static double MAX_VEL = ((MAX_RPM / 60) * GEAR_RATIO * WHEEL_RADIUS * 2 * Math.PI) * 0.85;
+    public static double MAX_VEL = 55;
     public static double MAX_ACCEL = ((MAX_RPM / 60) * GEAR_RATIO * WHEEL_RADIUS * 2 * Math.PI) * 0.85;
-    public static double MAX_ANG_VEL = 5.250979082957352;
-    public static double MAX_ANG_ACCEL = 1.3;
+    public static double MAX_ANG_VEL = Math.toRadians(60);
+    public static double MAX_ANG_ACCEL = Math.toRadians(60);
 
     public static RevHubOrientationOnRobot.LogoFacingDirection LOGO_FACING_DIR =
             RevHubOrientationOnRobot.LogoFacingDirection.LEFT;

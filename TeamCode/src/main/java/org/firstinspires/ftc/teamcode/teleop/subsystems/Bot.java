@@ -90,7 +90,7 @@ public class Bot {
         state = BotState.OUTTAKE_DOWN;
     }
 
-    public void pickup() throws InterruptedException { // pick up pixel from storage
+    public void pickup() { // pick up pixel from storage
         Thread thread = new Thread(() -> {
             try {
                 slides.runToBottom();

@@ -75,8 +75,8 @@ public class ColorDetectionPipeline2 extends OpenCvPipeline {
             Core.extractChannel(spikeLeft, matCbLeft, 2);
 
         } else if (alliance == 2) { // Red
-            Core.extractChannel(spikeCenter, matCrCenter, 0);
-            Core.extractChannel(spikeLeft, matCrLeft, 0);
+            Core.extractChannel(spikeCenter, matCrCenter, 1);
+            Core.extractChannel(spikeLeft, matCrLeft, 1);
         }
         // Calculate average
         Scalar meanCenter = Core.mean(matCbCenter);
