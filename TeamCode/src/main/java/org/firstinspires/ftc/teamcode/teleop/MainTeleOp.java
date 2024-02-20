@@ -195,8 +195,8 @@ public class MainTeleOp extends LinearOpMode {
                 if (bot.intake.getIntakeHeight() != bot.intake.intakeOut) {
                     bot.intake.setIntakeHeight(bot.intake.intakeOut);
                 }
-            } else if (gp1.wasJustPressed(GamepadKeys.Button.DPAD_UP)){ // up intake
-                bot.intake(false);
+            } else if (gp1.isDown(GamepadKeys.Button.DPAD_UP)){ // up intake
+                bot.intake(true);
                 if (bot.intake.getIntakeHeight() != bot.intake.intakeUp) {
                     bot.intake.setIntakeHeight(bot.intake.intakeUp);
                 }
