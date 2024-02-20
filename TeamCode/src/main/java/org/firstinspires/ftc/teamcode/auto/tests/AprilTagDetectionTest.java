@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.auto;
+package org.firstinspires.ftc.teamcode.auto.tests;
 
 import static org.firstinspires.ftc.teamcode.auto.drive.DriveConstants.MAX_ANG_VEL;
 import static org.firstinspires.ftc.teamcode.auto.drive.DriveConstants.MAX_VEL;

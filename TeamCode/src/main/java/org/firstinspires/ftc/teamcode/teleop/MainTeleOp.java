@@ -21,6 +21,7 @@ import org.firstinspires.ftc.teamcode.auto.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.auto.trajectorysequence.TrajectorySequence;
 import org.firstinspires.ftc.teamcode.auto.util.PoseStorage;
 import org.firstinspires.ftc.teamcode.teleop.subsystems.Bot;
+import org.firstinspires.ftc.teamcode.teleop.subsystems.Claw;
 import org.firstinspires.ftc.teamcode.teleop.subsystems.Intake;
 import org.firstinspires.ftc.teamcode.teleop.subsystems.Slides;
 
@@ -43,7 +44,7 @@ public class MainTeleOp extends LinearOpMode {
     private double driveSpeed = 1, driveMultiplier = 1;
     private GamepadEx gp1, gp2;
     private boolean fieldCentric = false;
-    Thread thread;
+    private Thread thread;
     DistanceSensor distanceSensor;
     DigitalChannel breakBeam;
 
@@ -112,6 +113,9 @@ public class MainTeleOp extends LinearOpMode {
                 }
                 if (gp2.wasJustPressed(GamepadKeys.Button.B)) { // pickup pixel
                     bot.pickup();
+                    if (breakBeam.getState()) {
+                        bot.claw.clawState = Claw.ClawState.SINGLE;
+                    }
                 }
                 if (gp2.wasJustPressed(GamepadKeys.Button.RIGHT_BUMPER)) { // drop pixel while in storage
                     bot.drop();
@@ -124,14 +128,14 @@ public class MainTeleOp extends LinearOpMode {
                 }
             } else if (bot.state == Bot.BotState.OUTTAKE_OUT) { // SCORING BACKBOARD
                 bot.slides.runManual(gp2.getRightY()*-0.5);
-                if (gp2.wasJustPressed(GamepadKeys.Button.Y)) { // drop and return to storage
+                if (gp2.wasJustPressed(GamepadKeys.Button.Y)) { // drop
                     bot.drop();
                 }
                 if (gp2.wasJustPressed(GamepadKeys.Button.B)) { // cancel and return to storage
                     bot.storage() ;
                 }
                 if (gp2.wasJustPressed(GamepadKeys.Button.X)) {
-                    bot.drop(true);
+                    bot.outtakeGround();
                 }
 //                if (Math.abs(gp2.getLeftY()) > 0.01) {
 //                    bot.fourbar.runAngle(bot.slides.motorLeft.getCurrentPosition());
@@ -189,17 +193,17 @@ public class MainTeleOp extends LinearOpMode {
             }
 
             // INTAKE
-            if (gp1.isDown(GamepadKeys.Button.RIGHT_BUMPER)) { // intake
+            if (gp1.isDown(GamepadKeys.Button.RIGHT_BUMPER)) { // reverse intake
                 bot.intake(false);
                 if (bot.intake.getIntakeHeight() != bot.intake.intakeOut) {
                     bot.intake.setIntakeHeight(bot.intake.intakeOut);
                 }
-            } else if (gp1.isDown(GamepadKeys.Button.LEFT_BUMPER)) { // reverse intake
+            } else if (gp1.isDown(GamepadKeys.Button.LEFT_BUMPER) && breakBeam.getState()) { // intake
                 bot.intake(true);
                 if (bot.intake.getIntakeHeight() != bot.intake.intakeOut) {
                     bot.intake.setIntakeHeight(bot.intake.intakeOut);
                 }
-            } else if (gp1.isDown(GamepadKeys.Button.DPAD_UP)){ // up intake
+            } else if (gp1.isDown(GamepadKeys.Button.DPAD_UP) && breakBeam.getState()){ // up intake
                 bot.intake(true);
                 if (bot.intake.getIntakeHeight() != bot.intake.intakeUp) {
                     bot.intake.setIntakeHeight(bot.intake.intakeUp);
@@ -235,11 +239,11 @@ public class MainTeleOp extends LinearOpMode {
             telemetry.addData("arm Right Position", bot.fourbar.armRight.getPosition());
             telemetry.addData("wrist Position", bot.fourbar.wrist.getPosition());
             telemetry.addData("Distance to wall (cm)", distanceSensor.getDistance(DistanceUnit.CM));
+            telemetry.addData("Break Beam", breakBeam.getState());
 
-            telemetry.addData("X = ", gp1.getLeftX());
-            telemetry.addData("Y = ", gp1.getLeftY());
-            telemetry.addData("RX = ", gp1.getRightX());
-            telemetry.addData("Break Beam: ", breakBeam.getState());
+            telemetry.addData("X", gp1.getLeftX());
+            telemetry.addData("Y", gp1.getLeftY());
+            telemetry.addData("RX", gp1.getRightX());
 
             telemetry.update();
             bot.slides.periodic();

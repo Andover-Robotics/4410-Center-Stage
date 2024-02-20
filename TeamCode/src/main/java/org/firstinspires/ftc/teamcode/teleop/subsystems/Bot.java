@@ -152,6 +152,7 @@ public class Bot {
         }
     }
 
+
     public void drop() { // drop pixel in outtake or storage position
         Thread thread = new Thread(() -> {
             try {
