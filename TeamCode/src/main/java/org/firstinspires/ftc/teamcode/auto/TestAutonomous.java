@@ -186,7 +186,7 @@ public class TestAutonomous extends LinearOpMode {
         left bumper - decrement slides height
 
         start - drop/pickup
-        back - switch bumper functions (default: slides height -> minimumAvg (color detection))
+        back - manual spike mark (FOR TUNING)
          */
         // Initialized configurations start
         while (!isStarted()) {
@@ -289,7 +289,15 @@ public class TestAutonomous extends LinearOpMode {
             else {
                 colorDetection.setAlliance(2);
             }
-            spikeMark = colorDetection.getSpikeMark();
+            // spikeMark = colorDetection.getSpikeMark();
+            // Manual change spike mark
+            if (gp1.wasJustPressed(GamepadKeys.Button.BACK)) {
+                switch (spikeMark) {
+                    case 1: spikeMark = 2; break;
+                    case 2: spikeMark = 3; break;
+                    case 3: spikeMark = 1; break;
+                }
+            }
             switch (spikeMark) {
                 case 1: spikeMarkString = "LEFT"; break;
                 case 2: spikeMarkString = "CENTER"; break;
