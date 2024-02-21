@@ -438,8 +438,7 @@ public class TestAutonomous extends LinearOpMode {
                     }
                     drive.followTrajectorySequence(stackTrajectory);
                     // Intake from stack
-                    bot.intake.setIntakeHeight(0.22);
-                    bot.intake(true);
+                    bot.intake(true, 0.22);
                     sleep(800);
                     pixelTap.start();
                     bot.intake.setIntakeHeight(bot.intake.intakeStorage);
@@ -528,30 +527,30 @@ public class TestAutonomous extends LinearOpMode {
                                 .lineToLinearHeading(new Pose2d(stackX, stackY1, Math.toRadians(180)))
                                 .build());
                         // Intake from stack
-                        bot.intake(true);
                         if (side == Side.CLOSE) {
                             if (stackIterations == 1) {
-                                bot.intake.setIntakeHeight(stackHeights[0]);
+                                bot.intake(true, stackHeights[0]);
                                 sleep(800);
-                                bot.intake.setIntakeHeight(stackHeights[1]);
+                                bot.intake(true, stackHeights[1]);
                                 sleep(800);
                             } else if (stackIterations == 2) {
-                                bot.intake.setIntakeHeight(stackHeights[4]);
+                                bot.intake(true, stackHeights[4]);
                             }
                         } else if (side == Side.FAR) {
                             if (stackIterations == 1) {
-                                bot.intake.setIntakeHeight(stackHeights[1]);
+                                bot.intake(true, stackHeights[1]);
                                 sleep(800);
-                                bot.intake.setIntakeHeight(stackHeights[2]);
+                                bot.intake(true, stackHeights[2]);
+                                sleep(800);
                             } else if (stackIterations == 2) {
-                                bot.intake.setIntakeHeight(stackHeights[4]);
+                                bot.intake(true, stackHeights[4]);
                             }
                         }
 
                         if (breakBeam.getState()) {
                             sleep(2000);
                         }
-                        bot.intake(false);
+                        bot.intake(false, bot.intake.intakeUp);
                         pixelTap.start();
 
                         // Across field
@@ -567,6 +566,7 @@ public class TestAutonomous extends LinearOpMode {
                                 .build());
 
                         // Score pixels on backboard
+                        bot.intake.stopIntake();
                         bot.outtakeOut(2);
                         if (slidesHeight != 0) bot.slides.runTo(-slidesHeight);
                         else bot.slides.runToBottom();
