@@ -191,6 +191,7 @@ public class TestAutonomous extends LinearOpMode {
         // Initialized configurations start
         while (!isStarted()) {
             gp1.readButtons();
+            gp2.readButtons();
 
             // Drop/pickup pixel
             if (gp1.wasJustPressed(GamepadKeys.Button.START)){
@@ -291,18 +292,30 @@ public class TestAutonomous extends LinearOpMode {
             }
             // spikeMark = colorDetection.getSpikeMark();
             // Manual change spike mark
-            if (gp1.wasJustPressed(GamepadKeys.Button.BACK)) {
-                switch (spikeMark) {
-                    case 1: spikeMark = 2; break;
-                    case 2: spikeMark = 3; break;
-                    case 3: spikeMark = 1; break;
-                }
+//            if (gp1.wasJustPressed(GamepadKeys.Button.BACK)) {
+//                switch (spikeMark) {
+//                    case 1: spikeMark = 2; break;
+//                    case 2: spikeMark = 3; break;
+//                    case 3: spikeMark = 1; break;
+//                }
+//            }
+//            switch (spikeMark) {
+//                case 1: spikeMarkString = "LEFT"; break;
+//                case 2: spikeMarkString = "CENTER"; break;
+//                case 3: spikeMarkString = "RIGHT"; break;
+//                default: spikeMarkString = "NONE"; break;
+//            }
+            if (gp2.wasJustPressed(GamepadKeys.Button.DPAD_UP)) {
+                spikeMark = 2;
+                spikeMarkString = "CENTER";
             }
-            switch (spikeMark) {
-                case 1: spikeMarkString = "LEFT"; break;
-                case 2: spikeMarkString = "CENTER"; break;
-                case 3: spikeMarkString = "RIGHT"; break;
-                default: spikeMarkString = "NONE"; break;
+            if (gp2.wasJustPressed(GamepadKeys.Button.DPAD_LEFT)) {
+                spikeMark = 1;
+                spikeMarkString = "LEFT";
+            }
+            if (gp2.wasJustPressed(GamepadKeys.Button.DPAD_RIGHT)) {
+                spikeMark = 3;
+                spikeMarkString = "RIGHT";
             }
             telemetry.addData("detected spike", spikeMarkString);
 
@@ -339,7 +352,7 @@ public class TestAutonomous extends LinearOpMode {
                 if (side == Side.CLOSE) { // BLUE Close side
                     switch (spikeMark) {
                         case 1: spikeTrajectory = drive.trajectorySequenceBuilder(drive.getPoseEstimate())
-                                .lineToLinearHeading(new Pose2d(17, 40, Math.toRadians(120)))
+                                .lineToLinearHeading(new Pose2d(24, 45, Math.toRadians(90)))
                                 .build(); break;
                         case 2: spikeTrajectory = drive.trajectorySequenceBuilder(drive.getPoseEstimate())
                                 .lineToLinearHeading(new Pose2d(23, 33, Math.toRadians(60)))
@@ -459,7 +472,7 @@ public class TestAutonomous extends LinearOpMode {
                 }
 
                 // Define backboard y value
-                int backboardX = 50, backboardY = 0;
+                int backboardX = 48, backboardY = 0;
                 if (alliance == Alliance.RED) {
                     switch (spikeMark) {
                         case 1: backboardY = -30; break;
@@ -512,11 +525,11 @@ public class TestAutonomous extends LinearOpMode {
 
                 // Pixel stack trajectory starts here
                 double [] stackHeights = new double [] { // from top pixel (1) to bottom pixel (5)
-                        0.26,
-                        0.285,
-                        0.3,
+                        0.315,
                         0.33,
-                        0.35
+                        0.35,
+                        0.38,
+                        0.4
                 };
                 if (toStack) {
                     int stackY1 = alliance == Alliance.RED ? -10 : 10;
@@ -531,7 +544,7 @@ public class TestAutonomous extends LinearOpMode {
                     for (int i = 0; i < stackIterations; i++) {
 
                         Thread extendIntake = new Thread(() -> {
-                            sleep(600);
+                            sleep(1200);
                             if (side == Side.CLOSE) {
                                 if (stackIterations == 1) {
                                     bot.intake(false, stackHeights[0]);
@@ -559,11 +572,12 @@ public class TestAutonomous extends LinearOpMode {
                                 bot.intake(false, stackHeights[0]);
                                 sleep(150);
                                 bot.intake(false, stackHeights[1]);
-                                sleep(400);
+                                sleep(800);
                                 if (breakBeam.getState()) {
                                     bot.intake(true, stackHeights[1]);
-                                    sleep(300);
+                                    sleep(150);
                                     bot.intake(false, stackHeights[1]);
+                                    sleep(1600);
                                 }
                             } else if (stackIterations == 2) {
                                 bot.intake(false, stackHeights[3]);
@@ -572,6 +586,7 @@ public class TestAutonomous extends LinearOpMode {
                                     bot.intake(true, stackHeights[3]);
                                     sleep(300);
                                     bot.intake(false, stackHeights[3]);
+                                    sleep(1200);
                                 }
                             }
                         } else if (side == Side.FAR) {
@@ -584,6 +599,7 @@ public class TestAutonomous extends LinearOpMode {
                                     bot.intake(true, stackHeights[2]);
                                     sleep(300);
                                     bot.intake(false, stackHeights[2]);
+                                    sleep(1200);
                                 }
                             } else if (stackIterations == 2) {
                                 bot.intake(false, stackHeights[4]);
@@ -592,6 +608,7 @@ public class TestAutonomous extends LinearOpMode {
                                     bot.intake(true, stackHeights[4]);
                                     sleep(300);
                                     bot.intake(false, stackHeights[4]);
+                                    sleep(1200);
                                 }
                             }
                         }

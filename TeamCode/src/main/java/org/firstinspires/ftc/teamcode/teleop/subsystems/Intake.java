@@ -16,7 +16,7 @@ public class Intake {
     private final Servo intakeRight;
 
     public static double power = 0.4, counterPower = 1.0; // optimal speed for intake
-    public double intakeStorage = 0.05, intakeOut = 0.35, intakeUp = 0.2;
+    public double intakeStorage = 0.10, intakeOut = 0.4, intakeUp = 0.3;
     private boolean isRunning = false;
     DigitalChannel breakBeam;
 
