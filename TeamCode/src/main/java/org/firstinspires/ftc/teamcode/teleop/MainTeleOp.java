@@ -78,9 +78,11 @@ public class MainTeleOp extends LinearOpMode {
         Driver 1 (gp1):
         joysticks - driving
         right trigger - slow down
+        start - toggle field centric
+
+        Y - manual intake
         left bumper - run intake
         right bumper - run reverse intake
-        start - toggle field centric
 
         Driver 2 (gp2):
         B - pick up pixels, cancel outtake out
@@ -95,6 +97,7 @@ public class MainTeleOp extends LinearOpMode {
 
         right bumper - drop pixel
         left bumper - tap pixel top
+
         left joystick - slides up/down
         right joystick - arm in/out
         */
@@ -200,6 +203,10 @@ public class MainTeleOp extends LinearOpMode {
                 bot.intake(false, bot.intake.intakeOut);
             } else if (gp1.isDown(GamepadKeys.Button.DPAD_UP) && breakBeam.getState()){ // up intake
                 bot.intake(false, bot.intake.intakeUp);
+
+            } else if (gp1.isDown(GamepadKeys.Button.Y)){ // manual intake, ignores break beams
+                bot.intake(false, bot.intake.intakeOut);
+
             } else { // stop intake
                 bot.intake.stopIntake();
                 bot.intake.setIntakeHeight(bot.intake.intakeStorage);
