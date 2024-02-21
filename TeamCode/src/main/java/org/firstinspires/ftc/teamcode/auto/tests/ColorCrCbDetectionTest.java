@@ -17,7 +17,7 @@ import org.openftc.easyopencv.OpenCvCameraRotation;
 public class ColorCrCbDetectionTest extends LinearOpMode {
     public static int alliance = 0;
     public static int spike = 0; // 0 - Center,1 - Left, 2 - Right
-    public static final double delta = 0.02;
+    public static final double delta = 0.2;
     @Override
     public void runOpMode() throws InterruptedException {
         GamepadEx gp1 = new GamepadEx(gamepad1);

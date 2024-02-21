@@ -48,7 +48,7 @@ public class MeepMeepTesting {
                 .setConstraints(60, 60, Math.toRadians(180), Math.toRadians(180), 13)
                 .followTrajectorySequence(drive -> drive.trajectorySequenceBuilder(blueCloseStart)
                         // 2+0
-                        .lineToLinearHeading(new Pose2d(17, 48, Math.toRadians(120))) // To spike mark
+                        .lineToLinearHeading(new Pose2d(17, 40, Math.toRadians(120))) // To spike mark
                         .waitSeconds(1) // Place purple pixel
                         .splineToLinearHeading(new Pose2d(51, 41, Math.toRadians(180)), Math.toRadians(0)) // To backboard
                         .waitSeconds(1) // Place yellow pixel
@@ -126,7 +126,7 @@ public class MeepMeepTesting {
                         .build());
 
         meepMeep.setBackground(MeepMeep.Background.FIELD_CENTERSTAGE_OFFICIAL)
-                .addEntity(blueRight2)
+                .addEntity(blueLeft1)
                 .start();
     }
 }

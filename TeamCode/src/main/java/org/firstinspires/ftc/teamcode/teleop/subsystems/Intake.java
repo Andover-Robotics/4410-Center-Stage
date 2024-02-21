@@ -5,6 +5,7 @@ import com.arcrobotics.ftclib.hardware.motors.CRServo;
 import com.arcrobotics.ftclib.hardware.motors.Motor;
 import com.arcrobotics.ftclib.hardware.motors.MotorEx;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.Servo;
 
 @Config
@@ -16,6 +17,7 @@ public class Intake {
     public static double power = 0.4, counterPower = 1.0; // optimal speed for intake
     public double intakeStorage = 0.05, intakeOut = 0.35, intakeUp = 0.2, intakeStack1 = 0.2, intakeStack2 = 0.26; // TODO: TUNE THESE VALUES
     private boolean isRunning = false;
+    DigitalChannel breakBeam;
 
     public Intake(OpMode opMode){
         noodles = new MotorEx(opMode.hardwareMap, "intake");

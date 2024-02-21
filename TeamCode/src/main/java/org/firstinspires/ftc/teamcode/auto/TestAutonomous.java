@@ -28,6 +28,7 @@ import org.openftc.easyopencv.OpenCvCameraRotation;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotor.RunMode;
+import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.Gamepad;
 
 import java.util.ArrayList;
@@ -55,12 +56,16 @@ public class TestAutonomous extends LinearOpMode {
     public static double spikeDelay = 0.0; // Delay before going to spike mark
     public static double stackDelay = 0.0; // Delay before going to stack, will park on side and wait
     public static double backboardDelay = 0.0; // Delay before going to backboard, after scoring spike mark
+    DigitalChannel breakBeam;
+
 
     @Override
     public void runOpMode() throws InterruptedException {
         // Instantiate
         telemetry.setAutoClear(true);
         bot = Bot.getInstance(this);
+        breakBeam = hardwareMap.get(DigitalChannel.class, "BreakBeam");
+
         SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
         GamepadEx gp1 = new GamepadEx(gamepad1);
         GamepadEx gp2 = new GamepadEx(gamepad2);
@@ -70,6 +75,7 @@ public class TestAutonomous extends LinearOpMode {
         OpenCvCamera camera = OpenCvCameraFactory.getInstance().createWebcam(camName);
         ColorDetectionPipeline2 colorDetection = new ColorDetectionPipeline2(telemetry);
         // Start camera
+        camera.setPipeline(colorDetection);
         camera.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
             @Override
             public void onOpened() {
@@ -80,9 +86,6 @@ public class TestAutonomous extends LinearOpMode {
                 telemetry.addData("Error code:", errorCode);
             }
         });
-        camera.setPipeline(colorDetection);
-        try { camera.stopStreaming(); camera.closeCameraDevice();}
-        catch ( OpenCvCameraException ignored ) { }
 
         // Threads
         // Slides periodic
@@ -119,19 +122,50 @@ public class TestAutonomous extends LinearOpMode {
         });
         pickup.start();
 
+        // Tap pixel
+        Thread pixelTap = new Thread(() -> {
+            sleep(300);
+            bot.slides.runToBottom();
+            bot.claw.fullOpen();
+            bot.intake.setIntakeHeight(0.1);
+            sleep(100);
+            bot.fourbar.bottomPixel();
+            sleep(300);
+            bot.claw.pickupClose();
+            sleep(250);
+            bot.storage();
+            sleep(50);
+            bot.claw.fullOpen();
+        });
+
+        // Pick up in auto
+        Thread autoPickup = new Thread(() -> {
+            bot.intake.stopIntake();
+            bot.slides.runToBottom();
+            bot.claw.fullOpen();
+            sleep(100);
+            bot.fourbar.pickup();
+            sleep(400);
+            bot.claw.pickupClose();
+            sleep(300);
+            bot.storage();
+        });
+
+
         Thread trackHeading = new Thread(() -> {
             while (opModeIsActive() && !isStopRequested()) {
-                if (drive.getExternalHeadingVelocity() > (0.2 * DriveConstants.MAX_ANG_VEL)) {
+                if (drive.getExternalHeadingVelocity() > (DriveConstants.MAX_ANG_VEL)) {
                     telemetry.addLine("SHUTTING DOWN!!!");
                     requestOpModeStop();
                 }
             }
         });
+        trackHeading.start();
 
 
         // Configuration variables
         boolean dropped = false;
-        String spikeMarkString = "", stackString = "2+0 (x0)", parkString = "NONE";
+        String spikeMarkString = "", stackString = "2+0 (x0)", parkString = "None";
         /*
         LIST OF CONFIGURATION CONTROLS: last updated 2/9/24 - zachery
 
@@ -251,16 +285,8 @@ public class TestAutonomous extends LinearOpMode {
             // Initiate color detection
             if (alliance == Alliance.RED)  {
                 colorDetection.setAlliance(1);
-                colorDetection.setAlliance(2);
-                colorDetection.setAlliance(1);
-                colorDetection.setAlliance(2);
-                colorDetection.setAlliance(1);
             }
             else {
-                colorDetection.setAlliance(2);
-                colorDetection.setAlliance(1);
-                colorDetection.setAlliance(2);
-                colorDetection.setAlliance(1);
                 colorDetection.setAlliance(2);
             }
             spikeMark = colorDetection.getSpikeMark();
@@ -283,7 +309,7 @@ public class TestAutonomous extends LinearOpMode {
         if (opModeIsActive() && !isStopRequested()) {
             // Run threads
             trackTime.start();
-            //trackHeading.start();
+            trackHeading.start();
             periodic.start();
 
             // Define starting pose
@@ -305,7 +331,7 @@ public class TestAutonomous extends LinearOpMode {
                 if (side == Side.CLOSE) { // BLUE Close side
                     switch (spikeMark) {
                         case 1: spikeTrajectory = drive.trajectorySequenceBuilder(drive.getPoseEstimate())
-                                .lineToLinearHeading(new Pose2d(17, 48, Math.toRadians(120)))
+                                .lineToLinearHeading(new Pose2d(17, 40, Math.toRadians(120)))
                                 .build(); break;
                         case 2: spikeTrajectory = drive.trajectorySequenceBuilder(drive.getPoseEstimate())
                                 .lineToLinearHeading(new Pose2d(23, 32, Math.toRadians(60)))
@@ -344,7 +370,7 @@ public class TestAutonomous extends LinearOpMode {
                                 .lineToLinearHeading(new Pose2d(51, -35, Math.toRadians(180)))
                                 .build(); break;
                         case 3: spikeTrajectory = drive.trajectorySequenceBuilder(drive.getPoseEstimate()).back(2)
-                                .lineToLinearHeading(new Pose2d(17, -48, Math.toRadians(120)))
+                                .lineToLinearHeading(new Pose2d(17, -40, Math.toRadians(120)))
                                 .build(); break;
                     }
                 } else { // RED Far side
@@ -366,19 +392,23 @@ public class TestAutonomous extends LinearOpMode {
             bot.outtakeGround(); // Go to outtake ground before trajectory
             drive.followTrajectorySequence(spikeTrajectory);
             // Place purple pixel
-            bot.claw.halfOpen();
-            sleep(300);
+            if(side == Side.CLOSE) {
+                bot.claw.halfOpen();
+            } else {
+                bot.claw.fullOpen();
+            }
+            sleep(150);
             bot.storage();
             bot.claw.close();
             sleep((long) backboardDelay * 1000);
 
             // To backboard
             if (toBackboard) {
+                int stackX = -56;
                 // Extra movements on far side
                 if (side == Side.FAR) {
                     // To pixel stack
                     TrajectorySequence stackTrajectory = null;
-                    int stackX = -59;
                     if (alliance == Alliance.BLUE) { // BLUE
                         switch (spikeMark) {
                             case 1: stackTrajectory = drive.trajectorySequenceBuilder(drive.getPoseEstimate())
@@ -408,19 +438,21 @@ public class TestAutonomous extends LinearOpMode {
                     }
                     drive.followTrajectorySequence(stackTrajectory);
                     // Intake from stack
-                    bot.intake.setIntakeHeight(0.18);
-                    bot.intake(false);
-                    sleep(1000);
+                    bot.intake.setIntakeHeight(0.22);
+                    bot.intake(true);
+                    sleep(800);
+                    pixelTap.start();
                     bot.intake.setIntakeHeight(bot.intake.intakeStorage);
                     // Across the field
                     int farY = alliance == Alliance.RED ? -11 : 11;
                     drive.followTrajectorySequence(drive.trajectorySequenceBuilder(drive.getPoseEstimate())
                             .lineToSplineHeading(new Pose2d(25, farY, Math.toRadians(180)))
                             .build());
+                    autoPickup.start();
                 }
 
                 // Define backboard y value
-                int backboardX = 50, backboardY = 0;
+                int backboardX = 51, backboardY = 0;
                 if (alliance == Alliance.RED) {
                     switch (spikeMark) {
                         case 1: backboardY = -30; break;
@@ -438,20 +470,10 @@ public class TestAutonomous extends LinearOpMode {
                 if ((alliance == Alliance.BLUE && side == Side.CLOSE && spikeMark == 1) || (alliance == Alliance.RED) && side == Side.CLOSE && spikeMark == 3) {
                     drive.followTrajectorySequence(drive.trajectorySequenceBuilder(drive.getPoseEstimate())
                             .splineToLinearHeading(backboardPose, Math.toRadians(0))
-//                            .addTemporalMarker(0.5, () -> {
-//                                bot.fourbar.topOuttake(true);
-//                                if (slidesHeight != 0) bot.slides.runTo(-slidesHeight);
-//                                else bot.slides.runToBottom();
-//                            })
                             .build());
                 } else {
                     drive.followTrajectorySequence(drive.trajectorySequenceBuilder(drive.getPoseEstimate())
                             .lineToLinearHeading(backboardPose)
-//                            .addTemporalMarker(0.5, () -> {
-//                                bot.fourbar.topOuttake(true);
-//                                if (slidesHeight != 0) bot.slides.runTo(-slidesHeight);
-//                                else bot.slides.runToBottom();
-//                            })
                             .build());
                 }
                 // Place yellow pixel
@@ -465,23 +487,29 @@ public class TestAutonomous extends LinearOpMode {
                     bot.storage();
                 } else { // Place both white and yellow
                     bot.intake.stopIntake();
-                    bot.claw.halfOpen();
-                    sleep(400);
-                    bot.fourbar.setWrist(0.22);
+                    bot.outtakeOut(2);
+                    if (slidesHeight != 0) bot.slides.runTo(-slidesHeight);
+                    else bot.slides.runToBottom();
+                    sleep(750);
+                    bot.claw.open();
+                    sleep(500);
+                    bot.fourbar.setArm(0.65);
+                    bot.fourbar.setWrist(0.72);
+                    bot.fourbar.topOuttake(false);
                     bot.slides.runTo(-800);
-                    bot.outtakeOut(1);
-                    sleep(300);
-                    bot.fourbar.setWrist(0.13);
-                    sleep(100);
-                    bot.claw.setPosition(0.66);
-                    sleep(200);
+                    sleep(500);
+                    bot.claw.open();
+                    sleep(500);
+                    bot.storage();
                 }
 
                 // Pixel stack trajectory starts here
-                double [] stackHeights = side == Side.FAR ? new double [] {0.22 // 1
-                        , 0.26 // 3
-                } : new double [] {0.24 // 2
-                        , 0.28 // 4
+                double [] stackHeights = new double [] { // from top pixel (1) to bottom pixel (5)
+                        0.26,
+                        0.28,
+                        0.3,
+                        0.32,
+                        0.34
                 };
                 if (toStack) {
                     int stackY1 = alliance == Alliance.RED ? -10 : 10;
@@ -497,29 +525,48 @@ public class TestAutonomous extends LinearOpMode {
                         // To pixel stack
                         drive.followTrajectorySequence(drive.trajectorySequenceBuilder(drive.getPoseEstimate())
                                 .splineToLinearHeading(new Pose2d(30, stackY1, Math.toRadians(180)), Math.toRadians(180))
-                                .addDisplacementMarker(2, () -> {
-                                    bot.storage();
-                                    bot.claw.close();
-                                })
-                                .lineToLinearHeading(new Pose2d(-62, stackY1, Math.toRadians(180)))
+                                .lineToLinearHeading(new Pose2d(stackX, stackY1, Math.toRadians(180)))
                                 .build());
                         // Intake from stack
-                        bot.intake.setIntakeHeight(stackHeights[i]);
+                        bot.intake(true);
+                        if (side == Side.CLOSE) {
+                            if (stackIterations == 1) {
+                                bot.intake.setIntakeHeight(stackHeights[0]);
+                                sleep(800);
+                                bot.intake.setIntakeHeight(stackHeights[1]);
+                                sleep(800);
+                            } else if (stackIterations == 2) {
+                                bot.intake.setIntakeHeight(stackHeights[4]);
+                            }
+                        } else if (side == Side.FAR) {
+                            if (stackIterations == 1) {
+                                bot.intake.setIntakeHeight(stackHeights[1]);
+                                sleep(800);
+                                bot.intake.setIntakeHeight(stackHeights[2]);
+                            } else if (stackIterations == 2) {
+                                bot.intake.setIntakeHeight(stackHeights[4]);
+                            }
+                        }
+
+                        if (breakBeam.getState()) {
+                            sleep(2000);
+                        }
                         bot.intake(false);
-                        sleep(2500);
-                        bot.intake.setIntakeHeight(bot.intake.intakeStorage);
-                        // To backboard
+                        pixelTap.start();
+
+                        // Across field
                         drive.followTrajectorySequence(drive.trajectorySequenceBuilder(drive.getPoseEstimate())
                                 .lineToLinearHeading(new Pose2d(38, stackY1, Math.toRadians(180)))
-                                .splineToLinearHeading(new Pose2d(50, stackY2, Math.toRadians(180)), Math.toRadians(0))
-//                                .addTemporalMarker(2, () -> {
-//                                    bot.slides.runTo(-1000);
-//                                    bot.outtakeOut(2);
-//                                    bot.fourbar.setArm(0.21);
-//                                })
                                 .build());
+                        autoPickup.start();
+                        // To backboard
+                        drive.followTrajectorySequence(drive.trajectorySequenceBuilder(drive.getPoseEstimate())
+                                .splineToLinearHeading(new Pose2d(backboardX, stackY2, Math.toRadians(180)), Math.toRadians(0),
+                                        SampleMecanumDrive.getVelocityConstraint(13, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
+                                        SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
+                                .build());
+
                         // Score pixels on backboard
-                        bot.intake.stopIntake();
                         bot.outtakeOut(2);
                         if (slidesHeight != 0) bot.slides.runTo(-slidesHeight);
                         else bot.slides.runToBottom();
@@ -532,28 +579,24 @@ public class TestAutonomous extends LinearOpMode {
                         bot.slides.runTo(-800);
                         sleep(500);
                         bot.claw.open();
-                        sleep(100);
+                        sleep(500);
                         bot.storage();
-
                     }
                 }
 
                 // Parking trajectory
                 if (park != 0) {
-                    int parkY = alliance == Alliance.RED ? (park == 1 ? -11 : -55) : (park == 1 ? 55 : 11);
+                    int parkY = alliance == Alliance.RED ? (park == 1 ? -10 : -58) : (park == 1 ? 58 : 10);
                     // To park
                     drive.followTrajectorySequence(drive.trajectorySequenceBuilder(drive.getPoseEstimate())
                             .splineToLinearHeading(new Pose2d(50, parkY, Math.toRadians(180)),Math.toRadians(15))
-                            .addTemporalMarker(1, () -> {
-                                bot.storage();
-                                bot.claw.close();
-                            })
                             .build());
                 }
             }
 
             // Stop op mode
-            sleep(500);
+            bot.storage();
+            sleep(1000);
             PoseStorage.currentPose = drive.getPoseEstimate();
             requestOpModeStop();
         }

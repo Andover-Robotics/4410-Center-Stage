@@ -112,9 +112,10 @@ public class MainTeleOp extends LinearOpMode {
                     bot.fixPixels();
                 }
                 if (gp2.wasJustPressed(GamepadKeys.Button.B)) { // pickup pixel
-                    bot.pickup();
                     if (breakBeam.getState()) {
-                        bot.claw.clawState = Claw.ClawState.SINGLE;
+                        bot.pickup(true);
+                    } else {
+                        bot.pickup();
                     }
                 }
                 if (gp2.wasJustPressed(GamepadKeys.Button.RIGHT_BUMPER)) { // drop pixel while in storage
@@ -153,7 +154,7 @@ public class MainTeleOp extends LinearOpMode {
             }
 
             // Distance sensor
-            if (distanceSensor.getDistance(DistanceUnit.CM) < 30) { // Slows down driving when approaching object
+            if (distanceSensor.getDistance(DistanceUnit.CM) < 30 && bot.claw.getClawState() != 0) { // Slows down driving when approaching object
                 driveMultiplier = 0.3;
                 if ((gp1.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER) > 0.2))
                 {

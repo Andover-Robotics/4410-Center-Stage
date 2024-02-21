@@ -25,16 +25,16 @@ public class ColorDetectionPipeline2 extends OpenCvPipeline {
     // Average Cb and Cr values
     public double avgCenter = 0, avgLeft = 0;
     public double percent_diff = 0;
-    public static double minimumAvg = 2;
+    public static double minimumAvg = 20;
 
     // Configurations
     enum SpikeMark{
         LEFT, MIDDLE, RIGHT, NONE
     }
     public SpikeMark spikeMark = SpikeMark.NONE;
-    public static int alliance = 0; // Alliance: 0 - NONE, 1 - RED, 2 - BLUE
+    public int alliance = 0; // Alliance: 0 - NONE, 1 - RED, 2 - BLUE
     public void setAlliance(int alliance) {
-        ColorDetectionPipeline2.alliance = alliance;
+        this.alliance = alliance;
     }
 
     // CONSTRUCTOR
@@ -81,8 +81,8 @@ public class ColorDetectionPipeline2 extends OpenCvPipeline {
         // Calculate average
         Scalar meanCenter = Core.mean(matCbCenter);
         Scalar meanLeft = Core.mean(matCbLeft);
-        avgCenter = meanCenter.val[0] / rectCenter.area();
-        avgLeft = meanLeft.val[0] / rectLeft.area();
+        avgCenter = meanCenter.val[0];
+        avgLeft = meanLeft.val[0];
 
         // normalize values
         percent_diff = Math.abs(avgLeft-avgCenter)/((avgLeft+avgCenter)/2.0)*100;

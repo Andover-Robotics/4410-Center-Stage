@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.auto.tests;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.arcrobotics.ftclib.gamepad.GamepadKeys;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
@@ -17,7 +18,8 @@ import org.openftc.easyopencv.OpenCvCameraRotation;
 
 import java.util.Arrays;
 
-@Autonomous(name = "Test Color Detection", group = "Test")
+@Disabled
+@Autonomous(name = "Test HSV Detection", group = "Test")
 public class ColorHSVDetectionTest extends LinearOpMode {
 
     private Bot bot;

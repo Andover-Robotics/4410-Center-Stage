@@ -106,6 +106,25 @@ public class Bot {
         thread.start();
     }
 
+    public void pickup(boolean single) { // pick up single pixel
+        Thread thread = new Thread(() -> {
+            try {
+                slides.runToBottom();
+                claw.fullOpen();
+                Thread.sleep(100);
+                fourbar.pickup();
+                Thread.sleep(400);
+                claw.pickupClose();
+                Thread.sleep(300);
+                storage();
+                claw.clawState = Claw.ClawState.SINGLE;
+            } catch (InterruptedException ignored) {}
+        });
+        if (single) {
+            thread.start();
+        }
+    }
+
     public void fixPixels() { // align pixels in storage
         Thread thread = new Thread(() -> {
             try {
@@ -165,7 +184,7 @@ public class Bot {
                         fourbar.setArm(0.65);
                         fourbar.setWrist(0.72);
                         if (slides.getPosition() > -2400) {
-                            slides.runTo(slides.getPosition() - 300);
+                            slides.runTo(slides.getPosition() - 200);
                         } else if (slides.getPosition() <= -2400){
                             slides.runTo(-2300);
                         }
@@ -212,7 +231,7 @@ public class Bot {
     }
 
     public void intake(boolean isReverse) { // intake/reverse intake
-        if (intake.getIntakeHeight() != intake.intakeOut) intake.setIntakeHeight(intake.intakeOut);
+        //if (intake.getIntakeHeight() != intake.intakeOut) intake.setIntakeHeight(intake.intakeOut);
         if (!isReverse) {
             intake.runIntake();
         } else {
