@@ -438,7 +438,7 @@ public class TestAutonomous extends LinearOpMode {
                     }
                     drive.followTrajectorySequence(stackTrajectory);
                     // Intake from stack
-                    bot.intake(true, 0.22);
+                    bot.intake(false, 0.26);
                     sleep(800);
                     pixelTap.start();
                     bot.intake.setIntakeHeight(bot.intake.intakeStorage);
@@ -507,8 +507,8 @@ public class TestAutonomous extends LinearOpMode {
                         0.26,
                         0.28,
                         0.3,
-                        0.32,
-                        0.34
+                        0.33,
+                        0.35
                 };
                 if (toStack) {
                     int stackY1 = alliance == Alliance.RED ? -10 : 10;
@@ -529,28 +529,28 @@ public class TestAutonomous extends LinearOpMode {
                         // Intake from stack
                         if (side == Side.CLOSE) {
                             if (stackIterations == 1) {
-                                bot.intake(true, stackHeights[0]);
+                                bot.intake(false, stackHeights[0]);
                                 sleep(800);
-                                bot.intake(true, stackHeights[1]);
+                                bot.intake(false, stackHeights[1]);
                                 sleep(800);
                             } else if (stackIterations == 2) {
-                                bot.intake(true, stackHeights[4]);
+                                bot.intake(false, stackHeights[4]);
                             }
                         } else if (side == Side.FAR) {
                             if (stackIterations == 1) {
-                                bot.intake(true, stackHeights[1]);
+                                bot.intake(false, stackHeights[1]);
                                 sleep(800);
-                                bot.intake(true, stackHeights[2]);
+                                bot.intake(false, stackHeights[2]);
                                 sleep(800);
                             } else if (stackIterations == 2) {
-                                bot.intake(true, stackHeights[4]);
+                                bot.intake(false, stackHeights[4]);
                             }
                         }
 
                         if (breakBeam.getState()) {
                             sleep(2000);
                         }
-                        bot.intake(false, bot.intake.intakeUp);
+                        bot.intake(true, bot.intake.intakeUp);
                         pixelTap.start();
 
                         // Across field

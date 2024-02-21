@@ -81,11 +81,11 @@ public class V4B {
 
     public void runArm(double manual) {
         if (manual > 0.1) {
-            if (armLeft.getPosition() > 0.15 && armLeft.getPosition() < 0.37) {//limit values are different because it usually overshoots by 0.002, if it was equal it would get stuck
+            if (armLeft.getPosition() > 0.4 && armLeft.getPosition() < 0.7) {//limit values are different because it usually overshoots by 0.002, if it was equal it would get stuck
                 setArm(armLeft.getPosition() + 0.005);
             }
         } else if (manual < -0.1){
-            if (armLeft.getPosition() > 0.16 && armLeft.getPosition() < 0.38) {
+            if (armLeft.getPosition() > 0.41 && armLeft.getPosition() < 0.71) {
                 setArm(armLeft.getPosition() - 0.005);
             }
         }

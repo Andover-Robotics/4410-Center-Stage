@@ -544,7 +544,7 @@ public class MainAutonomous extends LinearOpMode {
                         }
                     }
 
-                    bot.intake(true); // Reverse intake
+                    //bot.intake(true); // Reverse intake
 
                     // Drive across field
                     startPose = drive.getPoseEstimate();
@@ -564,7 +564,7 @@ public class MainAutonomous extends LinearOpMode {
                     sleep(600);
 
                     // AT PIXEL STACK, intake pixels
-                    bot.intake(false);
+                    //bot.intake(false);
                     if (alliance == Alliance.BLUE){
                         drive.followTrajectorySequence(drive.trajectorySequenceBuilder(drive.getPoseEstimate())
                                 .forward(1)
@@ -583,15 +583,15 @@ public class MainAutonomous extends LinearOpMode {
                         );
                     }
 
-                    Thread reverseIntake = new Thread(() -> {
-                        bot.intake(true);
-                        sleep(300);
-                        bot.intake.stopIntake();
-                        sleep(500);
-                        bot.intake(false);
-                        sleep(1000);
-                    });
-                    reverseIntake.start();
+//                    Thread reverseIntake = new Thread(() -> {
+//                        bot.intake(true);
+//                        sleep(300);
+//                        bot.intake.stopIntake();
+//                        sleep(500);
+//                        bot.intake(false);
+//                        sleep(1000);
+//                    });
+//                    reverseIntake.start();
 
                     Thread pixelTap = new Thread(() -> {
                         bot.slides.runToBottom();

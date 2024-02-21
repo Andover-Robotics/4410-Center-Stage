@@ -12,10 +12,11 @@ import com.qualcomm.robotcore.hardware.Servo;
 public class Intake {
     private final MotorEx noodles;
     private final CRServo counterRoller;
-    private final Servo intakeLeft, intakeRight;
+    public final Servo intakeLeft;
+    private final Servo intakeRight;
 
     public static double power = 0.4, counterPower = 1.0; // optimal speed for intake
-    public double intakeStorage = 0.05, intakeOut = 0.35, intakeUp = 0.2, intakeStack1 = 0.2, intakeStack2 = 0.26; // TODO: TUNE THESE VALUES
+    public double intakeStorage = 0.05, intakeOut = 0.35, intakeUp = 0.2;
     private boolean isRunning = false;
     DigitalChannel breakBeam;
 
@@ -34,16 +35,16 @@ public class Intake {
     }
 
     public void runIntake(){
-        noodles.setInverted(true);
+        //noodles.setInverted(true);
         noodles.set(Math.abs(power));
-        counterRoller.set(counterPower);
+        counterRoller.set(-counterPower);
         isRunning = true;
     }
 
     public void runReverseIntake(){
-        noodles.setInverted(false);
-        noodles.set(Math.abs(-power));
-        counterRoller.set(-1*counterPower);
+        noodles.setInverted(true);
+        noodles.set(Math.abs(power));
+        counterRoller.set(1*counterPower);
         isRunning = true;
     }
 

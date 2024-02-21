@@ -34,7 +34,7 @@ public class ServoTester extends OpMode {
 
     private void setArm(double position) {
         servo.setPosition(position);
-        servo2.setPosition(1 - position);
+        servo2.setPosition(1.025 - position);
     }
 
     @Override
