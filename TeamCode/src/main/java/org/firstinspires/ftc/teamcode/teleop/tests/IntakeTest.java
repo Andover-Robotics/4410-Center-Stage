@@ -30,7 +30,7 @@ public class IntakeTest extends LinearOpMode {
 
         breakBeam = hardwareMap.get(DigitalChannel.class, "BreakBeam");
 
-        bot.intake.setIntakeHeight(0.34);
+        bot.intake.setIntakeHeight(0.38);
 
         waitForStart();
         while (!isStopRequested()) {
