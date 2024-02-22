@@ -504,7 +504,7 @@ public class MainAutonomous extends LinearOpMode {
                 }
 
                 // Score yellow pixel on backboard
-                bot.fourbar.topOuttake(true);
+                bot.autoOuttakeOut(1);
                 bot.fourbar.setArm(0.21);
                 sleep(700);
                 bot.claw.setPosition(0.66); // extra open

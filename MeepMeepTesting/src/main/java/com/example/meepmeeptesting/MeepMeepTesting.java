@@ -50,7 +50,8 @@ public class MeepMeepTesting {
                         // 2+0
                         .lineToLinearHeading(new Pose2d(17, 40, Math.toRadians(120))) // To spike mark
                         .waitSeconds(1) // Place purple pixel
-                        .splineToLinearHeading(new Pose2d(51, 41, Math.toRadians(180)), Math.toRadians(0)) // To backboard
+                        .splineToLinearHeading(new Pose2d(48, 41, Math.toRadians(180)), Math.toRadians(0))
+                        .lineToLinearHeading(new Pose2d(51, 41, Math.toRadians(180))) // To backboard
                         .waitSeconds(1) // Place yellow pixel
                         .splineToLinearHeading(new Pose2d(50, 59, Math.toRadians(180)),Math.toRadians(15)) // To park
                         .build());
@@ -65,7 +66,7 @@ public class MeepMeepTesting {
                         .waitSeconds(1) // Place purple pixel
                         .lineToLinearHeading(new Pose2d(51, 29, Math.toRadians(180))) // To backboard
                         .waitSeconds(1) // Place yellow pixel
-                        .splineToLinearHeading(new Pose2d(50, 59, Math.toRadians(180)),Math.toRadians(15)) // To park
+                        .lineToLinearHeading(new Pose2d(50, 59, Math.toRadians(180))) // To park
                         .build());
         // FAR
         Pose2d blueFarStart = new Pose2d(-35,60,Math.toRadians(90));

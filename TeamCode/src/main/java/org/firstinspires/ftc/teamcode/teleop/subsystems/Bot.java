@@ -84,6 +84,11 @@ public class Bot {
         state = BotState.OUTTAKE_OUT;
     }
 
+    public void autoOuttakeOut(int pixel) { // go to outtake backboard position
+        fourbar.autoDualOuttake(pixel);
+        state = BotState.OUTTAKE_OUT;
+    }
+
     public void outtakeGround() { // go to outtake ground position
         fourbar.ground();
         slides.runToBottom();
@@ -130,14 +135,14 @@ public class Bot {
             try {
                 slides.runToBottom();
                 claw.fullOpen();
-                intake.setIntakeHeight(0.1);
+                intake.setIntakeHeight(0.2);
                 Thread.sleep(100);
                 fourbar.bottomPixel();
                 Thread.sleep(300);
                 claw.pickupClose();
-                Thread.sleep(250);
-                storage();
                 Thread.sleep(50);
+                storage();
+                Thread.sleep(200);
                 claw.fullOpen();
             } catch (InterruptedException ignored) {}
         });
@@ -184,12 +189,12 @@ public class Bot {
                         fourbar.setArm(0.65);
                         fourbar.setWrist(0.72);
                         if (slides.getPosition() > -2400) {
-                            slides.runTo(slides.getPosition() - 200);
+                            slides.runTo(slides.getPosition() - 180);
                         } else if (slides.getPosition() <= -2400){
                             slides.runTo(-2300);
                         }
                         Thread.sleep(500);
-                        fourbar.topOuttake(false);
+                        outtakeOut(1);
                         claw.close();
                     }
                 } else if (state == BotState.OUTTAKE_DOWN) { // drop pixel on ground

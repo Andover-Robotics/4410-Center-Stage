@@ -503,7 +503,7 @@ public class OldAutonomous extends LinearOpMode {
                     bot.slides.runToBottom();
                 }
                 bot.outtakeOut(bot.claw.getClawState());
-                bot.fourbar.topOuttake(true);
+                bot.fourbar.autoDualOuttake(1);
                 sleep(800);
                 bot.claw.open();
                 sleep(800);

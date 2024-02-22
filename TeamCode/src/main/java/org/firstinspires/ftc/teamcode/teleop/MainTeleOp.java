@@ -189,19 +189,19 @@ public class MainTeleOp extends LinearOpMode {
             if (gp1.wasJustReleased(GamepadKeys.Button.LEFT_STICK_BUTTON)) { // reset heading
                 drive.setPoseEstimate(PoseStorage.currentPose);
             }
-            if (gp1.wasJustPressed(GamepadKeys.Button.BACK)) { // auto align????
-                drive.setPoseEstimate(PoseStorage.currentPose);
-                drive.followTrajectory(drive.trajectoryBuilder(drive.getPoseEstimate())
-                        .splineToSplineHeading(new Pose2d(drive.getPoseEstimate().getX(), drive.getPoseEstimate().getY()+1, drive.getPoseEstimate().getHeading()), Math.toRadians(180))
-                        .build());
-            }
+//            if (gp1.wasJustPressed(GamepadKeys.Button.BACK)) { // auto align????
+//                drive.setPoseEstimate(PoseStorage.currentPose);
+//                drive.followTrajectory(drive.trajectoryBuilder(drive.getPoseEstimate())
+//                        .splineToSplineHeading(new Pose2d(drive.getPoseEstimate().getX(), drive.getPoseEstimate().getY()+1, drive.getPoseEstimate().getHeading()), Math.toRadians(180))
+//                        .build());
+//            }
 
             // INTAKE
             if (gp1.isDown(GamepadKeys.Button.RIGHT_BUMPER)) { // reverse intake
                 bot.intake(true, bot.intake.intakeOut);
             } else if (gp1.isDown(GamepadKeys.Button.LEFT_BUMPER) && breakBeam.getState()) { // intake
                 bot.intake(false, bot.intake.intakeOut);
-            } else if (gp1.isDown(GamepadKeys.Button.DPAD_UP) && breakBeam.getState()){ // up intake
+            } else if (gp1.isDown(GamepadKeys.Button.RIGHT_STICK_BUTTON) && breakBeam.getState()){ // up intake
                 bot.intake(false, bot.intake.intakeUp);
 
             } else if (gp1.isDown(GamepadKeys.Button.Y)){ // manual intake, ignores break beams
