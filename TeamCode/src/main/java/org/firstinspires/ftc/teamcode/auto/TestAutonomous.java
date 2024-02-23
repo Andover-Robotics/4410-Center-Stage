@@ -123,7 +123,7 @@ public class TestAutonomous extends LinearOpMode {
         pickup.start();
 
         // Pick up in auto
-        Thread autoPickup = new Thread(() -> {
+        Thread autoPickup2 = new Thread(() -> {
             bot.intake.stopIntake();
             bot.slides.runToBottom();
             bot.claw.fullOpen();
@@ -137,6 +137,22 @@ public class TestAutonomous extends LinearOpMode {
             bot.intake.stopIntake();
             bot.autoOuttakeOut(2);
             bot.slides.runTo(-700);
+        });
+
+        Thread autoPickup1 = new Thread(() -> {
+            bot.intake.stopIntake();
+            bot.slides.runToBottom();
+            bot.claw.fullOpen();
+            sleep(100);
+            bot.fourbar.pickup();
+            sleep(250);
+            bot.claw.pickupClose();
+            sleep(300);
+            bot.storage();
+            sleep(250);
+            bot.intake.stopIntake();
+            bot.autoOuttakeOut(2);
+            bot.slides.runTo(-200);
         });
 
 
@@ -322,8 +338,8 @@ public class TestAutonomous extends LinearOpMode {
 
             // Pixel stack trajectory starts here
             double [] stackHeights = new double [] { // from top pixel (1) to bottom pixel (5)
-                    0.24,
-                    0.27,
+                    0.23,
+                    0.26,
                     0.29,
                     0.31,
                     0.34
@@ -466,18 +482,18 @@ public class TestAutonomous extends LinearOpMode {
                     do {
                         sleep(5);
                         counter+=5;
-                        if (breakBeam.getState()) {
+                        if (!breakBeam.getState()) {
                             breakBeamCounter++;
                         }
-                    } while(counter < 800 || breakBeamCounter == 1);
+                    } while(counter < 1500 && breakBeamCounter < 2);
                     bot.autoFixPixels();
-                    bot.intake.setIntakeHeight(bot.intake.intakeStorage);
+                    bot.intake(true, 0.1);
                     // Across the field
                     int farY = alliance == Alliance.RED ? -11 : 11;
                     drive.followTrajectorySequence(drive.trajectorySequenceBuilder(drive.getPoseEstimate())
                             .lineToSplineHeading(new Pose2d(25, farY, Math.toRadians(180)))
                             .build());
-                    autoPickup.start();
+                    autoPickup1.start();
                 }
 
                 // Define backboard y value
@@ -485,13 +501,13 @@ public class TestAutonomous extends LinearOpMode {
                 if (alliance == Alliance.RED) {
                     switch (spikeMark) {
                         case 1: backboardY = -28; break;
-                        case 2: backboardY = -34; break;
+                        case 2: backboardY = -33; break;
                         case 3: backboardY = -39; break;
                     }
                 } else {
                     switch (spikeMark) {
                         case 1: backboardY = 39; break;
-                        case 2: backboardY = 34; break;
+                        case 2: backboardY = 33; break;
                         case 3: backboardY = 28; break;
                     }
                 }
@@ -519,15 +535,14 @@ public class TestAutonomous extends LinearOpMode {
                     bot.storage();
                 } else { // Place both white and yellow
                     bot.intake.stopIntake();
-                    bot.autoOuttakeOut(2);
-                    sleep(300);
                     bot.claw.open();
-                    sleep(400);
+                    sleep(500);
                     bot.fourbar.setArm(0.65);
                     bot.fourbar.setWrist(0.72);
+                    sleep(250);
                     bot.autoOuttakeOut(1);
                     bot.slides.runTo(-800);
-                    sleep(300);
+                    sleep(400);
                     bot.claw.open();
                     sleep(300);
                     bot.storage();
@@ -569,7 +584,7 @@ public class TestAutonomous extends LinearOpMode {
 
                         // To pixel stack
                         drive.followTrajectorySequence(drive.trajectorySequenceBuilder(drive.getPoseEstimate())
-                                .splineToLinearHeading(new Pose2d(30, stackY1, Math.toRadians(180)), Math.toRadians(180))
+                                .lineToLinearHeading(new Pose2d(30, stackY1, Math.toRadians(180)))
                                 .lineToLinearHeading(new Pose2d(stackX+10, stackY1, Math.toRadians(180)))
                                 .lineToLinearHeading(new Pose2d(stackX, stackY1, Math.toRadians(180)),
                                         SampleMecanumDrive.getVelocityConstraint(8, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
@@ -706,7 +721,7 @@ public class TestAutonomous extends LinearOpMode {
                         drive.followTrajectorySequence(drive.trajectorySequenceBuilder(drive.getPoseEstimate())
                                 .lineToLinearHeading(new Pose2d(38, stackY1, Math.toRadians(180)))
                                 .build());
-                        autoPickup.start();
+                        autoPickup2.start();
                         // To backboard
                         drive.followTrajectorySequence(drive.trajectorySequenceBuilder(drive.getPoseEstimate())
                                 .splineToLinearHeading(new Pose2d(backboardX, stackY2, Math.toRadians(180)), Math.toRadians(0))
@@ -714,12 +729,9 @@ public class TestAutonomous extends LinearOpMode {
 
 
                         // Score pixels on backboard
-                        bot.slides.runTo(-400);
-                        sleep(50);
                         bot.claw.open();
-                        sleep(400);
+                        sleep(500);
                         bot.autoOuttakeOut(1);
-                        bot.slides.runTo(-800);
                         sleep(300);
                         bot.claw.open();
                         sleep(300);
