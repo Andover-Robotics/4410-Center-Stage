@@ -338,9 +338,9 @@ public class TestAutonomous extends LinearOpMode {
 
             // Pixel stack trajectory starts here
             double [] stackHeights = new double [] { // from top pixel (1) to bottom pixel (5)
-                    0.23,
+                    0.24,
                     0.26,
-                    0.29,
+                    0.285,
                     0.31,
                     0.34
             };
