@@ -93,8 +93,8 @@ public class ColorDetectionPipeline2 extends OpenCvPipeline {
             sums[i] /= n;
             n=0;
         }
-        avgCenter = sums[0];
-        avgLeft = sums[1];
+        avgCenter = sums[1];
+        avgLeft = sums[0];
 
         // normalize values
         percent_diff = Math.abs(avgLeft-avgCenter)/((avgLeft+avgCenter)/2.0)*100;
