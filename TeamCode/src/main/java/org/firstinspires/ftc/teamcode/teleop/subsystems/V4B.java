@@ -84,6 +84,16 @@ public class V4B {
         setArm(armDualPickup);
     }
 
+    public void fixDown() {
+        setWrist(0.014);
+        setArm(armDualPickup);
+    }
+
+    public void fixStorage() {
+        setWrist(0.022);
+        setArm(armStorage);
+    }
+
     public void bottomPixel() {
         setWrist(wristDualPickup);
         setArm(armDualPickup);

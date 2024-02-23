@@ -9,6 +9,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
 
+import org.firstinspires.ftc.teamcode.auto.TestAutonomous;
 import org.firstinspires.ftc.teamcode.teleop.subsystems.Bot;
 
 // This class was made to demonstrate how the break beam prevents intake from running when there is a pixel

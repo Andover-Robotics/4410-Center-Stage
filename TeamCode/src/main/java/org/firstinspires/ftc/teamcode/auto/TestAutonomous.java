@@ -122,22 +122,6 @@ public class TestAutonomous extends LinearOpMode {
         });
         pickup.start();
 
-        // Tap pixel
-        Thread pixelTap = new Thread(() -> {
-            sleep(100);
-            bot.slides.runToBottom();
-            bot.claw.fullOpen();
-            bot.intake.setIntakeHeight(0.1);
-            sleep(100);
-            bot.fourbar.pickup();
-            sleep(200);
-            bot.claw.pickupClose();
-            sleep(250);
-            bot.storage();
-            sleep(150);
-            bot.claw.fullOpen();
-        });
-
         // Pick up in auto
         Thread autoPickup = new Thread(() -> {
             bot.intake.stopIntake();
@@ -355,12 +339,11 @@ public class TestAutonomous extends LinearOpMode {
                                 .lineToLinearHeading(new Pose2d(23, 45, Math.toRadians(90)))
                                 .build(); break;
                         case 2: spikeTrajectory = drive.trajectorySequenceBuilder(drive.getPoseEstimate())
-                                .lineToLinearHeading(new Pose2d(23, 33, Math.toRadians(60)))
+                                .lineToLinearHeading(new Pose2d(23, 32, Math.toRadians(60)))
                                 .build(); break;
                         case 3: spikeTrajectory = drive.trajectorySequenceBuilder(drive.getPoseEstimate())
                                 .lineToSplineHeading(new Pose2d(13,58,Math.toRadians(90)))
-                               // .splineToConstantHeading(new Vector2d(20, 40), Math.toRadians(225))
-                                .splineToSplineHeading(new Pose2d(13, 33, Math.toRadians(0)), Math.toRadians(225))
+                                .splineToSplineHeading(new Pose2d(12, 31, Math.toRadians(0)), Math.toRadians(225))
                                 .build(); break;
                     }
                 } else { // BLUE Far side
@@ -382,7 +365,6 @@ public class TestAutonomous extends LinearOpMode {
                     switch (spikeMark) {
                         case 1: spikeTrajectory = drive.trajectorySequenceBuilder(drive.getPoseEstimate())
                                 .lineToSplineHeading(new Pose2d(13,-58,Math.toRadians(-90)))
-                                // .splineToConstantHeading(new Vector2d(20, 40), Math.toRadians(225))
                                 .splineToSplineHeading(new Pose2d(12, -31, Math.toRadians(0)), Math.toRadians(-225))
                                 .build(); break;
                         case 2: spikeTrajectory = drive.trajectorySequenceBuilder(drive.getPoseEstimate())
@@ -433,7 +415,7 @@ public class TestAutonomous extends LinearOpMode {
 
             // To backboard
             if (toBackboard) {
-                int stackX = -58;
+                int stackX = -59;
                 // Extra movements on far side
                 if (side == Side.FAR) {
                     // To pixel stack
@@ -452,7 +434,7 @@ public class TestAutonomous extends LinearOpMode {
                                             SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
                                     .build(); break;
                             case 3: stackTrajectory = drive.trajectorySequenceBuilder(drive.getPoseEstimate())
-                                    .lineToLinearHeading(new Pose2d(stackX+2, 11, Math.toRadians(180)),
+                                    .lineToLinearHeading(new Pose2d(stackX, 11, Math.toRadians(180)),
                                             SampleMecanumDrive.getVelocityConstraint(10, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
                                             SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
                                     .build(); break;
@@ -488,7 +470,7 @@ public class TestAutonomous extends LinearOpMode {
                             breakBeamCounter++;
                         }
                     } while(counter < 800 || breakBeamCounter == 1);
-                    pixelTap.start();
+                    bot.autoFixPixels();
                     bot.intake.setIntakeHeight(bot.intake.intakeStorage);
                     // Across the field
                     int farY = alliance == Alliance.RED ? -11 : 11;
@@ -504,25 +486,25 @@ public class TestAutonomous extends LinearOpMode {
                     switch (spikeMark) {
                         case 1: backboardY = -28; break;
                         case 2: backboardY = -34; break;
-                        case 3: backboardY = -38; break;
+                        case 3: backboardY = -39; break;
                     }
                 } else {
                     switch (spikeMark) {
-                        case 1: backboardY = 41; break;
-                        case 2: backboardY = 35; break;
-                        case 3: backboardY = 29; break;
+                        case 1: backboardY = 39; break;
+                        case 2: backboardY = 34; break;
+                        case 3: backboardY = 28; break;
                     }
                 }
                 Pose2d backboardPose = new Pose2d(backboardX, backboardY, Math.toRadians(180));
                 if (alliance == Alliance.BLUE && side == Side.CLOSE && spikeMark == 1) {
                     drive.followTrajectorySequence(drive.trajectorySequenceBuilder(drive.getPoseEstimate())
                             .lineToLinearHeading(new Pose2d(28, 50, Math.toRadians(180)))
-                            .lineToLinearHeading(backboardPose)
+                            .lineToLinearHeading(new Pose2d(backboardX+1, backboardY, Math.toRadians(180)))
                             .build());
                 } else if (alliance == Alliance.RED && side == Side.CLOSE && spikeMark == 3) {
                     drive.followTrajectorySequence(drive.trajectorySequenceBuilder(drive.getPoseEstimate())
                             .lineToLinearHeading(new Pose2d(28, -50, Math.toRadians(180)))
-                            .lineToLinearHeading(backboardPose)
+                            .lineToLinearHeading(new Pose2d(backboardX+1, backboardY, Math.toRadians(180)))
                             .build());
                 } else {
                     drive.followTrajectorySequence(drive.trajectorySequenceBuilder(drive.getPoseEstimate())
@@ -588,7 +570,7 @@ public class TestAutonomous extends LinearOpMode {
                         // To pixel stack
                         drive.followTrajectorySequence(drive.trajectorySequenceBuilder(drive.getPoseEstimate())
                                 .splineToLinearHeading(new Pose2d(30, stackY1, Math.toRadians(180)), Math.toRadians(180))
-                                .lineToLinearHeading(new Pose2d(stackX+8, stackY1, Math.toRadians(180)))
+                                .lineToLinearHeading(new Pose2d(stackX+10, stackY1, Math.toRadians(180)))
                                 .lineToLinearHeading(new Pose2d(stackX, stackY1, Math.toRadians(180)),
                                         SampleMecanumDrive.getVelocityConstraint(8, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
                                         SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
@@ -597,11 +579,11 @@ public class TestAutonomous extends LinearOpMode {
                         if (stackIterations == 1 || (stackIterations == 2 && i == 0)) {
                             sleep(150);
                             if (side == Side.CLOSE) {
-                                bot.intake(true, stackHeights[0]);
+                                bot.intake(false, stackHeights[0]);
                             } else {
-                                bot.intake(true, stackHeights[1]);
+                                bot.intake(false, stackHeights[1]);
                             }
-                            sleep(150);
+                            sleep(10);
                             if (side == Side.CLOSE) {
                                 bot.intake(false, stackHeights[1]);
                             } else {
@@ -611,31 +593,31 @@ public class TestAutonomous extends LinearOpMode {
                             do {
                                 sleep(5);
                                 counter+=5;
-                                if (breakBeam.getState()) {
+                                if (!breakBeam.getState()) {
                                     breakBeamCounter++;
                                 }
-                            } while(counter < 1000 || breakBeamCounter == 2);
-                            if (side == Side.CLOSE) {
-                                bot.intake(false, stackHeights[1]);
-                            } else {
-                                bot.intake(false, stackHeights[2]);
-                            }
+                            } while(counter < 1500 && breakBeamCounter < 4);
                         } else {
                             sleep(150);
-                            bot.intake(false, stackHeights[3]);
-                            sleep(800);
-                            bot.intake(true, stackHeights[4]);
-                            sleep(150);
-                            bot.intake(false, stackHeights[4]);
+                            if (side == Side.CLOSE) {
+                                bot.intake(false, stackHeights[2]);
+                            } else {
+                                bot.intake(false, stackHeights[3]);
+                            }
+                            sleep(10);
+                            if (side == Side.CLOSE) {
+                                bot.intake(false, stackHeights[3]);
+                            } else {
+                                bot.intake(false, stackHeights[4]);
+                            }
                             int counter = 0, breakBeamCounter = 0;
                             do {
                                 sleep(5);
                                 counter+=5;
-                                if (breakBeam.getState()) {
+                                if (!breakBeam.getState()) {
                                     breakBeamCounter++;
                                 }
-                            } while(counter < 1000 || breakBeamCounter == 2);
-                            bot.intake(false, stackHeights[4]);
+                            } while(counter < 1500 && breakBeamCounter < 4);
                         }
 //
 //                        if (breakBeam.getState()) {
@@ -718,7 +700,7 @@ public class TestAutonomous extends LinearOpMode {
 
 
                         bot.intake(true, bot.intake.intakeUp);
-                        pixelTap.start();
+                        bot.autoFixPixels();
 
                         // Across field
                         drive.followTrajectorySequence(drive.trajectorySequenceBuilder(drive.getPoseEstimate())

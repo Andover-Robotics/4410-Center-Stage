@@ -60,21 +60,6 @@ public class DriveConstants extends OpMode {
     public static double kA = 0.004;
     public static double kStatic = 0.002;
 
-    /*don't frame me for adding sus comments to your code, I would never do that.
-     -Anushka
-     also, your robot is gay
-     -Anushka
-     */
-
-    /*
-    Roses are red
-    Violets are blue
-    Tuning auto is fun
-    Is a lie they'll all tell you
-    -Anushka
-     */
-
-
     /*
      * These values are used to generate the trajectories for you robot. To ensure proper operation,
      * the constraints should never exceed ~80% of the robot's actual capabilities. While Road

@@ -134,21 +134,46 @@ public class Bot {
         Thread thread = new Thread(() -> {
             try {
                 slides.runToBottom();
-                claw.fullOpen();
-                intake.setIntakeHeight(0.2);
+                claw.setPosition(claw.close);
                 Thread.sleep(100);
-                fourbar.bottomPixel();
-                Thread.sleep(300);
-                claw.pickupClose();
-                Thread.sleep(50);
-                storage();
+                fourbar.pickup();
                 Thread.sleep(200);
-                claw.fullOpen();
+                fourbar.storage();
+                Thread.sleep(100);
+                claw.setPosition(0.74);
+                fourbar.pickup();
+                Thread.sleep(200);
+                fourbar.storage();
+                Thread.sleep(100);
+                fourbar.pickup();
+                storage();
             } catch (InterruptedException ignored) {}
         });
         thread.start();
     }
 
+    public void autoFixPixels() { // align pixels in storage
+        Thread thread = new Thread(() -> {
+            try {
+                Thread.sleep(100);
+                slides.runToBottom();
+                claw.setPosition(claw.close);
+                Thread.sleep(100);
+                fourbar.pickup();
+                Thread.sleep(200);
+                fourbar.storage();
+                Thread.sleep(100);
+                claw.setPosition(0.74);
+                fourbar.pickup();
+                Thread.sleep(200);
+                fourbar.storage();
+                Thread.sleep(100);
+                fourbar.pickup();
+                storage();
+            } catch (InterruptedException ignored) {}
+        });
+        thread.start();
+    }
     public void presetSlides(int pos) { // run to preset slide position, the pos variable has a range of 1-4, representing bottom, low, middle, and top
         claw.close();
         switch (pos) {
