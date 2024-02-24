@@ -46,9 +46,10 @@ public class ColorCrCbDetectionTest extends LinearOpMode {
 
             if (gp1.wasJustPressed(GamepadKeys.Button.START)) {
                 alliance = (alliance == 0) ? 1 : (alliance == 1) ? 2 : 1;
+                colorPipeline.setAlliance(alliance);
             }
 
-            colorPipeline.setAlliance(alliance);
+
 
 //            if (gp1.wasJustPressed(GamepadKeys.Button.DPAD_UP)) {
 //                switch(spike) {

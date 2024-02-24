@@ -32,7 +32,7 @@ public class IntakeTest extends LinearOpMode {
         gp1 = new GamepadEx(gamepad1);
         breakBeam = hardwareMap.get(DigitalChannel.class, "BreakBeam");
 
-        bot.intake.setIntakeHeight(0.38);
+        bot.intake.setIntakeHeight(0.34);
 
         Thread runIntake = new Thread(() -> {
             if (!stopIntake) {
@@ -44,19 +44,24 @@ public class IntakeTest extends LinearOpMode {
         while (!isStopRequested()) {
             gp1.readButtons();
 
-            runIntake.start();
-
+//            runIntake.start();
+//
+//            if (!breakBeam.getState()) {
+//                bot.intake.stopIntake();
+//                stopIntake = true;
+//                telemetry.addLine("START to run intake again");
+//                if (gp1.wasJustPressed(GamepadKeys.Button.START)) {
+//                    intakeTime = 0.0;
+//                    stopIntake = true;
+//                }
+//            } else {
+//                sleep(100);
+//                intakeTime+=0.1;
+//            }
             if (!breakBeam.getState()) {
                 bot.intake.stopIntake();
-                stopIntake = true;
-                telemetry.addLine("START to run intake again");
-                if (gp1.wasJustPressed(GamepadKeys.Button.START)) {
-                    intakeTime = 0.0;
-                    stopIntake = true;
-                }
             } else {
-                sleep(100);
-                intakeTime+=0.1;
+                bot.intake(false, bot.intake.getIntakeHeight());
             }
 
             if(gp1.wasJustPressed(GamepadKeys.Button.DPAD_UP)){

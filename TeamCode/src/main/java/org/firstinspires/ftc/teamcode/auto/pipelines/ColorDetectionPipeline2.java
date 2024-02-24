@@ -21,11 +21,14 @@ public class ColorDetectionPipeline2 extends OpenCvPipeline {
     private final Mat matCbLeft = new Mat();
     private final Mat matCrCenter = new Mat();
     private final Mat matCrLeft = new Mat();
+    private Mat spikeCenter = new Mat();
+    private Mat spikeLeft = new Mat();
+    private Mat[] mats = new Mat[2];
 
     // Average Cb and Cr values
     public double avgCenter = 0, avgLeft = 0;
     public double percent_diff = 0;
-    public static double minimumAvg = 20;
+    public static double minimumAvg = 130;
 
     // Configurations
     enum SpikeMark{
@@ -45,15 +48,28 @@ public class ColorDetectionPipeline2 extends OpenCvPipeline {
 
     // Execute logic
     public int getSpikeMark() {
-        if(percent_diff < minimumAvg){
-            return 3;
-        }else{
-            if(avgLeft>avgCenter){
-                return 1;
+//        if (alliance == 1) {
+            if(minimumAvg> avgLeft && minimumAvg> avgCenter){
+                return 3;
             }else{
-                return 2;
+                if(avgLeft>avgCenter){
+                    return 1;
+                }else{
+                    return 2;
+                }
             }
-        }
+//        } else {
+//            if(avgCenter> avgLeft && percent_diff< 0.025) {
+//                return 3;
+//            } else {
+//                if (avgCenter> avgLeft) {
+//                    return 1;
+//                } else {
+//                    return 2;
+//                }
+//            }
+//        }
+
     }
 
     // PROCESSING FRAMES
@@ -62,25 +78,30 @@ public class ColorDetectionPipeline2 extends OpenCvPipeline {
         Imgproc.cvtColor(input, matYCrCb, Imgproc.COLOR_RGB2YCrCb);
 
         // Draw rectangles of left and center positions
-        Rect rectCenter = new Rect(600, 450, 680, 240);
-        Rect rectLeft = new Rect(100, 250, 325, 400);
+        Rect rectCenter = new Rect(600, 125, 680, 240);
+        Rect rectLeft = new Rect(150, 150, 375, 250);
 
         // Create mats for each rectangle
-        Mat spikeCenter = matYCrCb.submat(rectCenter);
-        Mat spikeLeft = matYCrCb.submat(rectLeft);
+        spikeCenter = matYCrCb.submat(rectCenter);
+        spikeLeft = matYCrCb.submat(rectLeft);
 
         // Extract color based off of alliance
         if (alliance == 1) { // Red
-            Core.extractChannel(spikeCenter, matCbCenter, 1);
-            Core.extractChannel(spikeLeft, matCbLeft, 1);
+            Core.extractChannel(spikeCenter, matCrCenter, 1);
+            Core.extractChannel(spikeLeft, matCrLeft, 1);
+            mats[0] = matCrLeft;
+            mats[1] = matCrCenter;
 
-        } else if (alliance == 2) { // Blue
-            Core.extractChannel(spikeCenter, matCrCenter, 2);
-            Core.extractChannel(spikeLeft, matCrLeft, 2);
+        } else{ // Blue
+            Core.extractChannel(spikeCenter, matCbCenter, 2);
+            Core.extractChannel(spikeLeft, matCbLeft, 2);
+//            mats = {matCbLeft, matCbCenter};
+            mats[0] = matCbLeft;
+            mats[1] = matCbCenter;
         }
 
         // Calculate average
-        Mat[] mats = new Mat[]{matCbLeft, matCbCenter};
+
         double[] sums = new double[2];
         int n = 0;
         for(int i = 0; i < 2; i++) { // left and center
@@ -97,7 +118,7 @@ public class ColorDetectionPipeline2 extends OpenCvPipeline {
         avgLeft = sums[0];
 
         // normalize values
-        percent_diff = Math.abs(avgLeft-avgCenter)/((avgLeft+avgCenter)/2.0)*100;
+        percent_diff = (avgCenter/(double) Math.max(avgLeft,avgCenter)) - (avgLeft/(double) Math.max(avgLeft,avgCenter));
 
 
         // Display rectangles
@@ -106,26 +127,29 @@ public class ColorDetectionPipeline2 extends OpenCvPipeline {
         // Left and Center turn yellow if right
         // any inactive stay green
 
-        if (getSpikeMark() == 1) {
-            Imgproc.rectangle(input, rectLeft, new Scalar(255, 0, 0), 5);
-        } else {
-            Imgproc.rectangle(input, rectLeft, new Scalar(0, 255, 0), 5);
-        }
-
-        if (getSpikeMark() == 2) {
+//        if (getSpikeMark() == 1) {
+//            Imgproc.rectangle(input, rectLeft, new Scalar(255, 0, 0), 5);
+//        } else {
+//            Imgproc.rectangle(input, rectLeft, new Scalar(0, 255, 0), 5);
+//        }
+//
+//        if (getSpikeMark() == 2) {
+//            Imgproc.rectangle(input, rectCenter, new Scalar(0, 255, 0), 5);
+//        } else {
+//            Imgproc.rectangle(input, rectCenter, new Scalar(255, 0, 0), 5);
+//        }
+//
+//        if (getSpikeMark() == 3) {
+//            Imgproc.rectangle(input, rectCenter, new Scalar(255, 255, 0), 5);
+//            Imgproc.rectangle(input, rectLeft, new Scalar(255, 255, 0), 5);
+//        } else {
             Imgproc.rectangle(input, rectCenter, new Scalar(0, 255, 0), 5);
-        } else {
-            Imgproc.rectangle(input, rectCenter, new Scalar(255, 0, 0), 5);
-        }
-
-        if (getSpikeMark() == 3) {
-            Imgproc.rectangle(input, rectCenter, new Scalar(255, 255, 0), 5);
-            Imgproc.rectangle(input, rectLeft, new Scalar(255, 255, 0), 5);
-        } else {
-            Imgproc.rectangle(input, rectCenter, new Scalar(0, 255, 0), 5);
             Imgproc.rectangle(input, rectLeft, new Scalar(0, 255, 0), 5);
-        }
-
+            matYCrCb.release();
+//            spikeLeft.release();
+//            spikeCenter.release();
+//            matCbCenter.release();
+//            matCbLeft.release();
         // Return img frame
         return input;
     }

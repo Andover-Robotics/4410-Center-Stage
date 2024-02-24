@@ -45,7 +45,7 @@ public class MainTeleOp extends LinearOpMode {
     private GamepadEx gp1, gp2;
     private boolean fieldCentric = false;
     private Thread thread;
-    DistanceSensor distanceSensor;
+    DistanceSensor distanceSensor, frontDistanceSensor;
     DigitalChannel breakBeam;
 
     @Override
@@ -63,6 +63,7 @@ public class MainTeleOp extends LinearOpMode {
         gp2 = new GamepadEx(gamepad2);
 
         distanceSensor = hardwareMap.get(DistanceSensor.class, "Distance");
+        frontDistanceSensor = hardwareMap.get(DistanceSensor.class, "frontDistance");
         breakBeam = hardwareMap.get(DigitalChannel.class, "BreakBeam");
 
 
@@ -237,12 +238,9 @@ public class MainTeleOp extends LinearOpMode {
             telemetry.addData("arm Left Position", bot.fourbar.armLeft.getPosition());
             telemetry.addData("arm Right Position", bot.fourbar.armRight.getPosition());
             telemetry.addData("wrist Position", bot.fourbar.wrist.getPosition());
-            telemetry.addData("Distance to wall (cm)", distanceSensor.getDistance(DistanceUnit.CM));
+            telemetry.addData("Back Distance to wall (cm)", distanceSensor.getDistance(DistanceUnit.CM));
+            telemetry.addData("Front Distance to wall (cm)", frontDistanceSensor.getDistance(DistanceUnit.CM));
             telemetry.addData("Break Beam", breakBeam.getState());
-
-            telemetry.addData("X", gp1.getLeftX());
-            telemetry.addData("Y", gp1.getLeftY());
-            telemetry.addData("RX", gp1.getRightX());
 
             telemetry.update();
             bot.slides.periodic();
