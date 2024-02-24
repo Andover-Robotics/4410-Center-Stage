@@ -225,7 +225,7 @@ public class MainTeleOp extends LinearOpMode {
                 bot.launcher.reset();
             }
 
-            bot.fourbar.runArm(gp2.getRightY());
+            bot.fourbar.runArm(gp2.getRightY()*-1);
 
             // TELEMETRY
             telemetry.addData("Field Centric",fieldCentric + " Heading: " + Math.toDegrees(drive.getPoseEstimate().getHeading()));;

@@ -28,8 +28,10 @@ public class MeepMeepTesting {
                         .lineToLinearHeading(new Pose2d(51, 35, Math.toRadians(180))) // To backboard
                         .waitSeconds(1) // Place yellow pixel
                         // 2+2
-                        .splineToLinearHeading(new Pose2d(30, 11, Math.toRadians(180)), Math.toRadians(180)) // To stage door
-                        .lineToLinearHeading(new Pose2d(-60, 11, Math.toRadians(180))) // To stack across field
+                        .splineToLinearHeading(new Pose2d(30, 10, Math.toRadians(180)), Math.toRadians(180))
+                        .lineToLinearHeading(new Pose2d( -59+8, 10, Math.toRadians(180)))
+//                        .splineToLinearHeading(new Pose2d(30, 11, Math.toRadians(180)), Math.toRadians(180)) // To stage door
+//                        .lineToLinearHeading(new Pose2d(-60, 11, Math.toRadians(180))) // To stack across field
                         .waitSeconds(1) // Intake from stack
                         .lineToLinearHeading(new Pose2d(38, 11, Math.toRadians(180))) // Return across field
                         .splineToLinearHeading(new Pose2d(50, 30, Math.toRadians(180)), Math.toRadians(0)) // To backboard
@@ -127,7 +129,7 @@ public class MeepMeepTesting {
                         .build());
 
         meepMeep.setBackground(MeepMeep.Background.FIELD_CENTERSTAGE_OFFICIAL)
-                .addEntity(blueLeft1)
+                .addEntity(blueCenter1)
                 .start();
     }
 }

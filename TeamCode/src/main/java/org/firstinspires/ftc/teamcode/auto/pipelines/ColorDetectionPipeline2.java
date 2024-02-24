@@ -78,8 +78,8 @@ public class ColorDetectionPipeline2 extends OpenCvPipeline {
         Imgproc.cvtColor(input, matYCrCb, Imgproc.COLOR_RGB2YCrCb);
 
         // Draw rectangles of left and center positions
-        Rect rectCenter = new Rect(600, 125, 680, 240);
-        Rect rectLeft = new Rect(150, 150, 375, 250);
+        Rect rectCenter = new Rect(300, 62, 340, 120);
+        Rect rectLeft = new Rect(75, 75, 180, 125);
 
         // Create mats for each rectangle
         spikeCenter = matYCrCb.submat(rectCenter);
