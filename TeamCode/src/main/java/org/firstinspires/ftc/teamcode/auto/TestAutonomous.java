@@ -326,6 +326,10 @@ public class TestAutonomous extends LinearOpMode {
             telemetry.update();
             sleep(20);
         }
+        try {
+            camera.stopStreaming();
+            camera.closeCameraDevice();
+        } catch (OpenCvCameraException e) { }
 
         waitForStart();
 
@@ -706,13 +710,16 @@ public class TestAutonomous extends LinearOpMode {
             PoseStorage.currentPose = drive.getPoseEstimate();
             requestOpModeStop();
         }
+        trackTime.interrupt();
+        trackHeading.interrupt();
+        periodic.interrupt();
 
-        //periodic.interrupt();
-        try {
-            camera.stopStreaming();
-            camera.closeCameraDevice();
-        } catch (OpenCvCameraException e) {
-            telemetry.addLine("Exception as follows: " + e);
-        }
+//        periodic.interrupt();
+//        try {
+//            camera.stopStreaming();
+//            camera.closeCameraDevice();
+//        } catch (OpenCvCameraException e) {
+//            telemetry.addLine("Exception as follows: " + e);
+//        }
     }
 }
