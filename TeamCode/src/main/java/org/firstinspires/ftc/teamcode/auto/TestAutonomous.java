@@ -523,7 +523,7 @@ public class TestAutonomous extends LinearOpMode {
                 }
 
                 // Define backboard y value
-                int backboardX = 48, backboardY = 0;
+                int backboardX = 50, backboardY = 0;
                 if (alliance == Alliance.RED) {
                     switch (spikeMark) {
                         case 1: backboardY = side == Side.CLOSE ? -28 : -28; break;
@@ -565,10 +565,10 @@ public class TestAutonomous extends LinearOpMode {
                     bot.fourbar.setArm(0.65);
                     bot.fourbar.setWrist(0.72);
                     bot.slides.runTo(-700);
-                    sleep(250);
+                    sleep(150);
                     bot.fourbar.setArm(bot.fourbar.armTopOuttake);
                     bot.fourbar.setWrist(bot.fourbar.wristTopOuttake);
-                    sleep(250);
+                    sleep(450);
                     bot.claw.open();
                     sleep(300);
                     bot.storage();
@@ -696,10 +696,10 @@ public class TestAutonomous extends LinearOpMode {
                         bot.fourbar.setArm(0.65);
                         bot.fourbar.setWrist(0.72);
                         bot.slides.runTo(-700);
-                        sleep(250);
+                        sleep(150);
                         bot.fourbar.setArm(bot.fourbar.armTopOuttake);
                         bot.fourbar.setWrist(bot.fourbar.wristTopOuttake);
-                        sleep(250);
+                        sleep(450);
                         bot.claw.open();
                         sleep(300);
                         bot.storage();

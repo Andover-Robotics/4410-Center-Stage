@@ -140,7 +140,7 @@ public class Bot {
                 Thread.sleep(200);
                 fourbar.storage();
                 Thread.sleep(100);
-                claw.setPosition(0.74);
+                claw.setPosition(0.68);
                 fourbar.pickup();
                 Thread.sleep(200);
                 fourbar.storage();
@@ -163,7 +163,7 @@ public class Bot {
                 Thread.sleep(200);
                 fourbar.storage();
                 Thread.sleep(100);
-                claw.setPosition(0.74);
+                claw.setPosition(0.68);
                 fourbar.pickup();
                 Thread.sleep(200);
                 fourbar.storage();
