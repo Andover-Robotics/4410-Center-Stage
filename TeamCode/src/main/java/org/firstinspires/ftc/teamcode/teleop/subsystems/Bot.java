@@ -140,7 +140,7 @@ public class Bot {
                 Thread.sleep(200);
                 fourbar.storage();
                 Thread.sleep(100);
-                claw.setPosition(0.68);
+                claw.setPosition(0.74);
                 fourbar.pickup();
                 Thread.sleep(200);
                 fourbar.storage();
@@ -163,7 +163,7 @@ public class Bot {
                 Thread.sleep(200);
                 fourbar.storage();
                 Thread.sleep(100);
-                claw.setPosition(0.68);
+                claw.setPosition(0.74);
                 fourbar.pickup();
                 Thread.sleep(200);
                 fourbar.storage();
@@ -174,7 +174,7 @@ public class Bot {
         });
         thread.start();
     }
-    public void presetSlides(int pos) { // run to preset slide position, the pos variable has a range of 1-4, representing bottom, low, middle, and top
+    public void presetSlides(int pos, double distance) { // run to preset slide position, the pos variable has a range of 1-4, representing bottom, low, middle, and top
         claw.close();
         switch (pos) {
             case 1: slides.runToBottom(); storage();  break;
@@ -187,6 +187,15 @@ public class Bot {
                 try {
                     Thread.sleep(900);
                     outtakeOut((claw.getClawState()));
+                    if (distance < 3.5 && distance > 1.55) {
+                        outtakeOut(claw.getClawState());
+                        fourbar.setArm(0.01 * (90 - Math.toDegrees(Math.acos((distance + 4.2) / 7.87))) / 3.55 + 0.54);
+                    } else if (distance < 1.55) {
+                        outtakeOut(claw.getClawState());
+                        fourbar.setArm(0.01 * (90 - Math.toDegrees(Math.acos((1.6 + 4.2) / 7.87))) / 3.55 + 0.54);
+                    } else {
+                        outtakeOut(claw.getClawState());
+                    }
                 } catch (InterruptedException ignored) {}
             });
             thread.start();
@@ -195,14 +204,41 @@ public class Bot {
                 try {
                     Thread.sleep(500);
                     outtakeOut((claw.getClawState()));
+                    if (distance < 3.5 && distance > 1.55) {
+                        outtakeOut(claw.getClawState());
+                        fourbar.setArm(0.01 * (90 - Math.toDegrees(Math.acos((distance + 4.2) / 7.87))) / 3.55 + 0.54);
+                    } else if (distance < 1.55) {
+                        outtakeOut(claw.getClawState());
+                        fourbar.setArm(0.01 * (90 - Math.toDegrees(Math.acos((1.6 + 4.2) / 7.87))) / 3.55 + 0.54);
+                    } else {
+                        outtakeOut(claw.getClawState());
+                    }
                 } catch (InterruptedException ignored) {}
+            });
+            thread.start();
+        } else if (pos == 2) {
+            Thread thread = new Thread(() -> {
+                try {
+                    Thread.sleep(100);
+                    outtakeOut((claw.getClawState()));
+                    if (distance < 3.5 && distance > 1.55) {
+                        outtakeOut(claw.getClawState());
+                        fourbar.setArm(0.01 * (90 - Math.toDegrees(Math.acos((distance + 4.2) / 7.87))) / 3.55 + 0.54);
+                    } else if (distance < 1.55) {
+                        outtakeOut(claw.getClawState());
+                        fourbar.setArm(0.01 * (90 - Math.toDegrees(Math.acos((1.6 + 4.2) / 7.87))) / 3.55 + 0.54);
+                    } else {
+                        outtakeOut(claw.getClawState());
+                    }
+                } catch (InterruptedException ignored) {
+                }
             });
             thread.start();
         }
     }
 
 
-    public void drop() { // drop pixel in outtake or storage position
+    public void drop(double distance) { // drop pixel in outtake or storage position
         Thread thread = new Thread(() -> {
             try {
                 claw.open();
@@ -211,7 +247,7 @@ public class Bot {
                     if (claw.getClawState() == 0) {
                         storage();
                     } else if (claw.getClawState() == 1) {
-                        fourbar.setArm(0.65);
+                        fourbar.setArm(0.58);
                         fourbar.setWrist(0.72);
                         if (slides.getPosition() > -2400) {
                             slides.runTo(slides.getPosition() - 180);
@@ -220,6 +256,11 @@ public class Bot {
                         }
                         Thread.sleep(500);
                         outtakeOut(1);
+                        if (distance < 3.5 && distance > 1.55) {
+                            fourbar.setArm(0.01*(90-Math.toDegrees(Math.acos((distance+4.2)/7.87)))/3.55+0.54);
+                        } else if (distance < 1.55) {
+                            fourbar.setArm(0.01 * (90 - Math.toDegrees(Math.acos((1.6 + 4.2) / 7.87))) / 3.55 + 0.54);
+                        }
                         claw.close();
                     }
                 } else if (state == BotState.OUTTAKE_DOWN) { // drop pixel on ground

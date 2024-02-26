@@ -123,10 +123,18 @@ public class MainTeleOp extends LinearOpMode {
                     }
                 }
                 if (gp2.wasJustPressed(GamepadKeys.Button.RIGHT_BUMPER)) { // drop pixel while in storage
-                    bot.drop();
+                    bot.drop(distanceSensor.getDistance(DistanceUnit.INCH));
                 }
                 if (gp2.wasJustPressed(GamepadKeys.Button.Y)) { // go to outtake out position
-                    bot.outtakeOut(bot.claw.getClawState());
+                    if (distanceSensor.getDistance(DistanceUnit.INCH) < 3.5 && distanceSensor.getDistance(DistanceUnit.INCH) > 1.55) {
+                        bot.outtakeOut(bot.claw.getClawState());
+                        bot.fourbar.setArm(0.01 * (90 - Math.toDegrees(Math.acos((distanceSensor.getDistance(DistanceUnit.INCH) + 4.2) / 7.87))) / 3.55 + 0.54);
+                    } else if (distanceSensor.getDistance(DistanceUnit.INCH) < 1.55){
+                        bot.outtakeOut(bot.claw.getClawState());
+                        bot.fourbar.setArm(0.01 * (90 - Math.toDegrees(Math.acos((1.6 + 4.2) / 7.87))) / 3.55 + 0.54);
+                    } else {
+                        bot.outtakeOut(bot.claw.getClawState());
+                    }
                 }
                 if (gp2.wasJustPressed(GamepadKeys.Button.X)) { // go to outtake ground position
                     bot.outtakeGround();
@@ -134,20 +142,17 @@ public class MainTeleOp extends LinearOpMode {
             } else if (bot.state == Bot.BotState.OUTTAKE_OUT) { // SCORING BACKBOARD
                 bot.slides.runManual(gp2.getRightY()*-0.5);
                 if (gp2.wasJustPressed(GamepadKeys.Button.Y)) { // drop
-                    bot.drop();
+                    bot.drop(distanceSensor.getDistance(DistanceUnit.INCH));
                 }
                 if (gp2.wasJustPressed(GamepadKeys.Button.B)) { // cancel and return to storage
-                    bot.storage() ;
+                    bot.storage();
                 }
                 if (gp2.wasJustPressed(GamepadKeys.Button.X)) {
                     bot.outtakeGround();
                 }
-//                if (Math.abs(gp2.getLeftY()) > 0.01) {
-//                    bot.fourbar.runAngle(bot.slides.motorLeft.getCurrentPosition());
-//                }
             } else if (bot.state == Bot.BotState.OUTTAKE_DOWN) { // SCORING GROUND
                 if (gp2.wasJustPressed(GamepadKeys.Button.X)) {
-                    bot.drop();
+                    bot.drop(distanceSensor.getDistance(DistanceUnit.INCH));
                 }
                 if (gp2.wasJustPressed(GamepadKeys.Button.A)) { // cancel and return to storage
                     bot.storage();
@@ -173,13 +178,13 @@ public class MainTeleOp extends LinearOpMode {
             bot.slides.runManual(gp2.getLeftY()*-0.5);
             // preset positions
             if (gp2.wasJustPressed(GamepadKeys.Button.DPAD_UP)) { // top
-                bot.presetSlides(4);
+                bot.presetSlides(4, distanceSensor.getDistance(DistanceUnit.INCH));
             } else if (gp2.wasJustPressed(GamepadKeys.Button.DPAD_RIGHT)) { // middle
-                bot.presetSlides(3);
+                bot.presetSlides(3, distanceSensor.getDistance(DistanceUnit.INCH));
             } else if (gp2.wasJustPressed(GamepadKeys.Button.DPAD_LEFT)) { // low
-                bot.presetSlides(2);
+                bot.presetSlides(2, distanceSensor.getDistance(DistanceUnit.INCH));
             } else if (gp2.wasJustPressed(GamepadKeys.Button.DPAD_DOWN)) { // bottom
-                bot.presetSlides(1);
+                bot.presetSlides(1, distanceSensor.getDistance(DistanceUnit.INCH));
             }
 
             // DRIVE
@@ -235,11 +240,8 @@ public class MainTeleOp extends LinearOpMode {
             telemetry.addData("Slides Position", bot.slides.getPosition() + " (pos: " + bot.slides.position + " current: " + bot.slides.getCurrent() + ")");
 
             telemetry.addData("Intake Power", Intake.power +"(running: " + bot.intake.getIsRunning() + ")");
-            telemetry.addData("arm Left Position", bot.fourbar.armLeft.getPosition());
-            telemetry.addData("arm Right Position", bot.fourbar.armRight.getPosition());
-            telemetry.addData("wrist Position", bot.fourbar.wrist.getPosition());
-            telemetry.addData("Back Distance to wall (cm)", distanceSensor.getDistance(DistanceUnit.CM));
-            telemetry.addData("Front Distance to wall (cm)", frontDistanceSensor.getDistance(DistanceUnit.CM));
+            telemetry.addData("Back Distance to wall (inch)", distanceSensor.getDistance(DistanceUnit.INCH));
+            telemetry.addData("Front Distance to wall (inch)", frontDistanceSensor.getDistance(DistanceUnit.INCH));
             telemetry.addData("Break Beam", breakBeam.getState());
 
             telemetry.update();

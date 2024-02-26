@@ -59,7 +59,7 @@ public class TestAutonomous extends LinearOpMode {
     public static double stackDelay = 0.0; // Delay before going to stack, will park on side and wait
     public static double backboardDelay = 0.0; // Delay before going to backboard, after scoring spike mark
     DigitalChannel breakBeam;
-    DistanceSensor frontDistanceSensor;
+    DistanceSensor frontDistanceSensor, distanceSensor;
 
 
     @Override
@@ -68,6 +68,7 @@ public class TestAutonomous extends LinearOpMode {
         telemetry.setAutoClear(true);
         bot = Bot.getInstance(this);
         frontDistanceSensor = hardwareMap.get(DistanceSensor.class, "frontDistance");
+        distanceSensor = hardwareMap.get(DistanceSensor.class, "Distance");
         breakBeam = hardwareMap.get(DigitalChannel.class, "BreakBeam");
 
         SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
@@ -157,6 +158,7 @@ public class TestAutonomous extends LinearOpMode {
             bot.autoOuttakeOut(2);
             bot.slides.runTo(-300);
         });
+
 
 
 
@@ -511,6 +513,7 @@ public class TestAutonomous extends LinearOpMode {
                         if (!breakBeam.getState()) {
                             breakBeamCounter++;
                         }
+                        bot.intake(counter > 700 && counter < 800 && breakBeamCounter < 2, bot.intake.getIntakeHeight());
                     } while(counter < 1500 && breakBeamCounter < 2);
                     bot.autoFixPixels();
                     bot.intake(true, 0.1);
@@ -523,7 +526,7 @@ public class TestAutonomous extends LinearOpMode {
                 }
 
                 // Define backboard y value
-                int backboardX = 50, backboardY = 0;
+                int backboardX = 49, backboardY = 0;
                 if (alliance == Alliance.RED) {
                     switch (spikeMark) {
                         case 1: backboardY = side == Side.CLOSE ? -28 : -28; break;
@@ -553,6 +556,7 @@ public class TestAutonomous extends LinearOpMode {
                             .lineToLinearHeading(backboardPose)
                             .build());
                 }
+
                 // Place yellow pixel
                 if (side == Side.CLOSE) {
                     sleep(100);
@@ -565,10 +569,10 @@ public class TestAutonomous extends LinearOpMode {
                     bot.fourbar.setArm(0.65);
                     bot.fourbar.setWrist(0.72);
                     bot.slides.runTo(-700);
-                    sleep(150);
+                    sleep(250);
                     bot.fourbar.setArm(bot.fourbar.armTopOuttake);
                     bot.fourbar.setWrist(bot.fourbar.wristTopOuttake);
-                    sleep(450);
+                    sleep(250);
                     bot.claw.open();
                     sleep(300);
                     bot.storage();
@@ -609,20 +613,21 @@ public class TestAutonomous extends LinearOpMode {
 
                         // To pixel stack
                         drive.followTrajectorySequence(drive.trajectorySequenceBuilder(drive.getPoseEstimate())
-//                                .lineToLinearHeading(new Pose2d(15, stackY1, Math.toRadians(180)))
-//                                //.lineToLinearHeading(new Pose2d(stackX+10, stackY1, Math.toRadians(180))) dont use
-//                                .lineToLinearHeading(new Pose2d(stackX, stackY1, Math.toRadians(180)),
-//                                        SampleMecanumDrive.getVelocityConstraint(10, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
-//                                        SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
-                                //.lineToLinearHeading(new Pose2d(30, stackY1, Math.toRadians(180)))
                                 .splineToLinearHeading(new Pose2d(30, stackY1, Math.toRadians(180)), Math.toRadians(180))
                                 .lineToLinearHeading(new Pose2d( stackX+8, stackY1, Math.toRadians(180)))
                                 .build());
 
-                        drive.followTrajectory(drive.trajectoryBuilder(drive.getPoseEstimate()).forward(frontDistanceSensor.getDistance(DistanceUnit.INCH) - 5.25,
-                                        SampleMecanumDrive.getVelocityConstraint(8, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
-                                        SampleMecanumDrive.getAccelerationConstraint(16))
-                                .build());
+                        if (frontDistanceSensor.getDistance(DistanceUnit.INCH) < 14) {
+                            drive.followTrajectory(drive.trajectoryBuilder(drive.getPoseEstimate()).forward(frontDistanceSensor.getDistance(DistanceUnit.INCH) - 5.25,
+                                    SampleMecanumDrive.getVelocityConstraint(8, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
+                                    SampleMecanumDrive.getAccelerationConstraint(16))
+                                    .build());
+                        } else {
+                            drive.followTrajectorySequence(drive.trajectorySequenceBuilder(drive.getPoseEstimate())
+                                    .lineToLinearHeading(new Pose2d(stackX, stackY1, Math.toRadians(180)))
+                                    .build());
+                        }
+
                         // Intake from stack
                         if (stackIterations == 1 || (stackIterations == 2 && i == 0)) {
                             sleep(50);
@@ -644,11 +649,7 @@ public class TestAutonomous extends LinearOpMode {
                                 if (!breakBeam.getState()) {
                                     breakBeamCounter++;
                                 }
-                                if (counter > 700 && counter < 800 && breakBeamCounter < 4) {
-                                    bot.intake(true, bot.intake.getIntakeHeight());
-                                } else {
-                                    bot.intake(false, bot.intake.getIntakeHeight());
-                                }
+                                bot.intake(counter > 700 && counter < 800 && breakBeamCounter < 2, bot.intake.getIntakeHeight());
                             } while(counter < 1500 && breakBeamCounter < 8);
 
                         } else {
@@ -671,6 +672,7 @@ public class TestAutonomous extends LinearOpMode {
                                 if (!breakBeam.getState()) {
                                     breakBeamCounter++;
                                 }
+                                bot.intake(counter > 700 && counter < 800 && breakBeamCounter < 2, bot.intake.getIntakeHeight());
                             } while(counter < 1500 && breakBeamCounter < 8);
                         }
 
@@ -696,10 +698,9 @@ public class TestAutonomous extends LinearOpMode {
                         bot.fourbar.setArm(0.65);
                         bot.fourbar.setWrist(0.72);
                         bot.slides.runTo(-700);
-                        sleep(150);
-                        bot.fourbar.setArm(bot.fourbar.armTopOuttake);
-                        bot.fourbar.setWrist(bot.fourbar.wristTopOuttake);
-                        sleep(450);
+                        sleep(250);
+                        bot.fourbar.autoDualOuttake(1);
+                        sleep(250);
                         bot.claw.open();
                         sleep(300);
                         bot.storage();
