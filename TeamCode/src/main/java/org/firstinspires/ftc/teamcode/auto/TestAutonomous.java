@@ -526,7 +526,7 @@ public class TestAutonomous extends LinearOpMode {
                 }
 
                 // Define backboard y value
-                int backboardX = 49, backboardY = 0;
+                int backboardX = 50, backboardY = 0;
                 if (alliance == Alliance.RED) {
                     switch (spikeMark) {
                         case 1: backboardY = side == Side.CLOSE ? -28 : -28; break;
