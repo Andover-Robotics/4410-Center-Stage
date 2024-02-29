@@ -516,9 +516,12 @@ public class TestAutonomous extends LinearOpMode {
                         bot.intake(counter > 700 && counter < 800 && breakBeamCounter < 2, bot.intake.getIntakeHeight());
                     } while(counter < 1500 && breakBeamCounter < 2);
                     bot.autoFixPixels();
-                    bot.intake(true, 0.1);
+                    bot.intake(true, bot.intake.intakeUp);
                     // Across the field
                     int farY = alliance == Alliance.RED ? -10 : 10;
+                    while (distanceSensor.getDistance(DistanceUnit.INCH) < 15) {
+                        sleep(50);
+                    }
                     drive.followTrajectorySequence(drive.trajectorySequenceBuilder(drive.getPoseEstimate())
                             .lineToSplineHeading(new Pose2d(25, farY, Math.toRadians(180)))
                             .build());
@@ -612,10 +615,11 @@ public class TestAutonomous extends LinearOpMode {
                         }
 
                         // To pixel stack
-                        drive.followTrajectorySequence(drive.trajectorySequenceBuilder(drive.getPoseEstimate())
+                        drive.followTrajectorySequenceAsync(drive.trajectorySequenceBuilder(drive.getPoseEstimate())
                                 .splineToLinearHeading(new Pose2d(30, stackY1, Math.toRadians(180)), Math.toRadians(180))
                                 .lineToLinearHeading(new Pose2d( stackX+8, stackY1, Math.toRadians(180)))
                                 .build());
+
 
                         if (frontDistanceSensor.getDistance(DistanceUnit.INCH) < 14) {
                             drive.followTrajectory(drive.trajectoryBuilder(drive.getPoseEstimate()).forward(frontDistanceSensor.getDistance(DistanceUnit.INCH) - 5.25,
@@ -681,6 +685,9 @@ public class TestAutonomous extends LinearOpMode {
                         bot.autoFixPixels();
 
                         // Across field
+                        while (distanceSensor.getDistance(DistanceUnit.INCH) < 15) {
+                            sleep(50);
+                        }
                         autoPickupClose.start();
                         drive.followTrajectorySequence(drive.trajectorySequenceBuilder(drive.getPoseEstimate())
                                 .lineToLinearHeading(new Pose2d(38, stackY1+1, Math.toRadians(180)))
