@@ -256,9 +256,9 @@ public class Bot {
                         Thread.sleep(500);
                         outtakeOut(1);
                         if (distance < 3.5 && distance > 1.55) {
-                            fourbar.setArm(0.01*(90-Math.toDegrees(Math.acos((distance+4.2)/7.87)))/3.55+0.54-0.015);
+                            fourbar.setArm(0.01*(90-Math.toDegrees(Math.acos((distance+4.2)/7.87)))/3.55+0.54-0.025);
                         } else if (distance < 1.55) {
-                            fourbar.setArm(0.01 * (90 - Math.toDegrees(Math.acos((1.6 + 4.2) / 7.87))) / 3.55 + 0.54-0.015);
+                            fourbar.setArm(0.01 * (90 - Math.toDegrees(Math.acos((1.6 + 4.2) / 7.87))) / 3.55 + 0.54-0.025);
                         }
                         claw.close();
                     }
