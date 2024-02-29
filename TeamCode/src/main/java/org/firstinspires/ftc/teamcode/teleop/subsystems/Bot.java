@@ -140,7 +140,7 @@ public class Bot {
                 Thread.sleep(200);
                 fourbar.storage();
                 Thread.sleep(100);
-                claw.setPosition(0.74);
+                claw.setPosition(0.69);
                 fourbar.pickup();
                 Thread.sleep(200);
                 fourbar.storage();
@@ -163,7 +163,7 @@ public class Bot {
                 Thread.sleep(200);
                 fourbar.storage();
                 Thread.sleep(100);
-                claw.setPosition(0.74);
+                claw.setPosition(0.69);
                 fourbar.pickup();
                 Thread.sleep(200);
                 fourbar.storage();
@@ -192,7 +192,7 @@ public class Bot {
                         fourbar.setArm(0.01 * (90 - Math.toDegrees(Math.acos((distance + 4.2) / 7.87))) / 3.55 + 0.54);
                     } else if (distance < 1.55) {
                         outtakeOut(claw.getClawState());
-                        fourbar.setArm(0.01 * (90 - Math.toDegrees(Math.acos((1.6 + 4.2) / 7.87))) / 3.55 + 0.54);
+                        fourbar.setArm(0.01 * (90 - Math.toDegrees(Math.acos((1.6 + 4.2) / 7.87))) / 3.55 + 0.54-0.015);
                     } else {
                         outtakeOut(claw.getClawState());
                     }
@@ -237,12 +237,11 @@ public class Bot {
         }
     }
 
-
     public void drop(double distance) { // drop pixel in outtake or storage position
         Thread thread = new Thread(() -> {
             try {
                 claw.open();
-                Thread.sleep(300);
+                Thread.sleep(500);
                 if (state == Bot.BotState.OUTTAKE_OUT) { // drop pixel on backboard
                     if (claw.getClawState() == 0) {
                         storage();
@@ -257,9 +256,9 @@ public class Bot {
                         Thread.sleep(500);
                         outtakeOut(1);
                         if (distance < 3.5 && distance > 1.55) {
-                            fourbar.setArm(0.01*(90-Math.toDegrees(Math.acos((distance+4.2)/7.87)))/3.55+0.54);
+                            fourbar.setArm(0.01*(90-Math.toDegrees(Math.acos((distance+4.2)/7.87)))/3.55+0.54-0.025);
                         } else if (distance < 1.55) {
-                            fourbar.setArm(0.01 * (90 - Math.toDegrees(Math.acos((1.6 + 4.2) / 7.87))) / 3.55 + 0.54);
+                            fourbar.setArm(0.01 * (90 - Math.toDegrees(Math.acos((1.6 + 4.2) / 7.87))) / 3.55 + 0.54-0.025);
                         }
                         claw.close();
                     }

@@ -356,11 +356,11 @@ public class TestAutonomous extends LinearOpMode {
 
             // Pixel stack trajectory starts here
             double [] stackHeights = new double [] { // from top pixel (1) to bottom pixel (5)
-                    0.24,
-                    0.27,
-                    0.285,
-                    0.31,
-                    0.34
+                    0.22,
+                    0.235,
+                    0.26,
+                    0.28,
+                    0.32
             };
 
             // To spike mark
@@ -529,7 +529,7 @@ public class TestAutonomous extends LinearOpMode {
                 }
 
                 // Define backboard y value
-                int backboardX = 49, backboardY = 0;
+                int backboardX = 50, backboardY = 0;
                 if (alliance == Alliance.RED) {
                     switch (spikeMark) {
                         case 1: backboardY = side == Side.CLOSE ? -28 : -28; break;
@@ -557,6 +557,13 @@ public class TestAutonomous extends LinearOpMode {
                 } else {
                     drive.followTrajectorySequence(drive.trajectorySequenceBuilder(drive.getPoseEstimate())
                             .lineToLinearHeading(backboardPose)
+                            .build());
+                }
+
+                if (distanceSensor.getDistance(DistanceUnit.INCH) > 3) {
+                    drive.followTrajectory(drive.trajectoryBuilder(drive.getPoseEstimate()).back(distanceSensor.getDistance(DistanceUnit.INCH) - 2,
+                                    SampleMecanumDrive.getVelocityConstraint(8, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
+                                    SampleMecanumDrive.getAccelerationConstraint(16))
                             .build());
                 }
 
@@ -697,7 +704,12 @@ public class TestAutonomous extends LinearOpMode {
 //                        drive.followTrajectorySequence(drive.trajectorySequenceBuilder(drive.getPoseEstimate())
 //                                .splineToLinearHeading(new Pose2d(28, stackY2, Math.toRadians(180)), Math.toRadians(0))
 //                                .build());
-
+                        if (distanceSensor.getDistance(DistanceUnit.INCH) > 3) {
+                            drive.followTrajectory(drive.trajectoryBuilder(drive.getPoseEstimate()).back(distanceSensor.getDistance(DistanceUnit.INCH) - 2,
+                                            SampleMecanumDrive.getVelocityConstraint(8, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
+                                            SampleMecanumDrive.getAccelerationConstraint(16))
+                                    .build());
+                        }
 
                         // Score pixels on backboard
                         bot.claw.open();
