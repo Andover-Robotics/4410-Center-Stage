@@ -132,7 +132,7 @@ public class MainTeleOp extends LinearOpMode {
                     } else if (distanceSensor.getDistance(DistanceUnit.INCH) < 1.55){
                         bot.outtakeOut(bot.claw.getClawState());
                         if (bot.claw.getClawState()==1) {
-                            bot.fourbar.setArm(0.01 * (90 - Math.toDegrees(Math.acos((1.6 + 4.2) / 7.87))) / 3.55 + 0.54-0.025);
+                            bot.fourbar.setArm(0.01 * (90 - Math.toDegrees(Math.acos((1.6 + 4.2) / 7.87))) / 3.55 + 0.54-0.02);
                         } else {
                             bot.fourbar.setArm(0.01 * (90 - Math.toDegrees(Math.acos((1.6 + 4.2) / 7.87))) / 3.55 + 0.54);
                         }
