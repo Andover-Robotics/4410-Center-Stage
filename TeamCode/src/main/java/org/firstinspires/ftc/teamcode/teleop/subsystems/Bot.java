@@ -241,7 +241,7 @@ public class Bot {
         Thread thread = new Thread(() -> {
             try {
                 claw.open();
-                Thread.sleep(500);
+                Thread.sleep(600);
                 if (state == Bot.BotState.OUTTAKE_OUT) { // drop pixel on backboard
                     if (claw.getClawState() == 0) {
                         storage();

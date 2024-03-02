@@ -432,7 +432,7 @@ public class TestAutonomous extends LinearOpMode {
             } else {
                 bot.claw.fullOpen();
             }
-            sleep(100);
+            sleep(150);
             bot.storage();
             bot.claw.close();
             sleep((long) backboardDelay * 1000);
@@ -519,7 +519,7 @@ public class TestAutonomous extends LinearOpMode {
                     bot.intake(true, bot.intake.intakeUp);
                     // Across the field
                     int farY = alliance == Alliance.RED ? -10 : 10;
-                    while (distanceSensor.getDistance(DistanceUnit.INCH) < 15) {
+                    while (distanceSensor.getDistance(DistanceUnit.INCH) < 30) {
                         sleep(50);
                     }
                     drive.followTrajectorySequence(drive.trajectorySequenceBuilder(drive.getPoseEstimate())
@@ -560,7 +560,7 @@ public class TestAutonomous extends LinearOpMode {
                             .build());
                 }
 
-                if (distanceSensor.getDistance(DistanceUnit.INCH) > 3) {
+                if (distanceSensor.getDistance(DistanceUnit.INCH) > 2.5) {
                     drive.followTrajectory(drive.trajectoryBuilder(drive.getPoseEstimate()).back(distanceSensor.getDistance(DistanceUnit.INCH) - 2,
                                     SampleMecanumDrive.getVelocityConstraint(8, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
                                     SampleMecanumDrive.getAccelerationConstraint(16))
@@ -590,6 +590,7 @@ public class TestAutonomous extends LinearOpMode {
 
 
                 if (toStack) {
+                    stackY1 = alliance == Alliance.RED ? -10 : 10;
                     int stackY2 = alliance == Alliance.RED ? -30 : 30;
                     // Check if there is stack delay, if there is, run to corner
                     if (stackDelay != 0.0) {
@@ -622,7 +623,7 @@ public class TestAutonomous extends LinearOpMode {
                         }
 
                         // To pixel stack
-                        drive.followTrajectorySequenceAsync(drive.trajectorySequenceBuilder(drive.getPoseEstimate())
+                        drive.followTrajectorySequence(drive.trajectorySequenceBuilder(drive.getPoseEstimate())
                                 .splineToLinearHeading(new Pose2d(30, stackY1, Math.toRadians(180)), Math.toRadians(180))
                                 .lineToLinearHeading(new Pose2d( stackX+8, stackY1, Math.toRadians(180)))
                                 .build());
@@ -692,7 +693,7 @@ public class TestAutonomous extends LinearOpMode {
                         bot.autoFixPixels();
 
                         // Across field
-                        while (distanceSensor.getDistance(DistanceUnit.INCH) < 15) {
+                        while (distanceSensor.getDistance(DistanceUnit.INCH) < 30) {
                             sleep(50);
                         }
                         autoPickupClose.start();
