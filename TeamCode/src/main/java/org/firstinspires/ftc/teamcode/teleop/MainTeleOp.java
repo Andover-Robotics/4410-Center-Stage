@@ -43,10 +43,11 @@ public class MainTeleOp extends LinearOpMode {
     private Bot bot;
     private double driveSpeed = 1, driveMultiplier = 1;
     private GamepadEx gp1, gp2;
-    private boolean fieldCentric = false;
+    private boolean fieldCentric = false, unJam = false;
     private Thread thread;
     DistanceSensor distanceSensor, frontDistanceSensor;
     DigitalChannel breakBeam;
+    static int jamTimer = 0;
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -209,8 +210,10 @@ public class MainTeleOp extends LinearOpMode {
             // INTAKE
             if (gp1.isDown(GamepadKeys.Button.RIGHT_BUMPER)) { // reverse intake
                 bot.intake(true, bot.intake.intakeOut);
-            } else if (gp1.isDown(GamepadKeys.Button.LEFT_BUMPER) && breakBeam.getState()) { // intake
+
+            } else if (gp1.isDown(GamepadKeys.Button.LEFT_BUMPER) && breakBeam.getState() && !unJam) { // intake
                 bot.intake(false, bot.intake.intakeOut);
+
             } else if (gp1.isDown(GamepadKeys.Button.RIGHT_STICK_BUTTON) && breakBeam.getState()){ // up intake
                 bot.intake(false, bot.intake.intakeUp);
 
@@ -221,6 +224,12 @@ public class MainTeleOp extends LinearOpMode {
                 bot.intake.stopIntake();
                 bot.intake.setIntakeHeight(bot.intake.intakeStorage);
             }
+
+            if ((bot.intake.getCurrent()) > 5500) {
+                unJam = true;
+                unJam();
+            }
+
             if (gp1.wasJustPressed(GamepadKeys.Button.DPAD_RIGHT)) { // increment power
                 bot.intake.changePower(true);
             } else if (gp1.wasJustPressed(GamepadKeys.Button.DPAD_LEFT)) { // decrement power
@@ -275,6 +284,19 @@ public class MainTeleOp extends LinearOpMode {
                     turnVector.getX() * driveSpeed
             );
         }
+    }
+
+    //Unjam
+    public void unJam() { // Extra manual drop open for tele-op in case only 1 pixel
+        Thread unjam = new Thread(() -> {
+            try {
+                bot.intake(true, bot.intake.intakeUp);
+                Thread.sleep(100);
+                bot.intake(false, bot.intake.intakeOut);
+                unJam = false;
+            } catch (InterruptedException ignored) {}
+        });
+        thread.start();
     }
 
 }

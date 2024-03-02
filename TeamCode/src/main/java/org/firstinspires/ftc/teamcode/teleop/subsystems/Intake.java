@@ -8,6 +8,8 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.Servo;
 
+import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
+
 @Config
 public class Intake {
     private final MotorEx noodles;
@@ -52,6 +54,10 @@ public class Intake {
         noodles.set(0);
         counterRoller.set(0);
         isRunning = false;
+    }
+
+    public double getCurrent() {
+        return noodles.motorEx.getCurrent(CurrentUnit.MILLIAMPS);
     }
 
     public void changePower(boolean increment) {

@@ -513,7 +513,7 @@ public class TestAutonomous extends LinearOpMode {
                         if (!breakBeam.getState()) {
                             breakBeamCounter++;
                         }
-                        bot.intake(counter > 700 && counter < 800 && breakBeamCounter < 2, bot.intake.getIntakeHeight());
+                        bot.intake((counter > 700 && counter < 800 && breakBeamCounter < 2) || bot.intake.getCurrent() > 5000, bot.intake.getIntakeHeight());
                     } while(counter < 1500 && breakBeamCounter < 2);
                     bot.autoFixPixels();
                     bot.intake(true, bot.intake.intakeUp);
@@ -661,7 +661,7 @@ public class TestAutonomous extends LinearOpMode {
                                 if (!breakBeam.getState()) {
                                     breakBeamCounter++;
                                 }
-                                bot.intake(counter > 700 && counter < 800 && breakBeamCounter < 2, bot.intake.getIntakeHeight());
+                                bot.intake((counter > 700 && counter < 800 && breakBeamCounter < 2) || bot.intake.getCurrent() > 5000, bot.intake.getIntakeHeight());
                             } while(counter < 1500 && breakBeamCounter < 8);
 
                         } else {
@@ -684,7 +684,7 @@ public class TestAutonomous extends LinearOpMode {
                                 if (!breakBeam.getState()) {
                                     breakBeamCounter++;
                                 }
-                                bot.intake(counter > 700 && counter < 800 && breakBeamCounter < 2, bot.intake.getIntakeHeight());
+                                bot.intake((counter > 700 && counter < 800 && breakBeamCounter < 2) || bot.intake.getCurrent() > 5000, bot.intake.getIntakeHeight());
                             } while(counter < 1500 && breakBeamCounter < 8);
                         }
 
