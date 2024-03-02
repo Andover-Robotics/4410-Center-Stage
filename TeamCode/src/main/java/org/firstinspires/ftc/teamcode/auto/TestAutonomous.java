@@ -705,7 +705,7 @@ public class TestAutonomous extends LinearOpMode {
 //                        drive.followTrajectorySequence(drive.trajectorySequenceBuilder(drive.getPoseEstimate())
 //                                .splineToLinearHeading(new Pose2d(28, stackY2, Math.toRadians(180)), Math.toRadians(0))
 //                                .build());
-                        if (distanceSensor.getDistance(DistanceUnit.INCH) > 3) {
+                        if (distanceSensor.getDistance(DistanceUnit.INCH) > 2.5) {
                             drive.followTrajectory(drive.trajectoryBuilder(drive.getPoseEstimate()).back(distanceSensor.getDistance(DistanceUnit.INCH) - 2,
                                             SampleMecanumDrive.getVelocityConstraint(8, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
                                             SampleMecanumDrive.getAccelerationConstraint(16))
