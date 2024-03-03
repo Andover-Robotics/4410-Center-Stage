@@ -127,25 +127,15 @@ public class MainTeleOp extends LinearOpMode {
                     bot.drop(distanceSensor.getDistance(DistanceUnit.INCH));
                 }
                 if (gp2.wasJustPressed(GamepadKeys.Button.Y)) { // go to outtake out position
-                    if (distanceSensor.getDistance(DistanceUnit.INCH) < 3.5 && distanceSensor.getDistance(DistanceUnit.INCH) > 1.55) {
                         bot.outtakeOut(bot.claw.getClawState());
-                        bot.fourbar.setArm(0.01 * (90 - Math.toDegrees(Math.acos((distanceSensor.getDistance(DistanceUnit.INCH) + 4.2) / 7.87))) / 3.55 + 0.54);
-                    } else if (distanceSensor.getDistance(DistanceUnit.INCH) < 1.55){
-                        bot.outtakeOut(bot.claw.getClawState());
-                        if (bot.claw.getClawState()==1) {
-                            bot.fourbar.setArm(0.01 * (90 - Math.toDegrees(Math.acos((1.6 + 4.2) / 7.87))) / 3.55 + 0.54-0.02);
-                        } else {
-                            bot.fourbar.setArm(0.01 * (90 - Math.toDegrees(Math.acos((1.6 + 4.2) / 7.87))) / 3.55 + 0.54);
-                        }
-                    } else {
-                        bot.outtakeOut(bot.claw.getClawState());
-                    }
+                        bot.inverseKinematics(distanceSensor.getDistance(DistanceUnit.INCH), bot.claw.getClawState());
                 }
                 if (gp2.wasJustPressed(GamepadKeys.Button.X)) { // go to outtake ground position
                     bot.outtakeGround();
                 }
             } else if (bot.state == Bot.BotState.OUTTAKE_OUT) { // SCORING BACKBOARD
-                bot.slides.runManual(gp2.getRightY()*-0.5);
+                //bot.slides.runManual(gp2.getRightY()*-0.5);
+                bot.inverseKinematics(distanceSensor.getDistance(DistanceUnit.INCH), bot.claw.getClawState());
                 if (gp2.wasJustPressed(GamepadKeys.Button.Y)) { // drop
                     bot.drop(distanceSensor.getDistance(DistanceUnit.INCH));
                 }
@@ -164,15 +154,16 @@ public class MainTeleOp extends LinearOpMode {
                 }
                 if (gp2.wasJustPressed(GamepadKeys.Button.Y)) { // go to outtake out position
                     bot.outtakeOut(bot.claw.getClawState());
+                    bot.inverseKinematics(distanceSensor.getDistance(DistanceUnit.INCH), bot.claw.getClawState());
                 }
             }
 
-            // Distance sensor
+            // Rear Distance sensor
             if (distanceSensor.getDistance(DistanceUnit.CM) < 30) { // Slows down driving when approaching object
-                driveMultiplier = 0.3;
+                driveMultiplier = 0.4;
                 if ((gp1.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER) > 0.2))
                 {
-                    driveMultiplier = 0.6;
+                    driveMultiplier = 1;
                 }
             } else {
                 driveMultiplier = 1;
