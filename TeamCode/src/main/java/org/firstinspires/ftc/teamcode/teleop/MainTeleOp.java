@@ -43,7 +43,7 @@ public class MainTeleOp extends LinearOpMode {
     private Bot bot;
     private double driveSpeed = 1, driveMultiplier = 1;
     private GamepadEx gp1, gp2;
-    private boolean fieldCentric = false, unJam = false;
+    private boolean fieldCentric = false, unJam = false, ik = true;
     private Thread thread;
     DistanceSensor distanceSensor, frontDistanceSensor;
     DigitalChannel breakBeam;
@@ -135,9 +135,13 @@ public class MainTeleOp extends LinearOpMode {
                 }
             } else if (bot.state == Bot.BotState.OUTTAKE_OUT) { // SCORING BACKBOARD
                 //bot.slides.runManual(gp2.getRightY()*-0.5);
-                bot.inverseKinematics(distanceSensor.getDistance(DistanceUnit.INCH), bot.claw.getClawState());
+                if (ik) {
+                    bot.inverseKinematics(distanceSensor.getDistance(DistanceUnit.INCH), bot.claw.getClawState());
+                }
+
                 if (gp2.wasJustPressed(GamepadKeys.Button.Y)) { // drop
                     bot.drop(distanceSensor.getDistance(DistanceUnit.INCH));
+                    ik = true;
                 }
                 if (gp2.wasJustPressed(GamepadKeys.Button.B)) { // cancel and return to storage
                     bot.storage();
@@ -155,6 +159,7 @@ public class MainTeleOp extends LinearOpMode {
                 if (gp2.wasJustPressed(GamepadKeys.Button.Y)) { // go to outtake out position
                     bot.outtakeOut(bot.claw.getClawState());
                     bot.inverseKinematics(distanceSensor.getDistance(DistanceUnit.INCH), bot.claw.getClawState());
+                    ik = true;
                 }
             }
 
@@ -175,10 +180,13 @@ public class MainTeleOp extends LinearOpMode {
             // preset positions
             if (gp2.wasJustPressed(GamepadKeys.Button.DPAD_UP)) { // top
                 bot.presetSlides(4, distanceSensor.getDistance(DistanceUnit.INCH));
+                ik = true;
             } else if (gp2.wasJustPressed(GamepadKeys.Button.DPAD_RIGHT)) { // middle
                 bot.presetSlides(3, distanceSensor.getDistance(DistanceUnit.INCH));
+                ik = true;
             } else if (gp2.wasJustPressed(GamepadKeys.Button.DPAD_LEFT)) { // low
                 bot.presetSlides(2, distanceSensor.getDistance(DistanceUnit.INCH));
+                ik = true;
             } else if (gp2.wasJustPressed(GamepadKeys.Button.DPAD_DOWN)) { // bottom
                 bot.presetSlides(1, distanceSensor.getDistance(DistanceUnit.INCH));
             }
@@ -234,7 +242,13 @@ public class MainTeleOp extends LinearOpMode {
                 bot.launcher.reset();
             }
 
-            bot.fourbar.runArm(gp2.getRightY()*-1);
+            if (Math.abs(gp2.getRightY())>0.4) {
+                ik = false;
+            }
+            if (ik) {
+                bot.fourbar.runArm(gp2.getRightY());
+            }
+
 
             // TELEMETRY
             telemetry.addData("Field Centric",fieldCentric + " Heading: " + Math.toDegrees(drive.getPoseEstimate().getHeading()));;
