@@ -141,7 +141,10 @@ public class MainTeleOp extends LinearOpMode {
 
                 if (gp2.wasJustPressed(GamepadKeys.Button.Y)) { // drop
                     bot.drop(distanceSensor.getDistance(DistanceUnit.INCH));
-                    ik = true;
+                    //ik = true;
+                }
+                if (gp2.wasJustPressed(GamepadKeys.Button.RIGHT_STICK_BUTTON)) { // manual half open for first pixel
+                    bot.claw.halfOpen();
                 }
                 if (gp2.wasJustPressed(GamepadKeys.Button.B)) { // cancel and return to storage
                     bot.storage();
@@ -224,10 +227,10 @@ public class MainTeleOp extends LinearOpMode {
                 bot.intake.setIntakeHeight(bot.intake.intakeStorage);
             }
 
-            if ((bot.intake.getCurrent()) > 5500) {
-                unJam = true;
-                unJam();
-            }
+//            if ((bot.intake.getCurrent()) > 1500) {
+//                unJam = true;
+//                unJam();
+//            }
 
             if (gp1.wasJustPressed(GamepadKeys.Button.DPAD_RIGHT)) { // increment power
                 bot.intake.changePower(true);
@@ -245,8 +248,8 @@ public class MainTeleOp extends LinearOpMode {
             if (Math.abs(gp2.getRightY())>0.4) {
                 ik = false;
             }
-            if (ik) {
-                bot.fourbar.runArm(gp2.getRightY());
+            if (!ik) {
+                bot.fourbar.runArm(gp2.getRightY()*-0.8);
             }
 
 
@@ -258,6 +261,7 @@ public class MainTeleOp extends LinearOpMode {
             telemetry.addData("Slides Position", bot.slides.getPosition() + " (pos: " + bot.slides.position + " current: " + bot.slides.getCurrent() + ")");
 
             telemetry.addData("Intake Power", Intake.power +"(running: " + bot.intake.getIsRunning() + ")");
+            telemetry.addData("Intake Milliamps: ", bot.intake.getCurrent());
             telemetry.addData("Back Distance to wall (inch)", distanceSensor.getDistance(DistanceUnit.INCH));
             telemetry.addData("Front Distance to wall (inch)", frontDistanceSensor.getDistance(DistanceUnit.INCH));
             telemetry.addData("Break Beam", breakBeam.getState());
@@ -294,14 +298,12 @@ public class MainTeleOp extends LinearOpMode {
     //Unjam
     public void unJam() { // Extra manual drop open for tele-op in case only 1 pixel
         Thread unjam = new Thread(() -> {
-            try {
-                bot.intake(true, bot.intake.intakeUp);
-                Thread.sleep(100);
-                bot.intake(false, bot.intake.intakeOut);
-                unJam = false;
-            } catch (InterruptedException ignored) {}
+            bot.intake(true, bot.intake.intakeUp);
+            sleep(100);
+            bot.intake(false, bot.intake.intakeOut);
+            unJam = false;
         });
-        thread.start();
+        unjam.start();
     }
 
 }

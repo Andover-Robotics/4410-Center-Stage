@@ -215,16 +215,16 @@ public class Bot {
 
     public void inverseKinematics(double distance, int pixel) {
         if (pixel == 1) {
-            if (distance < 3.1 && distance > 1.3) {
-                fourbar.setArm((90-Math.toDegrees(Math.acos((distance+4.7)/7.87)))/0.0355+0.54-0.015);
+            if (distance < 3.1 && distance > 1.1) {
+                fourbar.setArm((90-Math.toDegrees(Math.acos((distance+4.7)/7.87)))/355+0.54-0.023);
             } else if (distance < 1.3) {
-                fourbar.setArm((90-Math.toDegrees(Math.acos((1.3+4.7)/7.87)))/0.0355+0.54-0.015);
+                //fourbar.setArm((90-Math.toDegrees(Math.acos((1.3+4.7)/7.87)))/355+0.54-0.02);
             }
         } else {
-            if (distance < 3.1 && distance > 1.3) {
-                fourbar.setArm((90-Math.toDegrees(Math.acos((distance+4.7)/7.87)))/0.0355+0.54);
-            } else if (distance < 1.3) {
-                fourbar.setArm((90-Math.toDegrees(Math.acos((1.3+4.7)/7.87)))/0.0355+0.54);
+            if (distance < 3.1 && distance > 1.1) {
+                fourbar.setArm((90-Math.toDegrees(Math.acos((distance+4.7)/7.87)))/355+0.54-0.015);
+            } else if (distance < 1.1) {
+                //fourbar.setArm((90-Math.toDegrees(Math.acos((1.3+4.7)/7.87)))/355+0.54-0.01);
             }
         }
 
