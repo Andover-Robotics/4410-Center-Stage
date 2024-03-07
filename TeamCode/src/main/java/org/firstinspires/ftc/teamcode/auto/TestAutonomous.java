@@ -38,6 +38,8 @@ import java.util.ArrayList;
 import java.util.Map;
 import java.util.Objects;
 
+import kotlin._Assertions;
+
 @Config
 @Autonomous(name = "TestAutonomous")
 public class TestAutonomous extends LinearOpMode {
@@ -54,6 +56,7 @@ public class TestAutonomous extends LinearOpMode {
     // BOOLEANS
     public static boolean toBackboard = true; // Go to backboard or stop after scoring purple pixel on spike mark
     public static boolean toStack = false; // Go to pixel stack for extra points or stop after scoring yellow pixel
+    public static boolean placePixels = true; // Place stack pixels on backboard for 2+2, if not, just park
     // DELAYS
     public static double spikeDelay = 0.0; // Delay before going to spike mark
     public static double stackDelay = 0.0; // Delay before going to stack, will park on side and wait
@@ -513,7 +516,7 @@ public class TestAutonomous extends LinearOpMode {
                         if (!breakBeam.getState()) {
                             breakBeamCounter++;
                         }
-                        bot.intake((counter > 700 && counter < 800 && breakBeamCounter < 2) || bot.intake.getCurrent() > 2500, bot.intake.getIntakeHeight());
+                        bot.intake((counter > 700 && counter < 800 && breakBeamCounter < 2), bot.intake.getIntakeHeight());
                     } while(counter < 1500 && breakBeamCounter < 2);
                     bot.autoFixPixels();
                     bot.intake(true, bot.intake.intakeUp);
@@ -661,7 +664,7 @@ public class TestAutonomous extends LinearOpMode {
                                 if (!breakBeam.getState()) {
                                     breakBeamCounter++;
                                 }
-                                bot.intake((counter > 700 && counter < 800 && breakBeamCounter < 2) || bot.intake.getCurrent() > 3500, bot.intake.getIntakeHeight());
+                                bot.intake((counter > 700 && counter < 800 && breakBeamCounter < 2), bot.intake.getIntakeHeight());
                             } while(counter < 1500 && breakBeamCounter < 8);
 
                         } else {
@@ -696,34 +699,40 @@ public class TestAutonomous extends LinearOpMode {
                         while (distanceSensor.getDistance(DistanceUnit.INCH) < 30) {
                             sleep(50);
                         }
-                        autoPickupClose.start();
+                        if (secondsElapsed >= 22) {
+                            placePixels = false;
+                        }
+                        if (placePixels) {
+                            autoPickupClose.start();
+                        }
                         drive.followTrajectorySequence(drive.trajectorySequenceBuilder(drive.getPoseEstimate())
                                 .lineToLinearHeading(new Pose2d(38, stackY1+1, Math.toRadians(180)))
-                                .splineToLinearHeading(new Pose2d(backboardX, stackY2, Math.toRadians(180)), Math.toRadians(0))
                                 .build());
-//                        // To backboard
-//                        drive.followTrajectorySequence(drive.trajectorySequenceBuilder(drive.getPoseEstimate())
-//                                .splineToLinearHeading(new Pose2d(28, stackY2, Math.toRadians(180)), Math.toRadians(0))
-//                                .build());
-                        if (distanceSensor.getDistance(DistanceUnit.INCH) > 2.5) {
-                            drive.followTrajectory(drive.trajectoryBuilder(drive.getPoseEstimate()).back(distanceSensor.getDistance(DistanceUnit.INCH) - 2,
-                                            SampleMecanumDrive.getVelocityConstraint(8, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
-                                            SampleMecanumDrive.getAccelerationConstraint(16))
+                        // Spline to backboard and place pixels
+                        if (placePixels) {
+                            drive.followTrajectorySequence(drive.trajectorySequenceBuilder(drive.getPoseEstimate())
+                                    .splineToLinearHeading(new Pose2d(backboardX, stackY2, Math.toRadians(180)), Math.toRadians(0))
                                     .build());
-                        }
+                            if (distanceSensor.getDistance(DistanceUnit.INCH) > 2.5) {
+                                drive.followTrajectory(drive.trajectoryBuilder(drive.getPoseEstimate()).back(distanceSensor.getDistance(DistanceUnit.INCH) - 2,
+                                                SampleMecanumDrive.getVelocityConstraint(8, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
+                                                SampleMecanumDrive.getAccelerationConstraint(16))
+                                        .build());
+                            }
 
-                        // Score pixels on backboard
-                        bot.claw.open();
-                        sleep(300);
-                        bot.fourbar.setArm(0.65);
-                        bot.fourbar.setWrist(0.72);
-                        bot.slides.runTo(-700);
-                        sleep(250);
-                        bot.fourbar.autoDualOuttake(1);
-                        sleep(250);
-                        bot.claw.open();
-                        sleep(300);
-                        bot.storage();
+                            // Score pixels on backboard
+                            bot.claw.open();
+                            sleep(300);
+                            bot.fourbar.setArm(0.65);
+                            bot.fourbar.setWrist(0.72);
+                            bot.slides.runTo(-700);
+                            sleep(250);
+                            bot.fourbar.autoDualOuttake(1);
+                            sleep(250);
+                            bot.claw.open();
+                            sleep(300);
+                            bot.storage();
+                        }
                     }
                 }
 

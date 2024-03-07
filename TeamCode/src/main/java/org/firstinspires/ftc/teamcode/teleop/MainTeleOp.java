@@ -143,8 +143,8 @@ public class MainTeleOp extends LinearOpMode {
                     bot.drop(distanceSensor.getDistance(DistanceUnit.INCH));
                     //ik = true;
                 }
-                if (gp2.wasJustPressed(GamepadKeys.Button.RIGHT_STICK_BUTTON)) { // manual half open for first pixel
-                    bot.claw.halfOpen();
+                if (gp2.wasJustPressed(GamepadKeys.Button.RIGHT_STICK_BUTTON)) { // manual full open when outtaking
+                    bot.claw.fullOpen();
                 }
                 if (gp2.wasJustPressed(GamepadKeys.Button.B)) { // cancel and return to storage
                     bot.storage();
@@ -249,7 +249,7 @@ public class MainTeleOp extends LinearOpMode {
                 ik = false;
             }
             if (!ik) {
-                bot.fourbar.runArm(gp2.getRightY()*-0.8);
+                bot.fourbar.runArm(gp2.getRightY()*-1);
             }
 
 
