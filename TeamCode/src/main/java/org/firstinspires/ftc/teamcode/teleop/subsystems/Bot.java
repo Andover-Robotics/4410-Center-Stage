@@ -246,7 +246,7 @@ public class Bot {
                         } else if (slides.getPosition() <= -2400){
                             slides.runTo(-2300);
                         }
-                        Thread.sleep(500);
+                        Thread.sleep(700);
                         outtakeOut(1);
                         inverseKinematics(distance, claw.getClawState());
                         claw.close();
