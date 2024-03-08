@@ -230,6 +230,10 @@ public class Bot {
 
     }
 
+    public void resetEncoders() {
+        slides.resetEncoder();
+    }
+
     public void drop(double distance) { // drop pixel in outtake or storage position
         Thread thread = new Thread(() -> {
             try {
@@ -241,10 +245,8 @@ public class Bot {
                     } else if (claw.getClawState() == 1) {
                         fourbar.setArm(0.64);
                         fourbar.setWrist(0.73);
-                        if (slides.getPosition() > -2400) {
+                        if (slides.getPosition() > -2500) {
                             slides.runTo(slides.getPosition() - 180);
-                        } else if (slides.getPosition() <= -2400){
-                            slides.runTo(-2300);
                         }
                         Thread.sleep(700);
                         outtakeOut(1);

@@ -201,6 +201,7 @@ public class MainTeleOp extends LinearOpMode {
             }
             if (gp1.wasJustReleased(GamepadKeys.Button.LEFT_STICK_BUTTON)) { // reset heading
                 drive.setPoseEstimate(PoseStorage.currentPose);
+                bot.resetEncoders();
             }
 //            if (gp1.wasJustPressed(GamepadKeys.Button.BACK)) { // auto align????
 //                drive.setPoseEstimate(PoseStorage.currentPose);
@@ -216,10 +217,10 @@ public class MainTeleOp extends LinearOpMode {
             } else if (gp1.isDown(GamepadKeys.Button.LEFT_BUMPER) && breakBeam.getState() && !unJam) { // intake
                 bot.intake(false, bot.intake.intakeOut);
 
-            } else if (gp1.isDown(GamepadKeys.Button.RIGHT_STICK_BUTTON) && breakBeam.getState()){ // up intake
+            } else if ((gp1.isDown(GamepadKeys.Button.RIGHT_STICK_BUTTON) || gp1.isDown(GamepadKeys.Button.Y)) && breakBeam.getState()){ // up intake
                 bot.intake(false, bot.intake.intakeUp);
 
-            } else if (gp1.isDown(GamepadKeys.Button.Y)){ // manual intake, ignores break beams
+            } else if (gp1.isDown(GamepadKeys.Button.X)){ // manual intake, ignores break beams
                 bot.intake(false, bot.intake.intakeOut);
 
             } else { // stop intake

@@ -57,6 +57,7 @@ public class TestAutonomous extends LinearOpMode {
     public static boolean toBackboard = true; // Go to backboard or stop after scoring purple pixel on spike mark
     public static boolean toStack = false; // Go to pixel stack for extra points or stop after scoring yellow pixel
     public static boolean placePixels = true; // Place stack pixels on backboard for 2+2, if not, just park
+    public static boolean timeout = true; //stack timeout
     // DELAYS
     public static double spikeDelay = 0.0; // Delay before going to spike mark
     public static double stackDelay = 0.0; // Delay before going to stack, will park on side and wait
@@ -282,11 +283,15 @@ public class TestAutonomous extends LinearOpMode {
             telemetry.addData("delays: backboard (up)", backboardDelay + " spike (down): " + spikeDelay + " stack (left): " + stackDelay);
 
             // BOOLEANS
+
+            // Toggle timeout
+            if (gp1.wasJustPressed(GamepadKeys.Button.DPAD_RIGHT)) {timeout = !timeout;}
             // Toggle to backboard
             if (gp1.wasJustPressed(GamepadKeys.Button.LEFT_STICK_BUTTON)) toBackboard = !toBackboard;
             // Toggle to stack
             if (gp1.wasJustPressed(GamepadKeys.Button.RIGHT_STICK_BUTTON)) toStack = !toStack;
             telemetry.addData("to backboard (Lstick)", toBackboard + " to stack (Rstick): " + toStack);
+            telemetry.addData("timeout (right)? :", timeout);
 
             // BUMPER FUNCTIONS
             if (gp1.wasJustPressed(GamepadKeys.Button.RIGHT_BUMPER)) {
@@ -699,9 +704,13 @@ public class TestAutonomous extends LinearOpMode {
                         while (distanceSensor.getDistance(DistanceUnit.INCH) < 30) {
                             sleep(50);
                         }
-                        if (secondsElapsed >= 22) {
-                            placePixels = false;
+
+                        if (timeout) {
+                            if (secondsElapsed >= 25) {
+                                placePixels = false;
+                            }
                         }
+
                         if (placePixels) {
                             autoPickupClose.start();
                         }
